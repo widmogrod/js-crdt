@@ -7,6 +7,7 @@ before_script:
 - npm install --dev
 
 script:
+- npm test
 - npm run js-lint
 
 notifications:
