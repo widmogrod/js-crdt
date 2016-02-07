@@ -27,6 +27,6 @@ function axioms(assert, a, b, c) {
   // idempotent    f(f(a)) = f(a)               i.e: ||a|| = |a|
   assert(
     equal(merge(a, a), a),
-    'is idempotent?'
+    'is not idempotent'
   );
 }
