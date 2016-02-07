@@ -4,7 +4,8 @@
   "description": "CRDT Conflict-free Replication Data Type",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "js-lint": "./node_modules/.bin/eslint ./src ./index.js"
   },
   "repository": {
     "type": "git",
