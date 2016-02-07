@@ -1,0 +1,22 @@
+{
+  "name": "js-crdt",
+  "version": "1.0.0",
+  "description": "CRDT Conflict-free Replication Data Type",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/widmogrod/js-crdt.git"
+  },
+  "keywords": [
+    "crdt"
+  ],
+  "author": "Gabriel Habryn",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/widmogrod/js-crdt/issues"
+  },
+  "homepage": "https://github.com/widmogrod/js-crdt#readme"
+}
