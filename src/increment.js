@@ -1,19 +1,21 @@
 'use strict';
 
-function Increment(value) {
-  this.value = value;
+class Increment {
+  constructor(value) {
+    this.value = value;
+  }
+
+  merge(b) {
+    return new Increment(Math.max(this.value, b.value));
+  }
+
+  equal(b) {
+    return this.value === b.value;
+  }
+
+  increment() {
+    return new Increment(this.value + 1);
+  }
 }
-
-Increment.prototype.merge = function(b) {
-  return new Increment(Math.max(this.value, b.value)); // join
-};
-
-Increment.prototype.equal = function(b) {
-  return this.value === b.value;
-};
-
-Increment.prototype.increment = function() {
-  return new Increment(this.value + 1);
-};
 
 module.exports = Increment;
