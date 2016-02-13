@@ -10,6 +10,21 @@ function equal(a, b) {
   return a.equal(b);
 }
 
+exports.compare = compare;
+function compare(a, b) {
+  return a.compare(b);
+}
+
+exports.concat = concat;
+function concat() {
+  return [].concat.apply([], arguments)
+}
+
+exports.applyOperation = applyOperation;
+function applyOperation(operation, data) {
+  return operation.apply(data);
+}
+
 exports.axioms = axioms;
 function axioms(assert, a, b, c) {
   // commutative   a + c = c + a                i.e: 1 + 2 = 2 + 1
