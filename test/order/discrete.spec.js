@@ -4,21 +4,21 @@ const Discrete = require('../../src/order/discrete');
 const f = require('../../src/functions');
 const assert = require('assert');
 
-function D(id, vector) {
+function d(id, vector) {
   return new Discrete(id, vector);
-};
+}
 
 describe('order/Discrete', () => {
 /*
-a:0  xxx  a:1          a:2 b:1  zzz  a:3 b:1
-            |             |
-b:0      b:1 a:0  yyy  b:2 a:0
-c:0
+  a:0  xxx  a:1          a:2 b:1  zzz  a:3 b:1
+              |             |
+  b:0      b:1 a:0  yyy  b:2 a:0
+  c:0
 */
-  const o = D('origin', {origin: 0});
-  const a0 = D('a', o.vector);
-  const b0 = D('b', o.vector);
-  const c0 = D('c', o.vector);
+  const o = d('origin', {origin: 0});
+  const a0 = d('a', o.vector);
+  const b0 = d('b', o.vector);
+  const c0 = d('c', o.vector);
 
   // Actor A sends (a:0) to B
   const a1 = a0.next();
@@ -52,55 +52,56 @@ c:0
   });
 
   const useCases = {
-    'same should be where it is': {
+    'same version should be equal': {
       a: o,
       b: o,
       expected: 0
     },
-    'b1': {
+    'origin should be before b0': {
       a: o,
       b: b0,
       expected: -1
     },
-    'b2': {
+    'b0 should be after origin': {
       a: b0,
       b: o,
       expected: 1
     },
-    'lexical order 1': {
+    'when "same" version is matched, then lexical order should be applied a < b': {
       a: a0,
       b: b0,
       expected: -1
     },
-    'lexical order 2': {
+    'when "same" version is matched, then lexical order should be applied b > a': {
       a: b0,
       b: a0,
       expected: 1
     },
-    'sequencial 1': {
+    'sequence of versions on the same branch a:0 < a:1': {
       a: a0,
       b: a1,
       expected: -1
     },
-    'sequencial 2': {
+    'sequence of versions on the same branch a:1 > a:0': {
       a: a1,
       b: a0,
       expected: 1
     },
-    'diverge 1': {
+    'more advanced version should be next in order a:1 > b:0': {
       a: a1,
       b: b0,
       expected: 1
     },
-    'diverge 2': {
+    'less advanced version should be previous in order b:0 < a:1': {
       a: b0,
       b: a1,
       expected: -1
-    },
+    }
   };
 
   Object.keys(useCases).forEach(name => {
     const useCase = useCases[name];
+
     it(name, () => {
       assert.deepEqual(
         f.compare(useCase.a, useCase.b),

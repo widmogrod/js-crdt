@@ -40,6 +40,7 @@ describe('Order', () => {
 
   Object.keys(useCases).forEach(name => {
     const useCase = useCases[name];
+
     it(name, () => {
       assert.deepEqual(
         f.compare(useCase.a, useCase.b),
