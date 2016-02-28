@@ -12,13 +12,15 @@ class Discrete {
   }
 
   next() {
-    var vector = u.clone(this.vector);
+    const vector = u.clone(this.vector);
+
     ++vector[this.id];
+
     return new Discrete(this.id, vector);
   }
 
   merge(b) {
-    let vector = u.union(
+    const vector = u.union(
       Object.keys(this.vector),
       Object.keys(b.vector)
     ).reduce((vector, key) => {
@@ -38,19 +40,20 @@ class Discrete {
   }
 
   compare(b) {
-    let r = u.common(this.vector, b.vector)
+    const position = u.common(this.vector, b.vector)
       .reduce((result, key) => {
         return result + (this.vector[key] - b.vector[key]);
       }, 0);
 
-    if (r === 0) {
-      let x = this.vector[this.id] - b.vector[b.id];
-      if (x !== 0) {
-        return x;
+    if (position === 0) {
+      const tipPosition = this.vector[this.id] - b.vector[b.id];
+
+      if (tipPosition !== 0) {
+        return tipPosition;
       }
 
-      let ha = b.vector.hasOwnProperty(this.id);
-      let hb = this.vector.hasOwnProperty(b.id);
+      const ha = b.vector.hasOwnProperty(this.id);
+      const hb = this.vector.hasOwnProperty(b.id);
 
       if (!ha && !hb) {
         return this.id < b.id ? -1 : 1;
@@ -61,7 +64,7 @@ class Discrete {
       }
     }
 
-    return r;
+    return position;
   }
 }
 

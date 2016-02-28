@@ -22,12 +22,13 @@ class Text {
   }
 
   merge(b) {
-    let ordersIndexA = this.ordersIndex.slice(0);
+    const ordersIndexA = this.ordersIndex.slice(0);
     let operationsIndexA = this.operationsIndex.slice(0);
 
     operationsIndexA = b.operationsIndex.reduce((operationsIndexA, operationsB, orderIndexB) => {
       const orderB = b.ordersIndex[orderIndexB];
       const notFoundInA = -1 === ordersIndexA.findIndex(orderA => orderA.equal(orderB));
+
       if (notFoundInA) {
         const index = ordersIndexA.push(orderB) - 1;
 
@@ -50,7 +51,8 @@ class Text {
 
   reduce(fn, accumulator) {
     return this.ordersIndex.slice(0).sort(f.compare).reduce((accumulator, order) => {
-      let orderIndex = this.ordersIndex.findIndex(o => o.equal(order));
+      const orderIndex = this.ordersIndex.findIndex(o => o.equal(order));
+
       return this.operationsIndex[orderIndex].reduce((accumulator, operation, index) => {
         return fn(accumulator, operation, order, index);
       }, accumulator);

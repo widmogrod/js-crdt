@@ -17,7 +17,7 @@ function compare(a, b) {
 
 exports.concat = concat;
 function concat() {
-  return [].concat.apply([], arguments)
+  return [].concat.apply([], arguments);
 }
 
 exports.applyOperation = applyOperation;

@@ -27,8 +27,9 @@ function sortNumbers(a, b) {
 
 exports.clone = clone;
 function clone(obj) {
-  var target = {};
-  for (var i in obj) {
+  const target = {};
+
+  for (const i in obj) {
     if (obj.hasOwnProperty(i)) {
       target[i] = obj[i];
     }
@@ -55,9 +56,9 @@ exports.common = common;
 function common(a, b) {
   return Object.keys(a).reduce((r, k) => {
     if (b.hasOwnProperty(k)) {
-      r.push(k)
+      r.push(k);
     }
 
-    return r
+    return r;
   }, []).sort();
 }
