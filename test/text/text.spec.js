@@ -7,7 +7,7 @@ const Discrete = require('../../src/order/discrete');
 const f = require('../../src/functions');
 const assert = require('assert');
 
-function D(id, vector) {
+function create(id, vector) {
   return new Discrete(id, vector);
 }
 
@@ -34,28 +34,29 @@ function lastPosition(text) {
 }
 
 describe('Text', () => {
-  const origin = D('origin', {origin: 0});
+  const origin = create('origin', {origin: 0});
 
   describe('axioms for ordered inserts', () => {
     let a, b, c;
 
     beforeEach(() => {
-      a = new Text(D('a', origin.vector));
+      a = new Text(create('a', origin.vector));
       a.apply(new Insert(0, 'abc'));
 
-      b = new Text(D('b', origin.vector));
+      b = new Text(create('b', origin.vector));
       b.apply(new Insert(0, 'def'));
 
-      c = new Text(D('c', origin.vector));
+      c = new Text(create('c', origin.vector));
       c.apply(new Insert(0, 'ghi'));
     });
 
     it('should obey CRDT axioms', () => {
-      f.axioms(assert, a, b, c)
+      f.axioms(assert, a, b, c);
     });
 
     it('should converge to text', () => {
       const merged = f.merge(f.merge(a, b), c);
+
       assert.equal(merged.toString(), 'ghidefabc');
     });
   });
@@ -64,34 +65,36 @@ describe('Text', () => {
     let a, b, c;
 
     beforeEach(() => {
-      a = new Text(D('a', origin.vector));
+      a = new Text(create('a', origin.vector));
       a.apply(new Insert(0, 'abc'));
       a.apply(new Delete(0, 1));
 
-      b = new Text(D('b', origin.vector));
+      b = new Text(create('b', origin.vector));
       b.apply(new Insert(0, 'def'));
       b.apply(new Delete(0, 1));
 
-      c = new Text(D('c', origin.vector));
+      c = new Text(create('c', origin.vector));
       c.apply(new Insert(0, 'ghi'));
       c.apply(new Delete(0, 1));
     });
 
     it('should obey CRDT axioms', () => {
-      f.axioms(assert, a, b, c)
+      f.axioms(assert, a, b, c);
     });
 
     it('should converge to text', () => {
       const merged = f.merge(f.merge(a, b), c);
+
       assert.equal(merged.toString(), 'hiefbc');
     });
   });
 
   describe('set of complex merging operations (integration more like tests)', () => {
     let a, b, _;
+
     it('conflict', () => {
-      a = new Text(D('a', origin.vector));
-      b = new Text(D('b', origin.vector));
+      a = new Text(create('a', origin.vector));
+      b = new Text(create('b', origin.vector));
 
       assert.equal(a.index, 0);
       assert.equal(b.index, 0);
@@ -100,7 +103,7 @@ describe('Text', () => {
       assert(lastPosition(a) === 0);
       assert(lastPosition(b) === 0);
 
-      _ = a.apply(new Insert(0, 'a'));
+      a.apply(new Insert(0, 'a'));
       b = f.merge(b, a);
       a = snapshot(a);
 
@@ -111,7 +114,7 @@ describe('Text', () => {
       assert(lastPosition(a) === 1);
       assert(lastPosition(b) === 0);
 
-      _ = a.apply(new Insert(1, 'a'));
+      a.apply(new Insert(1, 'a'));
       b = f.merge(b, a);
       a = snapshot(a);
 
@@ -122,7 +125,7 @@ describe('Text', () => {
       assert(lastPosition(a) === 2);
       assert(lastPosition(b) === 0);
 
-      _ = a.apply(new Insert(2, 'a'));
+      a.apply(new Insert(2, 'a'));
       b = f.merge(b, a);
       a = snapshot(a);
 
@@ -145,7 +148,7 @@ describe('Text', () => {
       assert(lastPosition(a) === 3);
       assert(lastPosition(b) === 4);
 
-      _ = a.apply(new Insert(0, 'c'));
+      a.apply(new Insert(0, 'c'));
       b = f.merge(b, a);
       a = snapshot(a);
 
