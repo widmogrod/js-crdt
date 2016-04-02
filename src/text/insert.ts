@@ -1,20 +1,20 @@
 import { ensureArrayLength } from '../utils';
 import { concat, Applicator } from '../functions';
 
-export class Delete {
+export class Insert {
     at: number
-    length: number
-    constructor(at: number, length: number) {
+    value: string
+    constructor(at, value) {
         this.at = at;
-        this.length = length;
+        this.value = String(value);
     }
 
     apply(data) {
         data = ensureArrayLength(data, this.at);
 
         return concat(
-            data.slice(0, this.at),
-            data.slice(this.at + this.length)
+            concat(data.slice(0, this.at), this.value.split('')),
+            data.slice(this.at)
         );
     }
 }

@@ -23,10 +23,10 @@ export function compare<T>(a: Comparer<T>, b: Comparer<T>): number {
 }
 
 export interface Concater<T> {
-    concat(b: Concater<T>): T
+    concat(b: Concater<T>): Concater<T>
 }
 
-export function concat<T>(a: Concater<T>, b: Concater<T>): T {
+export function concat<T>(a: Concater<T>, b: Concater<T>): Concater<T> {
     return a.concat(b)
 }
 

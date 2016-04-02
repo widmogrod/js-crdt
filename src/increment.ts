@@ -1,4 +1,4 @@
-import {CRDT} from 'functions'
+import {CRDT} from './functions'
 
 export class Increment implements CRDT<Increment> {
     value: number
