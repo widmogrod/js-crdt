@@ -1,9 +1,10 @@
+import {Orderer} from './domain'
 import {clone, union, common} from '../utils'
 
 type Key = string
 type Vector = { [id: string]: number }
 
-export class Discrete {
+export class Discrete implements Orderer<Discrete>{
     id: Key
     vector: Vector
     constructor(id, vector) {
@@ -22,7 +23,7 @@ export class Discrete {
         return new Discrete(this.id, vector);
     }
 
-    merge(b) {
+    merge(b: Discrete): Discrete {
         const vector = union(
             Object.keys(this.vector),
             Object.keys(b.vector)
@@ -38,13 +39,13 @@ export class Discrete {
         return new Discrete(this.id, vector);
     }
 
-    equal(b) {
+    equal(b: Discrete): Boolean {
         return this.compare(b) === 0;
     }
 
-    compare(b) {
+    compare(b: Discrete): number {
         const position = common(this.vector, b.vector)
-            .reduce((result, key) => {
+            .reduce((result, key: any) => {
                 return result + (this.vector[key] - b.vector[key]);
             }, 0);
 

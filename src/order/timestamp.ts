@@ -18,4 +18,12 @@ export class Timestamp implements Orderer<Timestamp> {
 
         return this.bucket < b.bucket ? -1 : 1;
     }
+    
+    merge(b: Timestamp): Timestamp {
+        return this;
+    }
+    
+    equal(b: Timestamp): Boolean {
+        return false;
+    }
 }

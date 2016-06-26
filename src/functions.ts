@@ -10,7 +10,7 @@ export interface Equaler<T> {
     equal(b: Equaler<T>): Boolean
 }
 
-export function equal<T>(a: Equaler<T>, b: Equaler<T>): Boolean {
+export function equal<T>( a: Equaler<T>, b: Equaler<T>): Boolean {
     return a.equal(b);
 }
 

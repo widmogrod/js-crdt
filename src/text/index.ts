@@ -1,7 +1,7 @@
 export * from './delete';
 export * from './insert';
 
-import {merge, applyOperation} from '../functions'
+import {merge, applyOperation, compare} from '../functions'
 import {Orderer} from '../order'
 
 // type Operation = Insert | Delete
@@ -60,7 +60,7 @@ export class Text {
     }
 
     reduce(fn, accumulator) {
-        return this.ordersIndex.slice(0).sort(f.compare).reduce((accumulator, order) => {
+        return this.ordersIndex.slice(0).sort(compare).reduce((accumulator, order) => {
             const orderIndex = this.ordersIndex.findIndex(o => o.equal(order));
 
             return this.operationsIndex[orderIndex].reduce((accumulator, operation, index) => {
