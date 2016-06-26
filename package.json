@@ -5,8 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "test": "mocha",
-    "build": "./node_modules/.bin/tsc",
-    "js-lint": "./node_modules/.bin/eslint ./src ./index.js"
+    "build": "./node_modules/.bin/tsc"
   },
   "repository": {
     "type": "git",
@@ -22,7 +21,6 @@
   },
   "homepage": "https://github.com/widmogrod/js-crdt#readme",
   "devDependencies": {
-    "eslint": "1.10.3",
     "mocha": "2.4.5",
     "typescript": "^1.8.10"
   }
