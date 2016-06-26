@@ -5,7 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "test": "mocha",
-    "build": "./node_modules/.bin/tsc"
+    "build": "./node_modules/.bin/tsc",
+    "dist": "./node_modules/.bin/browserify build/index.js > dist/bundle.js"
   },
   "repository": {
     "type": "git",
@@ -22,6 +23,7 @@
   "homepage": "https://github.com/widmogrod/js-crdt#readme",
   "devDependencies": {
     "mocha": "2.4.5",
-    "typescript": "^1.8.10"
+    "typescript": "^1.8.10",
+    "browserify": "^13.0.1"
   }
 }

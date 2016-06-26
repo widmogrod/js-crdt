@@ -7,10 +7,7 @@ CRDT Conflict-free Replication Data Type in JavaScript.
 npm install
 npm run build
 npm test
-```
-
-```
-browserify build/index.js -r build/index.js > dist/bundle.js
+nom run dist
 ```
 
 ## How `crdt/Text` type with `order/discrete` should work? (WIP)
