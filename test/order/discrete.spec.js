@@ -1,7 +1,7 @@
 'use strict';
 
-const Discrete = require('../../src/order/discrete');
-const f = require('../../src/functions');
+const Discrete = require('../../build/order').Discrete;
+const f = require('../../build/functions');
 const assert = require('assert');
 
 function d(id, vector) {

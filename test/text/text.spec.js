@@ -1,10 +1,10 @@
 'use strict';
 
-const Text = require('../../src/text/text');
-const Insert = require('../../src/text/insert');
-const Delete = require('../../src/text/delete');
-const Discrete = require('../../src/order/discrete');
-const f = require('../../src/functions');
+const Text = require('../../build/text').Text;
+const Insert = require('../../build/text').Insert;
+const Delete = require('../../build/text').Delete;
+const Discrete = require('../../build/order/discrete').Discrete;
+const f = require('../../build/functions');
 const assert = require('assert');
 
 function create(id, vector) {

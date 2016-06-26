@@ -1,5 +1,5 @@
 const assert = require('assert');
-const utils = require('../src/utils');
+const utils = require('../build/utils');
 
 describe('utils', () => {
   describe('between()', () => {
