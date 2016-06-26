@@ -1,3 +1,4 @@
+"use strict";
 var utils_1 = require('../utils');
 var functions_1 = require('../functions');
 var Delete = (function () {
@@ -10,6 +11,6 @@ var Delete = (function () {
         return functions_1.concat(data.slice(0, this.at), data.slice(this.at + this.length));
     };
     return Delete;
-})();
+}());
 exports.Delete = Delete;
 //# sourceMappingURL=delete.js.map

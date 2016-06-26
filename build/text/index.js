@@ -1,3 +1,4 @@
+"use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
@@ -41,7 +42,7 @@ var Text = (function () {
     };
     Text.prototype.reduce = function (fn, accumulator) {
         var _this = this;
-        return this.ordersIndex.slice(0).sort(f.compare).reduce(function (accumulator, order) {
+        return this.ordersIndex.slice(0).sort(functions_1.compare).reduce(function (accumulator, order) {
             var orderIndex = _this.ordersIndex.findIndex(function (o) { return o.equal(order); });
             return _this.operationsIndex[orderIndex].reduce(function (accumulator, operation, index) {
                 return fn(accumulator, operation, order, index);
@@ -54,6 +55,6 @@ var Text = (function () {
         }, []).join('');
     };
     return Text;
-})();
+}());
 exports.Text = Text;
 //# sourceMappingURL=index.js.map

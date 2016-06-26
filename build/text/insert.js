@@ -1,3 +1,4 @@
+"use strict";
 var utils_1 = require('../utils');
 var functions_1 = require('../functions');
 var Insert = (function () {
@@ -10,6 +11,6 @@ var Insert = (function () {
         return functions_1.concat(functions_1.concat(data.slice(0, this.at), this.value.split('')), data.slice(this.at));
     };
     return Insert;
-})();
+}());
 exports.Insert = Insert;
 //# sourceMappingURL=insert.js.map
