@@ -1,7 +1,7 @@
 'use strict';
 
-const Increment = require('../src/increment');
-const f = require('../src/functions');
+const Increment = require('../build/increment').Increment;
+const f = require('../build/functions');
 const assert = require('assert')
 
 describe('Increment', () => {

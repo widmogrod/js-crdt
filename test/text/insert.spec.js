@@ -1,6 +1,6 @@
 'use strict';
 
-const Insert = require('../../src/text/insert');
+const Insert = require('../../build/text/insert').Insert;
 const assert = require('assert');
 
 describe('Text.insert', () => {
