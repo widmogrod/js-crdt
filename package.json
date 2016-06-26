@@ -23,7 +23,7 @@
   "homepage": "https://github.com/widmogrod/js-crdt#readme",
   "devDependencies": {
     "eslint": "1.10.3",
-    "tsc": "1.20150623.0",
-    "mocha": "2.4.5"
+    "mocha": "2.4.5",
+    "typescript": "^1.8.10"
   }
 }
