@@ -39,7 +39,7 @@ export class Discrete implements Orderer<Discrete>{
         return new Discrete(this.id, vector);
     }
 
-    equal(b: Discrete): Boolean {
+    equal(b: Discrete): boolean {
         return this.compare(b) === 0;
     }
 

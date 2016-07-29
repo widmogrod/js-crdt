@@ -7,10 +7,10 @@ export function merge<T>(a: Merger<T>, b: Merger<T>): T {
 }
 
 export interface Equaler<T> {
-    equal(b: Equaler<T>): Boolean
+    equal(b: Equaler<T>): boolean
 }
 
-export function equal<T>( a: Equaler<T>, b: Equaler<T>): Boolean {
+export function equal<T>( a: Equaler<T>, b: Equaler<T>): boolean {
     return a.equal(b);
 }
 

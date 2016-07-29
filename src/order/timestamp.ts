@@ -9,7 +9,11 @@ export class Timestamp implements Orderer<Timestamp> {
     constructor(bucket, time) {
         this.bucket = bucket;
         this.time = time;
-    }s
+    }
+    
+    next() {
+        return new Timestamp(this.bucket, this.time + 1);
+    }
 
     compare(b: Timestamp): number {
         if (this.bucket === b.bucket) {
@@ -23,7 +27,7 @@ export class Timestamp implements Orderer<Timestamp> {
         return this;
     }
     
-    equal(b: Timestamp): Boolean {
+    equal(b: Timestamp): boolean {
         return false;
     }
 }

@@ -132,6 +132,9 @@ var Timestamp = (function () {
         this.bucket = bucket;
         this.time = time;
     }
+    Timestamp.prototype.next = function () {
+        return new Timestamp(this.bucket, this.time + 1);
+    };
     Timestamp.prototype.compare = function (b) {
         if (this.bucket === b.bucket) {
             return this.time - b.time;
