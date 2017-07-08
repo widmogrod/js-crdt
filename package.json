@@ -4,6 +4,7 @@
   "description": "CRDT Conflict-free Replication Data Type",
   "main": "src/index.js",
   "scripts": {
+    "pretest": "./node_modules/.bin/tsc",
     "test": "mocha",
     "build": "./node_modules/.bin/tsc",
     "browserify": "./node_modules/.bin/browserify build/index.js > dist/crdt.js",
