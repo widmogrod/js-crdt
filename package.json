@@ -8,8 +8,10 @@
     "test": "mocha",
     "build": "./node_modules/.bin/tsc",
     "browserify": "./node_modules/.bin/browserify build/index.js > dist/crdt.js",
-    "uglifyjs":"./node_modules/.bin/uglifyjs --screw-ie8 --compress -o dist/crdt.min.js dist/crdt.js",
-    "dist": "npm run browserify && npm run uglifyjs"
+    "uglifyjs": "./node_modules/.bin/uglifyjs --screw-ie8 --compress -o dist/crdt.min.js dist/crdt.js",
+    "dist": "npm run browserify && npm run uglifyjs",
+    "lint": "eslint src test",
+    "fix": "eslint src test --fix"
   },
   "repository": {
     "type": "git",
@@ -25,9 +27,13 @@
   },
   "homepage": "https://github.com/widmogrod/js-crdt#readme",
   "devDependencies": {
+    "babel-eslint": "^7.2.3",
     "browserify": "^13.0.1",
-    "mocha": "2.4.5",
-    "typescript": "^1.8.10",
+    "eslint": "^4.1.1",
+    "mocha": "^3.4.2",
+    "ts-node": "^3.2.0",
+    "typescript": "^2.4.1",
+    "typescript-eslint-parser": "^3.0.0",
     "uglify-js": "^2.6.4"
   }
 }

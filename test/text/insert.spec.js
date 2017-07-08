@@ -16,7 +16,7 @@ describe('Text.insert', () => {
         at: 3,
         value: 'abc',
         data: [],
-        expected: [,,, 'a', 'b', 'c']
+        expected: [null, null, null, 'a', 'b', 'c']
       },
       'should populate longer data, without loosing information': {
         at: 2,

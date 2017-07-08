@@ -2,7 +2,7 @@
 
 const Increment = require('../build/increment').Increment;
 const f = require('../build/functions');
-const assert = require('assert')
+const assert = require('assert');
 
 describe('Increment', () => {
   describe('#url()', () => {

@@ -90,7 +90,7 @@ describe('Text', () => {
   });
 
   describe('set of complex merging operations (integration more like tests)', () => {
-    let a, b, _;
+    let a, b;
 
     it('conflict', () => {
       a = new Text(create('a', origin.vector));
@@ -137,7 +137,7 @@ describe('Text', () => {
       assert(lastPosition(a) === 3);
       assert(lastPosition(b) === 0);
 
-      _ = b.apply(new Insert(3, 'b'));
+      b.apply(new Insert(3, 'b'));
       a = f.merge(a, b);
       b = snapshot(b);
 
