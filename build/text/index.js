@@ -2,9 +2,10 @@
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(require('./delete'));
-__export(require('./insert'));
-var functions_1 = require('../functions');
+Object.defineProperty(exports, "__esModule", { value: true });
+__export(require("./delete"));
+__export(require("./insert"));
+var functions_1 = require("../functions");
 // type Operation = Insert | Delete
 // type OrdersIndex = Array<Operation>
 // type OperationsIndex<T> = Array<Orderer<Text<T>>

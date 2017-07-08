@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var Timestamp = (function () {
     function Timestamp(bucket, time) {
         this.bucket = bucket;

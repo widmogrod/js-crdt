@@ -7,7 +7,8 @@ CRDT Conflict-free Replication Data Type in JavaScript.
 npm install
 npm run build
 npm test
-nom run dist
+npm run lint
+npm run dist
 ```
 
 ## How `crdt/Text` type with `order/discrete` should work? (WIP)
@@ -28,29 +29,29 @@ b:0
 ```
 
 Actor `a` decided to send his version `a:1` to actor `b`,
-but before that, he want to be sure that regardless if `b` receives his changes, he can continue on working his version of document. 
+but before that, he want to be sure that regardless if `b` receives his changes, he can continue on working his version of document.
 so he created a snapshot `a:1` of his version of document and send changes to actor `b`.
 
 ```
-a:0  xxx  a:1 
+a:0  xxx  a:1
 b:0
 ```
 
 Actor `b` sees incoming changes `a:0` of the actor `a`,
 so he merge them with his current state and create new version it `b:1 a:0`
 ```
-a:0  xxx  a:1 
-            |             
+a:0  xxx  a:1
+            |
 b:0      b:1 a:0
 ```
 
 Actor `b` decides to add something to document `yyy`, and send his changes to actor `a`.
-Actor `b` in the same manner, before sending his changes to actor `a` 
+Actor `b` in the same manner, before sending his changes to actor `a`
 he creates snapshot of his version of document `b:2 a:0` and send changes `b:1 a:0` to `a`.
 
 ```
-a:0  xxx  a:1          
-            |             
+a:0  xxx  a:1
+            |
 b:0      b:1 a:0  yyy  b:2 a:0
 ```
 

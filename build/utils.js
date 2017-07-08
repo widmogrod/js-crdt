@@ -1,4 +1,5 @@
 'use strict';
+Object.defineProperty(exports, "__esModule", { value: true });
 function between(value, min, max) {
     if (value <= min) {
         return false;

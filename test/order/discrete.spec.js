@@ -48,7 +48,7 @@ describe('order/Discrete', () => {
     assert.deepEqual(
       [o, a0, b0, c0, b1a0, b2a0, a1, a2b1, a3b1].sort(f.compare),
       orderOfEvents
-    )
+    );
   });
 
   const useCases = {

@@ -1,6 +1,7 @@
 "use strict";
-var utils_1 = require('../utils');
-var functions_1 = require('../functions');
+Object.defineProperty(exports, "__esModule", { value: true });
+var utils_1 = require("../utils");
+var functions_1 = require("../functions");
 var Delete = (function () {
     function Delete(at, length) {
         this.at = at;

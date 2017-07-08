@@ -1,0 +1,22 @@
+{
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module"
+  },
+  "extends": "eslint:recommended",
+  "env": {
+    "node": true,
+    "es6": true,
+    "mocha": true
+  },
+  "rules": {
+    "strict": 0,
+    "eqeqeq": 1,
+    "prefer-const": 1,
+    "eol-last": 2,
+    "semi": 1,
+    "no-var": 2,
+    "no-unused-vars": ["error", {"args": "after-used", "caughtErrorsIgnorePattern": "^ignore"}]
+  },
+  "parser": "typescript-eslint-parser"
+}

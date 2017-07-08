@@ -1,5 +1,6 @@
 "use strict";
-var utils_1 = require('../utils');
+Object.defineProperty(exports, "__esModule", { value: true });
+var utils_1 = require("../utils");
 var Discrete = (function () {
     function Discrete(id, vector) {
         vector = utils_1.clone(vector);
