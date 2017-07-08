@@ -1,9 +1,7 @@
 'use strict';
 
-const Text = require('../../src/text/text');
-const Insert = require('../../src/text/insert');
-const Delete = require('../../src/text/delete');
-const Discrete = require('../../src/order/discrete');
+const {Text, Insert, Delete} = require('../../src/text');
+const {Discrete} = require('../../src/order/discrete');
 const f = require('../../src/functions');
 const assert = require('assert');
 

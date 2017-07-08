@@ -4,9 +4,10 @@
   "description": "CRDT Conflict-free Replication Data Type",
   "main": "src/index.js",
   "scripts": {
+    "pretest": "./node_modules/.bin/tsc",
     "test": "mocha",
     "build": "./node_modules/.bin/tsc",
-    "js-lint": "./node_modules/.bin/eslint ./src ./index.js"
+    "lint": "./node_modules/.bin/eslint ./src ./index.js"
   },
   "repository": {
     "type": "git",
@@ -21,9 +22,10 @@
     "url": "https://github.com/widmogrod/js-crdt/issues"
   },
   "homepage": "https://github.com/widmogrod/js-crdt#readme",
-  "devDependencies": {
-    "eslint": "1.10.3",
-    "tsc": "1.20150623.0",
-    "mocha": "2.4.5"
+  "dependencies": {
+    "eslint": "^4.1.1",
+    "mocha": "^3.4.2",
+    "ts-node": "^3.2.0",
+    "typescript": "^2.4.1"
   }
 }

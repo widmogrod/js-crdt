@@ -1,3 +1,5 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var Increment = (function () {
     function Increment(value) {
         this.value = value;
@@ -12,6 +14,6 @@ var Increment = (function () {
         return new Increment(this.value + 1);
     };
     return Increment;
-})();
+}());
 exports.Increment = Increment;
 //# sourceMappingURL=increment.js.map

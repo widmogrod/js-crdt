@@ -2,7 +2,7 @@ export interface Merger<T> {
     merge(b: Merger<T>): T
 }
 
-export function merge<T>(a: Merger<T>, b: Merger<T>): T {
+export function merge<T extends Merger<any>>(a: T, b: T): T {
     return a.merge(b)
 }
 
@@ -42,8 +42,10 @@ export interface CRDT<T> extends Merger<T>, Equaler<T> { }
 
 export type AssertFunc = (boolean, string) => void
 
-export function axioms<T extends CRDT<T>>(assert: AssertFunc, a: T, b: T, c: T): void {
+    export function axioms<T extends CRDT<any>>(assert: AssertFunc, a: T, b: T, c: T): void {
     // commutative   a + c = c + a                i.e: 1 + 2 = 2 + 1
+    let x = a.merge(b)
+    // let x:CRDT<T> = a.merge(b)
     assert(
         equal(merge(a, b), merge(b, a)),
         'is not commutative'

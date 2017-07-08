@@ -1,5 +1,7 @@
-var utils_1 = require('../utils');
-var functions_1 = require('../functions');
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var utils_1 = require("../utils");
+var functions_1 = require("../functions");
 var Delete = (function () {
     function Delete(at, length) {
         this.at = at;
@@ -10,6 +12,6 @@ var Delete = (function () {
         return functions_1.concat(data.slice(0, this.at), data.slice(this.at + this.length));
     };
     return Delete;
-})();
+}());
 exports.Delete = Delete;
 //# sourceMappingURL=delete.js.map

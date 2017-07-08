@@ -1,6 +1,6 @@
 'use strict';
 
-const Delete = require('../../src/text/delete');
+const {Delete} = require('../../src/text/delete');
 const assert = require('assert');
 
 describe('Text.Delete', () => {
