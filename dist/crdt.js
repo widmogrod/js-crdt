@@ -1,5 +1,6 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 function merge(a, b) {
     return a.merge(b);
 }
@@ -22,6 +23,8 @@ function applyOperation(operation, data) {
 exports.applyOperation = applyOperation;
 function axioms(assert, a, b, c) {
     // commutative   a + c = c + a                i.e: 1 + 2 = 2 + 1
+    var x = a.merge(b);
+    // let x:CRDT<T> = a.merge(b)
     assert(equal(merge(a, b), merge(b, a)), 'is not commutative');
     // associative   a + (b + c) = (a + b) + c    i.e: 1 + (2 + 3) = (1 + 2) + 3
     assert(equal(merge(a, merge(b, c)), merge(merge(a, b), c)), 'is not associative');
@@ -32,6 +35,7 @@ exports.axioms = axioms;
 
 },{}],2:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var Increment = (function () {
     function Increment(value) {
         this.value = value;
@@ -54,15 +58,17 @@ exports.Increment = Increment;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(require('./functions'));
-__export(require('./increment'));
-__export(require('./utils'));
-__export(require('./order'));
-__export(require('./text'));
+Object.defineProperty(exports, "__esModule", { value: true });
+__export(require("./functions"));
+__export(require("./increment"));
+__export(require("./utils"));
+__export(require("./order/index"));
+__export(require("./text/index"));
 
-},{"./functions":1,"./increment":2,"./order":5,"./text":8,"./utils":10}],4:[function(require,module,exports){
+},{"./functions":1,"./increment":2,"./order/index":5,"./text/index":8,"./utils":10}],4:[function(require,module,exports){
 "use strict";
-var utils_1 = require('../utils');
+Object.defineProperty(exports, "__esModule", { value: true });
+var utils_1 = require("../utils");
 var Discrete = (function () {
     function Discrete(id, vector) {
         vector = utils_1.clone(vector);
@@ -120,13 +126,15 @@ exports.Discrete = Discrete;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(require('./discrete'));
-__export(require('./timestamp'));
-__export(require('./discrete'));
-__export(require('./timestamp'));
+Object.defineProperty(exports, "__esModule", { value: true });
+__export(require("./discrete"));
+__export(require("./timestamp"));
+__export(require("./discrete"));
+__export(require("./timestamp"));
 
 },{"./discrete":4,"./timestamp":6}],6:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var Timestamp = (function () {
     function Timestamp(bucket, time) {
         this.bucket = bucket;
@@ -153,8 +161,9 @@ exports.Timestamp = Timestamp;
 
 },{}],7:[function(require,module,exports){
 "use strict";
-var utils_1 = require('../utils');
-var functions_1 = require('../functions');
+Object.defineProperty(exports, "__esModule", { value: true });
+var utils_1 = require("../utils");
+var functions_1 = require("../functions");
 var Delete = (function () {
     function Delete(at, length) {
         this.at = at;
@@ -173,9 +182,10 @@ exports.Delete = Delete;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(require('./delete'));
-__export(require('./insert'));
-var functions_1 = require('../functions');
+Object.defineProperty(exports, "__esModule", { value: true });
+__export(require("./delete"));
+__export(require("./insert"));
+var functions_1 = require("../functions");
 // type Operation = Insert | Delete
 // type OrdersIndex = Array<Operation>
 // type OperationsIndex<T> = Array<Orderer<Text<T>>
@@ -231,8 +241,9 @@ exports.Text = Text;
 
 },{"../functions":1,"./delete":7,"./insert":9}],9:[function(require,module,exports){
 "use strict";
-var utils_1 = require('../utils');
-var functions_1 = require('../functions');
+Object.defineProperty(exports, "__esModule", { value: true });
+var utils_1 = require("../utils");
+var functions_1 = require("../functions");
 var Insert = (function () {
     function Insert(at, value) {
         this.at = at;
@@ -248,6 +259,7 @@ exports.Insert = Insert;
 
 },{"../functions":1,"../utils":10}],10:[function(require,module,exports){
 'use strict';
+Object.defineProperty(exports, "__esModule", { value: true });
 function between(value, min, max) {
     if (value <= min) {
         return false;
