@@ -5,6 +5,7 @@ const app = express();
 const server = require('http').createServer();
 
 app.use(express.static('public'));
+app.use(express.static('../../dist'));
 
 const wss = new WebSocket.Server({ server });
 
