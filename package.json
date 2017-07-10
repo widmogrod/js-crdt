@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha",
     "build": "./node_modules/.bin/tsc",
-    "browserify": "./node_modules/.bin/browserify build/index.js > dist/crdt.js",
+    "browserify": "./node_modules/.bin/browserify --standalone crdt build/index.js > dist/crdt.js",
     "uglifyjs": "./node_modules/.bin/uglifyjs --screw-ie8 --compress -o dist/crdt.min.js dist/crdt.js",
     "dist": "npm run browserify && npm run uglifyjs",
     "lint": "eslint src test",
