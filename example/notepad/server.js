@@ -59,12 +59,15 @@ function deserialise(string) {
 let database = new Text(new Discrete('server', {}));
 
 wss.on('connection', function connection(ws) {
+  // Restore database state
   database.forEach(({order, operations}) => {
     ws.send(serialise(order, operations))
   });
 
   ws.on('message', function incoming(data) {
+    // Update database state
     database = database.merge(deserialise(data))
+
     // Broadcast to everyone else.
     wss.clients.forEach(function each(client) {
       if (client !== ws && client.readyState === WebSocket.OPEN) {

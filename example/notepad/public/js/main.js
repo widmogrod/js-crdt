@@ -125,6 +125,9 @@ messages
   .map(deserialise)
   .on(e => {
     database = database.merge(e);
+  })
+  .debounce(1)
+  .on(_ => {
     editorElement.value = database.toString();
   })
 ;
