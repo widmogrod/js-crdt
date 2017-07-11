@@ -53,11 +53,11 @@ function deserialise(string) {
   }, new crdt.Text(new crdt.Discrete(id, vector)));
 }
 
-let editor = document.getElementById('editor');
+let editorElement = document.getElementById('editor');
 let keyup = new jef.stream(function(onValue){
-  editor.addEventListener('keydown', e => {onValue(e);});
-  editor.addEventListener('keyup', e => {onValue(e);});
-  editor.addEventListener('keypress', e => {onValue(e);});
+  editorElement.addEventListener('keydown', e => {onValue(e);});
+  editorElement.addEventListener('keyup', e => {onValue(e);});
+  editorElement.addEventListener('keypress', e => {onValue(e);});
 });
 
 
@@ -128,6 +128,6 @@ messages
   .map(deserialise)
   .on(e => {
     database = database.merge(e);
-    editor.value = database.toString();
+    editorElement.value = database.toString();
   })
 ;

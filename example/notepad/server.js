@@ -18,8 +18,53 @@ wss.broadcast = function broadcast(data) {
   });
 };
 
+const {Text, Insert, Delete, Discrete} = require('../../build/index');
+
+function serialise(order, operations) {
+  return JSON.stringify(
+    operations
+    .reduce((result, operation) => {
+      let value = operation instanceof Insert
+        ? {type: 'insert', args: [operation.at, operation.value]}
+        : {type: 'delete', args: [operation.at, operation.length]}
+      ;
+
+      result.operations.push(value);
+      return result
+    }, {
+      operations: [],
+      order: {
+        id: order.id,
+        vector: order.vector,
+      }
+    })
+   );
+}
+
+function deserialise(string) {
+  const {order, operations} = JSON.parse(string);
+  const {id, vector} = order;
+
+  return operations.reduce((text, {type, args}) => {
+    const operation = (type === 'insert')
+      ? new Insert(args[0], args[1])
+      : new Delete(args[0], args[1]);
+
+    text.apply(operation)
+    return text
+  }, new Text(new Discrete(id, vector)));
+}
+
+
+let database = new Text(new Discrete('server', {}));
+
 wss.on('connection', function connection(ws) {
+  database.forEach(({order, operations}) => {
+    ws.send(serialise(order, operations))
+  });
+
   ws.on('message', function incoming(data) {
+    database = database.merge(deserialise(data))
     // Broadcast to everyone else.
     wss.clients.forEach(function each(client) {
       if (client !== ws && client.readyState === WebSocket.OPEN) {
