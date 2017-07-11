@@ -12,6 +12,12 @@ describe('Text.insert', () => {
         data: [],
         expected: ['a','b', 'c']
       },
+      'should insert as first element when position in negative number': {
+        at: -1,
+        value: 'abc',
+        data: ['1', '2', '3'],
+        expected: ['a','b', 'c', '1', '2', '3']
+      },
       'should fill data to position at witch modification was performed': {
         at: 3,
         value: 'abc',

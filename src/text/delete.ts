@@ -10,6 +10,8 @@ export class Delete {
     }
 
     apply(data) {
+        if (this.at < 0) return data
+
         data = ensureArrayLength(data, this.at);
 
         return concat(

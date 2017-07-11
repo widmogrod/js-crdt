@@ -18,6 +18,12 @@ describe('Text.Delete', () => {
         data: ['a'],
         expected: ['a']
       },
+      'should leave data intact, when index position is negative': {
+        at: -2,
+        length: 1,
+        data: ['a'],
+        expected: ['a']
+      },
       'should remove portion of data': {
         at: 3,
         length: 2,

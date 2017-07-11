@@ -5,7 +5,7 @@ export class Insert {
     at: number
     value: string
     constructor(at, value) {
-        this.at = at;
+        this.at = at < 0 ? 0 : at;
         this.value = String(value);
     }
 
