@@ -4,7 +4,7 @@ var utils_1 = require("../utils");
 var functions_1 = require("../functions");
 var Insert = (function () {
     function Insert(at, value) {
-        this.at = at;
+        this.at = at < 0 ? 0 : at;
         this.value = String(value);
     }
     Insert.prototype.apply = function (data) {

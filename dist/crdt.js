@@ -170,6 +170,8 @@ var Delete = (function () {
         this.length = length;
     }
     Delete.prototype.apply = function (data) {
+        if (this.at < 0)
+            return data;
         data = utils_1.ensureArrayLength(data, this.at);
         return functions_1.concat(data.slice(0, this.at), data.slice(this.at + this.length));
     };
@@ -246,7 +248,7 @@ var utils_1 = require("../utils");
 var functions_1 = require("../functions");
 var Insert = (function () {
     function Insert(at, value) {
-        this.at = at;
+        this.at = at < 0 ? 0 : at;
         this.value = String(value);
     }
     Insert.prototype.apply = function (data) {
