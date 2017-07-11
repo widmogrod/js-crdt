@@ -50,6 +50,14 @@ var Text = (function () {
             }, accumulator);
         }, accumulator);
     };
+    Text.prototype.forEach = function (fn) {
+        var _this = this;
+        return this.ordersIndex.slice(0).sort(functions_1.compare).forEach(function (order) {
+            var orderIndex = _this.ordersIndex.findIndex(function (o) { return o.equal(order); });
+            var operations = _this.operationsIndex[orderIndex];
+            fn({ order: order, operations: operations });
+        });
+    };
     Text.prototype.toString = function () {
         return this.reduce(function (accumulator, operation) {
             return functions_1.applyOperation(operation, accumulator);
