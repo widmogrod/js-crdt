@@ -73,7 +73,6 @@ let database = new crdt.Text(create(uuid()));
 const BACKSPACE = 8;
 const ENTER = 13;
 
-// keyup.log('key')
 keyup
   .filter(e => {
     switch(e.type) {
@@ -93,7 +92,6 @@ keyup
       selection: e.target.selectionEnd - e.target.selectionStart
     };
   })
-  .log('data')
   .flatMap(({key, code, pos, selection}) => {
     if (code === ENTER) {
       key = '\n';
@@ -115,7 +113,6 @@ keyup
 
     return jef.stream.fromValue(new crdt.Insert(pos, key))
   })
-  .log('send')
   .map(op => database.apply(op))
   .on(_ => {
     ws.send(serialise(database));
