@@ -1,7 +1,7 @@
 'use strict';
 
 function uuid() {
-  const array = new Uint32Array(2);
+  const array = new Uint8Array(2);
   crypto.getRandomValues(array);
   return array.join('-')
 }
@@ -114,6 +114,7 @@ keyup
     return jef.stream.fromValue(new crdt.Insert(pos, key))
   })
   .map(op => database.apply(op))
+  .debounce(400)
   .on(_ => {
     ws.send(serialise(database));
     database = snapshot(database);
