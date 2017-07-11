@@ -55,8 +55,9 @@ function deserialise(string) {
 
 let editor = document.getElementById('editor');
 let keyup = new jef.stream(function(onValue){
-  // editor.addEventListener('keydown', e => e.preventDefault());
+  editor.addEventListener('keydown', e => {onValue(e);});
   editor.addEventListener('keyup', e => {onValue(e);});
+  editor.addEventListener('keypress', e => {onValue(e);});
 });
 
 
@@ -69,16 +70,35 @@ let messages = new jef.stream(function(onValue) {
 
 let database = new crdt.Text(create(uuid()));
 
+const BACKSPACE = 8;
+
+// keyup.log('key')
 keyup
-  .map(e => {
-    return {key: e.key, pos: e.target.selectionStart}
+  .filter(e => {
+    switch(e.type) {
+      case 'keydown':
+        return e.keyCode === BACKSPACE;
+      case 'keypress':
+        return true;
+      default:
+        return false;
+    }
   })
-  .map(({key, pos}) => {
-    return (key === 'Backspace')
-      ? new crdt.Delete(pos+1, 1)
+  .map(e => {
+    return {
+      key: e.key,
+      code: e.keyCode,
+      pos: e.target.selectionStart,
+      selection: e.target.selectionEnd - e.target.selectionStart
+    };
+  })
+  .map(({key, code, pos, selection}) => {
+    return (code === BACKSPACE)
+      ? new crdt.Delete(pos+1, selection || 1)
       : new crdt.Insert(pos, key)
     ;
   })
+  .log('send')
   .map(op => database.apply(op))
   .on(_ => {
     ws.send(serialise(database));
@@ -90,10 +110,7 @@ messages
   .map(e => e.data)
   .map(deserialise)
   .on(e => {
-    // console.log('before:', database.toString())
     database = database.merge(e);
-    // console.log('after :', database.toString())
-    editor.value = database.toString();:w
-
+    editor.value = database.toString();
   })
 ;
