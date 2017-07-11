@@ -69,6 +69,15 @@ export class Text {
         }, accumulator);
     }
 
+    forEach(fn) {
+        return this.ordersIndex.slice(0).sort(compare).forEach(order => {
+            const orderIndex = this.ordersIndex.findIndex(o => o.equal(order));
+            const operations = this.operationsIndex[orderIndex];
+
+            fn({order, operations})
+        });
+    }
+
     toString() {
         return this.reduce((accumulator, operation) => {
             return applyOperation(operation, accumulator);
