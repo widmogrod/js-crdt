@@ -71,6 +71,7 @@ let messages = new jef.stream(function(onValue) {
 let database = new crdt.Text(create(uuid()));
 
 const BACKSPACE = 8;
+const ENTER = 13;
 
 // keyup.log('key')
 keyup
@@ -92,11 +93,27 @@ keyup
       selection: e.target.selectionEnd - e.target.selectionStart
     };
   })
-  .map(({key, code, pos, selection}) => {
-    return (code === BACKSPACE)
-      ? new crdt.Delete(pos+1, selection || 1)
-      : new crdt.Insert(pos, key)
-    ;
+  .log('data')
+  .flatMap(({key, code, pos, selection}) => {
+    if (code === ENTER) {
+      key = '\n';
+    }
+    if (code === BACKSPACE) {
+      return jef.stream.fromValue(
+        selection
+          ? new crdt.Delete(pos, selection)
+          : new crdt.Delete(pos-1, 1)
+      );
+    }
+
+    if (selection) {
+      return jef.stream.fromArray([
+        new crdt.Delete(pos, selection),
+        new crdt.Insert(pos, key),
+      ]);
+    }
+
+    return jef.stream.fromValue(new crdt.Insert(pos, key))
   })
   .log('send')
   .map(op => database.apply(op))
