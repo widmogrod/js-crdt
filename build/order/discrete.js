@@ -10,7 +10,6 @@ var Discrete = (function () {
     }
     Discrete.prototype.next = function () {
         var vector = utils_1.clone(this.vector);
-        ++vector[this.id];
         return new Discrete(this.id, vector);
     };
     Discrete.prototype.merge = function (b) {
@@ -30,24 +29,31 @@ var Discrete = (function () {
             .reduce(function (result, key) {
             return result + (_this.vector[key] - b.vector[key]);
         }, 0);
-        if (position === 0) {
-            var tipPosition = this.vector[this.id] - b.vector[b.id];
-            if (tipPosition !== 0) {
-                return tipPosition;
-            }
-            var ha = b.vector.hasOwnProperty(this.id);
-            var hb = this.vector.hasOwnProperty(b.id);
-            if (!ha && !hb) {
-                return this.id < b.id ? -1 : 1;
-            }
-            else if (ha && !hb) {
-                return -1;
-            }
-            else if (hb && !ha) {
-                return 1;
-            }
+        if (position !== 0) {
+            return position;
         }
-        return position;
+        var difA = utils_1.diff(this.vector, b.vector).length;
+        var difB = utils_1.diff(b.vector, this.vector).length;
+        var dif = difA - difB;
+        if (dif !== 0) {
+            return dif;
+        }
+        var tipPosition = this.vector[this.id] - b.vector[b.id];
+        if (tipPosition !== 0) {
+            return tipPosition;
+        }
+        var ha = b.vector.hasOwnProperty(this.id);
+        var hb = this.vector.hasOwnProperty(b.id);
+        if (!ha && !hb) {
+            return this.id < b.id ? -1 : 1;
+        }
+        else if (ha && !hb) {
+            return -1;
+        }
+        else if (hb && !ha) {
+            return 1;
+        }
+        return 0;
     };
     return Discrete;
 }());

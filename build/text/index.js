@@ -24,6 +24,9 @@ var Text = (function () {
     Text.prototype.apply = function (operation) {
         this.operationsIndex[this.index].push(operation);
     };
+    Text.prototype.hasChanges = function () {
+        return this.operationsIndex[this.index].length > 0;
+    };
     Text.prototype.merge = function (b) {
         var ordersIndexA = this.ordersIndex.slice(0);
         var operationsIndexA = this.operationsIndex.slice(0);
@@ -36,7 +39,10 @@ var Text = (function () {
             }
             return operationsIndexA;
         }, operationsIndexA);
-        return new Text(functions_1.merge(this.order, b.order).next(), ordersIndexA, operationsIndexA);
+        var orderNext = functions_1.merge(this.order, b.order);
+        return new Text(
+        // TODO move snapshoting to different layer
+        this.hasChanges() ? orderNext.next() : orderNext, ordersIndexA, operationsIndexA);
     };
     Text.prototype.equal = function (b) {
         return this.toString() === b.toString();

@@ -51,4 +51,13 @@ function common(a, b) {
     }, []).sort();
 }
 exports.common = common;
+function diff(a, b) {
+    return Object.keys(a).reduce(function (r, k) {
+        if (!b.hasOwnProperty(k)) {
+            r.push(k);
+        }
+        return r;
+    }, []);
+}
+exports.diff = diff;
 //# sourceMappingURL=utils.js.map
