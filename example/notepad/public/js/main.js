@@ -114,7 +114,8 @@ keyup
     return jef.stream.fromValue(new crdt.Insert(pos, key))
   })
   .map(op => database.apply(op))
-  .timeout(400)
+  .timeout(600)
+  .filter(_ => database.hasChanges())
   .on(_ => {
     ws.send(serialise(database));
     database = snapshot(database);
@@ -127,7 +128,7 @@ messages
   .on(e => {
     database = database.merge(e);
   })
-  .debounce(1)
+  .debounce(16)
   .on(_ => {
     editorElement.value = database.toString();
   })
