@@ -54,3 +54,13 @@ export function common<T>(a: T, b: T): Array<T> {
         return r;
     }, []).sort();
 }
+
+export function diff<T>(a: T, b:T): Array<T> {
+    return Object.keys(a).reduce((r, k) => {
+        if (!b.hasOwnProperty(k)) {
+            r.push(k);
+        }
+
+        return r;
+    }, []);
+}

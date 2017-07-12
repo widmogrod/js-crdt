@@ -31,6 +31,10 @@ export class Text {
         this.operationsIndex[this.index].push(operation);
     }
 
+    hasChanges() {
+        return this.operationsIndex[this.index].length > 0;
+    }
+
     merge(b) {
         const ordersIndexA = this.ordersIndex.slice(0);
         let operationsIndexA = this.operationsIndex.slice(0);
@@ -48,8 +52,10 @@ export class Text {
             return operationsIndexA;
         }, operationsIndexA);
 
+        const orderNext = merge(this.order, b.order);
         return new Text(
-            merge(this.order, b.order).next(),
+            // TODO move snapshoting to different layer
+            this.hasChanges() ? orderNext.next() : orderNext,
             ordersIndexA,
             operationsIndexA
         );
