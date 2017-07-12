@@ -114,7 +114,7 @@ keyup
     return jef.stream.fromValue(new crdt.Insert(pos, key))
   })
   .map(op => database.apply(op))
-  .debounce(400)
+  .timeout(400)
   .on(_ => {
     ws.send(serialise(database));
     database = snapshot(database);
