@@ -10,6 +10,7 @@ var Discrete = (function () {
     }
     Discrete.prototype.next = function () {
         var vector = utils_1.clone(this.vector);
+        ++vector[this.id];
         return new Discrete(this.id, vector);
     };
     Discrete.prototype.merge = function (b) {

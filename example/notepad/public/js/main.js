@@ -115,10 +115,10 @@ keyup
   })
   .map(op => database.apply(op))
   .timeout(600)
-  .filter(_ => database.hasChanges())
   .on(_ => {
-    ws.send(serialise(database));
+    const data = serialise(database);
     database = snapshot(database);
+    ws.send(data);
   })
 ;
 

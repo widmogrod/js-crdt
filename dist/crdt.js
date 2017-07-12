@@ -78,6 +78,7 @@ var Discrete = (function () {
     }
     Discrete.prototype.next = function () {
         var vector = utils_1.clone(this.vector);
+        ++vector[this.id];
         return new Discrete(this.id, vector);
     };
     Discrete.prototype.merge = function (b) {
@@ -212,9 +213,6 @@ var Text = (function () {
     Text.prototype.apply = function (operation) {
         this.operationsIndex[this.index].push(operation);
     };
-    Text.prototype.hasChanges = function () {
-        return this.operationsIndex[this.index].length > 0;
-    };
     Text.prototype.merge = function (b) {
         var ordersIndexA = this.ordersIndex.slice(0);
         var operationsIndexA = this.operationsIndex.slice(0);
@@ -228,9 +226,7 @@ var Text = (function () {
             return operationsIndexA;
         }, operationsIndexA);
         var orderNext = functions_1.merge(this.order, b.order);
-        return new Text(
-        // TODO move snapshoting to different layer
-        this.hasChanges() ? orderNext.next() : orderNext, ordersIndexA, operationsIndexA);
+        return new Text(orderNext.next(), ordersIndexA, operationsIndexA);
     };
     Text.prototype.equal = function (b) {
         return this.toString() === b.toString();
