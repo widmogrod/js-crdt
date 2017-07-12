@@ -18,6 +18,7 @@ export class Discrete implements Orderer<Discrete>{
     next() {
         const vector = clone(this.vector);
 
+        ++vector[this.id];
 
         return new Discrete(this.id, vector);
     }
@@ -77,5 +78,6 @@ export class Discrete implements Orderer<Discrete>{
         }
 
         return 0;
+
     }
 }
