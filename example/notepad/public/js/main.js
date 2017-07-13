@@ -153,7 +153,7 @@ keyup
     return jef.stream.fromValue(new crdt.Insert(pos, key))
   })
   .map(op => database.apply(op))
-  .timeout(600)
+  .timeout(700)
   .on(_ => {
     const data = serialise(database);
     database = snapshot(database);
@@ -167,14 +167,19 @@ messages
   .on(e => {
     database = database.merge(e);
   })
-  .debounce(16)
+  .debounce(50)
   .on(e => {
     const start = editorElement.selectionStart,
           end   = editorElement.selectionEnd;
 
     const shiftBy = shiftCursorPositionRelativeTo(e, start);
 
-    editorElement.value = database.toString();
-    editorElement.setSelectionRange(start + shiftBy, end + shiftBy);
+    requestAnimationFrame(() => {
+      editorElement.value = database.toString();
+    });
+
+    requestAnimationFrame(() => {
+      editorElement.setSelectionRange(start + shiftBy, end + shiftBy);
+    });
   })
 ;
