@@ -18,6 +18,24 @@ function snapshot(text) {
   );
 }
 
+function shiftCursorPositionRelativeTo(text, position) {
+  return text.reduce((shiftBy, operation) => {
+    if (operation instanceof crdt.Insert) {
+      if (operation.at <= position) {
+        return shiftBy + operation.value.length;
+      }
+    }
+
+    if (operation instanceof crdt.Delete) {
+      if (operation.at <= position) {
+        return shiftBy - operation.length;
+      }
+    }
+
+    return shiftBy;
+  }, 0);
+}
+
 function serialise(text) {
   const operations = text.operationsIndex[text.index]
     .reduce((result, operation) => {
@@ -129,7 +147,13 @@ messages
     database = database.merge(e);
   })
   .debounce(16)
-  .on(_ => {
+  .on(e => {
+    const start = editorElement.selectionStart,
+          end   = editorElement.selectionEnd;
+
+    const shiftBy = shiftCursorPositionRelativeTo(e, start);
+
     editorElement.value = database.toString();
+    editorElement.setSelectionRange(start + shiftBy, end + shiftBy);
   })
 ;
