@@ -21,7 +21,7 @@ function snapshot(text) {
 function shiftCursorPositionRelativeTo(text, position) {
   return text.reduce(({shiftBy, position}, operation) => {
     if (operation instanceof crdt.Insert) {
-      if (operation.at <= position) {
+      if (operation.at < position) {
         shiftBy += operation.value.length;
         position += operation.value.length;
       }
