@@ -76,6 +76,8 @@ let keyup = new jef.stream(function(onValue){
   editorElement.addEventListener('keydown', e => {onValue(e);});
   editorElement.addEventListener('keyup', e => {onValue(e);});
   editorElement.addEventListener('keypress', e => {onValue(e);});
+  editorElement.addEventListener('paste', e => {onValue(e);});
+  editorElement.addEventListener('cut', e => {onValue(e);});
 });
 
 
@@ -98,14 +100,17 @@ keyup
         return e.keyCode === BACKSPACE;
       case 'keypress':
         return true;
+      case 'cut':
+      case 'paste':
+        return true;
       default:
         return false;
     }
   })
   .map(e => {
     return {
-      key: e.key,
-      code: e.keyCode,
+      key: (e.type === 'paste') ? e.clipboardData.getData('text/plain') : e.key,
+      code: e.keyCode || e.type,
       pos: e.target.selectionStart,
       selection: e.target.selectionEnd - e.target.selectionStart
     };
@@ -114,6 +119,13 @@ keyup
     if (code === ENTER) {
       key = '\n';
     }
+
+    if (code === 'cut') {
+      return jef.stream.fromValue(
+          new crdt.Delete(pos, selection)
+      );
+    }
+
     if (code === BACKSPACE) {
       return jef.stream.fromValue(
         selection
