@@ -19,21 +19,20 @@ function snapshot(text) {
 }
 
 function shiftCursorPositionRelativeTo(text, position) {
-  return text.reduce((shiftBy, operation) => {
+  return text.reduce(({shiftBy, position}, operation) => {
     if (operation instanceof crdt.Insert) {
       if (operation.at <= position) {
-        return shiftBy + operation.value.length;
+        shiftBy += operation.value.length;
+        position += operation.value.length;
+      }
+    } else if (operation instanceof crdt.Delete) {
+      if (operation.at < position) {
+        shiftBy -= operation.length;
       }
     }
 
-    if (operation instanceof crdt.Delete) {
-      if (operation.at <= position) {
-        return shiftBy - operation.length;
-      }
-    }
-
-    return shiftBy;
-  }, 0);
+    return {shiftBy, position};
+  }, {shiftBy: 0, position}).shiftBy;
 }
 
 function serialise(text) {
@@ -45,7 +44,8 @@ function serialise(text) {
       ;
 
       result.operations.push(value);
-      return result
+
+      return result;
     }, {
       operations: [],
       order: {
@@ -91,13 +91,14 @@ let messages = new jef.stream(function(onValue) {
 let database = new crdt.Text(create(uuid()));
 
 const BACKSPACE = 8;
+const DELETE = 46;
 const ENTER = 13;
 
 keyup
   .filter(e => {
     switch(e.type) {
       case 'keydown':
-        return e.keyCode === BACKSPACE;
+        return e.keyCode === BACKSPACE || e.keyCode === DELETE;
       case 'keypress':
         return true;
       case 'cut':
@@ -131,6 +132,14 @@ keyup
         selection
           ? new crdt.Delete(pos, selection)
           : new crdt.Delete(pos-1, 1)
+      );
+    }
+
+    if (code === DELETE) {
+      return jef.stream.fromValue(
+        selection
+          ? new crdt.Delete(pos, selection)
+          : new crdt.Delete(pos, 1)
       );
     }
 
