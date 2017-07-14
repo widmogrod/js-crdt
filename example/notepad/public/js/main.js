@@ -21,7 +21,7 @@ function snapshot(text) {
 function shiftCursorPositionRelativeTo(text, position) {
   return text.reduce(({shiftBy, position}, operation) => {
     if (operation instanceof crdt.Insert) {
-      if (operation.at < position) {
+      if (operation.at <= position) {
         shiftBy += operation.value.length;
         position += operation.value.length;
       }
@@ -73,13 +73,12 @@ function deserialise(string) {
 
 let editorElement = document.getElementById('editor');
 let keyup = new jef.stream(function(onValue){
-  editorElement.addEventListener('keydown', e => {onValue(e);});
-  editorElement.addEventListener('keyup', e => {onValue(e);});
-  editorElement.addEventListener('keypress', e => {onValue(e);});
-  editorElement.addEventListener('paste', e => {onValue(e);});
-  editorElement.addEventListener('cut', e => {onValue(e);});
+  editorElement.addEventListener('keydown', e => { onValue(e);});
+  editorElement.addEventListener('keyup', e => {e.preventDefault(); onValue(e);});
+  editorElement.addEventListener('keypress', e => {e.preventDefault(); onValue(e);});
+  editorElement.addEventListener('paste', e => {e.preventDefault(); onValue(e);});
+  editorElement.addEventListener('cut', e => {e.preventDefault(); onValue(e);});
 });
-
 
 let host = window.document.location.host.replace(/:.*/, '');
 let ws = new WebSocket('ws://' + host + ':8080');
@@ -152,8 +151,10 @@ keyup
 
     return jef.stream.fromValue(new crdt.Insert(pos, key))
   })
-  .map(op => database.apply(op))
-  .timeout(700)
+  .on(op => database.apply(op))
+  .on(render)
+  .on(op => setCursor([op]))
+  .timeout(100)
   .on(_ => {
     const data = serialise(database);
     database = snapshot(database);
@@ -168,18 +169,24 @@ messages
     database = database.merge(e);
   })
   .debounce(50)
-  .on(e => {
-    const start = editorElement.selectionStart,
-          end   = editorElement.selectionEnd;
-
-    const shiftBy = shiftCursorPositionRelativeTo(e, start);
-
-    requestAnimationFrame(() => {
-      editorElement.value = database.toString();
-    });
-
-    requestAnimationFrame(() => {
-      editorElement.setSelectionRange(start + shiftBy, end + shiftBy);
-    });
-  })
+  .on(render)
+  .on(e => setCursor(e))
 ;
+
+function setCursor(e) {
+  const
+  start = editorElement.selectionStart,
+    end = editorElement.selectionEnd;
+
+  const shiftBy = shiftCursorPositionRelativeTo(e, start);
+
+  requestAnimationFrame(() => {
+    editorElement.setSelectionRange(start + shiftBy, end + shiftBy);
+  });
+}
+
+function render() {
+  requestAnimationFrame(() => {
+    editorElement.value = database.toString();
+  });
+}
