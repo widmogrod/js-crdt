@@ -20,6 +20,7 @@
 
 - Text reduce is sub optimal comptation wise
   - Sort is done on every reduce use i.e SortedSet
+        When I used naive sorted set - render time was reduced drasticly
 
 - Text merging should not do snapshots,
   snapshots should be done when sending changes
