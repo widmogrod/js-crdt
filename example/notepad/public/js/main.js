@@ -1,5 +1,17 @@
 'use strict';
 
+function bench(name, func, ctx) {
+  return function() {
+    const start = new Date();
+    const result = func.apply(ctx, arguments);
+    const end = new Date();
+
+    console.log({name, time: end.getTime() - start.getTime()});
+
+    return result;
+  }
+}
+
 function uuid() {
   const array = new Uint8Array(2);
   crypto.getRandomValues(array);
@@ -11,11 +23,7 @@ function create(id) {
 }
 
 function snapshot(text) {
-  return new crdt.Text(
-    text.order.next(),
-    text.ordersIndex,
-    text.operationsIndex
-  );
+  return text.next();
 }
 
 function shiftCursorPositionRelativeTo(text, position) {
@@ -151,42 +159,49 @@ keyup
 
     return jef.stream.fromValue(new crdt.Insert(pos, key))
   })
-  .on(op => database.apply(op))
-  .on(render)
-  .on(op => setCursor([op]))
-  .timeout(100)
+  .on(op => bench('key-apply', database.apply, database)(op))
+  .on(onFrame(render, (op, start, end) => setCursor([op], start, end)))
+  .timeout(300)
   .on(_ => {
-    const data = serialise(database);
-    database = snapshot(database);
+    const data = bench('key-serialise', serialise)(database);
+    database = bench('key-snapshot', snapshot)(database);
     ws.send(data);
   })
 ;
 
 messages
   .map(e => e.data)
-  .map(deserialise)
+  .map(bench('ws-deserialise', deserialise))
   .on(e => {
-    database = database.merge(e);
+    database = bench('ws-merge', database.merge, database)(e);
   })
-  .debounce(50)
-  .on(render)
-  .on(e => setCursor(e))
+  .on(onFrame(render, setCursor))
 ;
 
-function setCursor(e) {
-  const
-  start = editorElement.selectionStart,
-    end = editorElement.selectionEnd;
+function onFrame(f1, f2) {
+  return (arg) => {
+    requestAnimationFrame(() => {
+      const
+      start = editorElement.selectionStart,
+        end = editorElement.selectionEnd;
 
-  const shiftBy = shiftCursorPositionRelativeTo(e, start);
+      const shiftBy = f2(arg, start, end);
+      f1(arg);
+      editorElement.setSelectionRange(start + shiftBy, end + shiftBy);
+    });
+  };
+}
 
-  requestAnimationFrame(() => {
-    editorElement.setSelectionRange(start + shiftBy, end + shiftBy);
-  });
+function setCursor(e, start, end) {
+  return bench('cursor-calculate', () => {
+    return shiftCursorPositionRelativeTo(e, start);
+  })();
 }
 
 function render() {
-  requestAnimationFrame(() => {
-    editorElement.value = database.toString();
-  });
+    const string = bench('render-string', () => {
+      return database.toString();
+    })();
+
+    bench('render-set', () => editorElement.value = string)();
 }
