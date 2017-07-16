@@ -4,10 +4,6 @@ export * from './insert';
 import {merge, applyOperation, compare} from '../functions'
 import {Orderer} from '../order'
 
-// type Operation = Insert | Delete
-// type OrdersIndex = Array<Operation>
-// type OperationsIndex<T> = Array<Orderer<Text<T>>
-
 export class Text {
     order: any
     ordersIndex: any
@@ -62,7 +58,8 @@ export class Text {
 
     reduce(fn, accumulator) {
         return this.ordersIndex.slice(0).sort(compare).reduce((accumulator, order) => {
-            const orderIndex = this.ordersIndex.findIndex(o => o.equal(order));
+          // const orderIndex = this.ordersIndex.findIndex(o => o.equal(order));
+            const orderIndex = this.ordersIndex.findIndex(o => o === order);
 
             return this.operationsIndex[orderIndex].reduce((accumulator, operation, index) => {
                 return fn(accumulator, operation, order, index);
@@ -80,7 +77,7 @@ export class Text {
     }
 
     toString() {
-        return this.reduce((accumulator, operation) => {
+      return this.reduce((accumulator, operation) => {
             return applyOperation(operation, accumulator);
         }, []).join('');
     }
