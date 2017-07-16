@@ -1,26 +1,72 @@
 export * from './delete';
 export * from './insert';
 
-import {merge, applyOperation, compare} from '../functions'
+import {merge, applyOperation, compare, equal} from '../functions'
 import {Orderer} from '../order'
+
+interface Set<T> {
+  add(T): number
+  reduce<Y>(fn: (Y, T, number) => Y, accumulator: Y): Y
+  index(number): T
+}
+
+class SortedSet<T extends Orderer<T>> implements Set<T> {
+  elements: any
+
+  constructor() {
+    this.elements = [];
+  }
+
+  add(value: T): number {
+    let index = this.elements.findIndex(({item}) => {
+      return item.equal(value)
+    });
+
+    if (-1 === index) {
+      index = this.elements.length;
+      this.elements.push({item: value, index});
+      this.elements.sort((a, b) => compare(a.item, b.item))
+    }
+
+    return index;
+  }
+
+  index(idx: number): T {
+    const item = this.elements.find(({index}) => index === idx);
+    if (item) {
+      return item.item
+    }
+  }
+
+  reduce<Y>(fn: (Y, T, number) => Y, accumulator: Y): Y {
+    return this.elements.reduce((accumulator, {item, index}) => {
+      return fn(accumulator, item, index);
+    }, accumulator);
+  }
+}
 
 export class Text {
     order: any
-    ordersIndex: any
+    ordersSet: any
     operationsIndex: any
     index: number
-    constructor(order: any, ordersIndex: any, operationsIndex: any) {
+    constructor(order: any, ordersSet: any, operationsIndex: any) {
         this.order = order;
-        this.ordersIndex = ordersIndex || [];
+        this.ordersSet = ordersSet || new SortedSet();
         this.operationsIndex = operationsIndex || [];
 
-        this.index = this.ordersIndex.findIndex(o => o.equal(order));
-        if (-1 === this.index) {
-            this.index = this.ordersIndex.push(order) - 1;
-        }
+        this.index = this.ordersSet.add(order);
 
         this.operationsIndex[this.index] =
             this.operationsIndex[this.index] || [];
+    }
+
+    next() {
+      return new Text(
+        this.order.next(),
+        this.ordersSet,
+        this.operationsIndex
+      );
     }
 
     apply(operation) {
@@ -28,25 +74,23 @@ export class Text {
     }
 
     merge(b) {
-        const ordersIndexA = this.ordersIndex.slice(0);
+        const ordersIndexA = this.ordersSet;
         let operationsIndexA = this.operationsIndex.slice(0);
 
         operationsIndexA = b.operationsIndex.reduce((operationsIndexA, operationsB, orderIndexB) => {
-            const orderB = b.ordersIndex[orderIndexB];
-            const notFoundInA = -1 === ordersIndexA.findIndex(orderA => orderA.equal(orderB));
+            const orderB = b.ordersSet.index(orderIndexB);
+          if (!orderB) {
+            return operationsIndexA;
+          }
+            const index = ordersIndexA.add(orderB);
 
-            if (notFoundInA) {
-                const index = ordersIndexA.push(orderB) - 1;
-
-                operationsIndexA[index] = operationsB;
-            }
+            operationsIndexA[index] = operationsB;
 
             return operationsIndexA;
         }, operationsIndexA);
 
-        const orderNext = merge(this.order, b.order);
         return new Text(
-            orderNext.next(),
+            merge(this.order, b.order).next(),
             ordersIndexA,
             operationsIndexA
         );
@@ -57,10 +101,7 @@ export class Text {
     }
 
     reduce(fn, accumulator) {
-        return this.ordersIndex.slice(0).sort(compare).reduce((accumulator, order) => {
-          // const orderIndex = this.ordersIndex.findIndex(o => o.equal(order));
-            const orderIndex = this.ordersIndex.findIndex(o => o === order);
-
+        return this.ordersSet.reduce((accumulator, order, orderIndex) => {
             return this.operationsIndex[orderIndex].reduce((accumulator, operation, index) => {
                 return fn(accumulator, operation, order, index);
             }, accumulator);
@@ -68,12 +109,11 @@ export class Text {
     }
 
     forEach(fn) {
-        return this.ordersIndex.slice(0).sort(compare).forEach(order => {
-            const orderIndex = this.ordersIndex.findIndex(o => o.equal(order));
+        this.ordersSet.reduce((_, order, orderIndex) => {
             const operations = this.operationsIndex[orderIndex];
-
             fn({order, operations})
-        });
+            return _;
+        }, null);
     }
 
     toString() {
