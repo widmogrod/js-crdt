@@ -1,19 +1,19 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var utils_1 = require("../utils");
-var functions_1 = require("../functions");
-var Delete = (function () {
-    function Delete(at, length) {
+const utils_1 = require("../utils");
+class Delete {
+    constructor(at, length) {
         this.at = at;
         this.length = length;
     }
-    Delete.prototype.apply = function (data) {
+    apply(data) {
         if (this.at < 0)
             return data;
-        data = utils_1.ensureArrayLength(data, this.at);
-        return functions_1.concat(data.slice(0, this.at), data.slice(this.at + this.length));
-    };
-    return Delete;
-}());
+        let copy = data.slice(0);
+        copy = utils_1.ensureArrayLength(copy, this.at);
+        copy.splice(this.at, this.length);
+        return copy;
+    }
+}
 exports.Delete = Delete;
 //# sourceMappingURL=delete.js.map

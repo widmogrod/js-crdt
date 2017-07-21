@@ -23,7 +23,7 @@ function sortNumbers(a, b) {
 exports.sortNumbers = sortNumbers;
 function clone(obj) {
     var target = {};
-    for (var i in obj) {
+    for (const i in obj) {
         if (obj.hasOwnProperty(i)) {
             target[i] = obj[i];
         }
@@ -43,7 +43,7 @@ function union(a, b) {
 }
 exports.union = union;
 function common(a, b) {
-    return Object.keys(a).reduce(function (r, k) {
+    return Object.keys(a).reduce((r, k) => {
         if (b.hasOwnProperty(k)) {
             r.push(k);
         }
@@ -52,7 +52,7 @@ function common(a, b) {
 }
 exports.common = common;
 function diff(a, b) {
-    return Object.keys(a).reduce(function (r, k) {
+    return Object.keys(a).reduce((r, k) => {
         if (!b.hasOwnProperty(k)) {
             r.push(k);
         }
