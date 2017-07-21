@@ -161,7 +161,7 @@ keyup
   })
   .on(op => bench('key-apply', database.apply, database)(op))
   .on(onFrame(render, (op, start, end) => setCursor([op], start, end)))
-  .timeout(300)
+  .timeout(300) // here is issue with empty sends
   .on(_ => {
     const data = bench('key-serialise', serialise)(database);
     database = bench('key-snapshot', snapshot)(database);
