@@ -116,11 +116,20 @@ keyup
     }
   })
   .map(e => {
+    const selection = e.target.selectionEnd - e.target.selectionStart;
+    const pos = e.target.selectionStart;
+
+    // HACK: reset selection when keypress was made
+    // without it selection do not disaperes
+    // and this makes situations like
+    // insert removes selected block all the time
+    editorElement.setSelectionRange(pos, pos);
+
     return {
       key: (e.type === 'paste') ? e.clipboardData.getData('text/plain') : e.key,
       code: e.keyCode || e.type,
-      pos: e.target.selectionStart,
-      selection: e.target.selectionEnd - e.target.selectionStart
+      pos,
+      selection,
     };
   })
   .flatMap(({key, code, pos, selection}) => {
