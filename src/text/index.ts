@@ -3,6 +3,8 @@ export * from './insert';
 
 import {merge, applyOperation, compare, equal} from '../functions'
 import {Orderer} from '../order'
+import {SortedSetFast} from '../structures/sorted-set'
+import {SortedSetArray} from '../structures/sorted-set'
 
 interface Set<T> {
   add(T): number
@@ -52,7 +54,7 @@ export class Text {
     index: number
     constructor(order: any, ordersSet: any, operationsIndex: any) {
         this.order = order;
-        this.ordersSet = ordersSet || new SortedSet();
+        this.ordersSet = ordersSet || new SortedSetArray();
         this.operationsIndex = operationsIndex || [];
 
         this.index = this.ordersSet.add(order);
@@ -79,9 +81,9 @@ export class Text {
 
         operationsIndexA = b.operationsIndex.reduce((operationsIndexA, operationsB, orderIndexB) => {
             const orderB = b.ordersSet.index(orderIndexB);
-          if (!orderB) {
-            return operationsIndexA;
-          }
+            if (!orderB) {
+              return operationsIndexA;
+            }
             const index = ordersIndexA.add(orderB);
 
             operationsIndexA[index] = operationsB;
