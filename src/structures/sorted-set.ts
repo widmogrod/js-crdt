@@ -125,9 +125,10 @@ class Branch<T extends Item<T>>{
 */
 
 interface Set<T> {
-  add(T): number
+  add(item: T): number
+  // disjoin(b: Set<T>): Set<T>
   reduce<Y>(fn: (Y, T, number) => Y, accumulator: Y): Y
-  index(number): T
+  index(index: number): T
 }
 
 function increment(value: number): number {
@@ -193,6 +194,30 @@ export class SortedSetFast<T extends Item<T>> implements Set<T> {
   }
 }
 
+function divide<T extends Item<T>>(lower: number, upper: number, elements: Array<Indexed<T>>, item: Indexed<T>): number {
+  const step = (upper - lower);
+  if (step < 1) {
+    elements.splice(lower, 0, item);
+    return item.index;
+  }
+
+  const half = step / 2 | 0;
+  const idx = lower + step;
+  const elm = elements[idx];
+  const cmp = elm.compare(item);
+  if (cmp < 0) {
+    return divide(idx, upper, elements, item);
+  }
+
+  if (cmp > 0) {
+    return divide(lower, idx, elements, item);
+  }
+
+  if (cmp === 0) {
+    return elm.index;
+  }
+}
+
 export class SortedSetArray<T extends Item<T>> implements Set<T> {
   elements: Array<Indexed<T>>
 
@@ -201,30 +226,6 @@ export class SortedSetArray<T extends Item<T>> implements Set<T> {
   }
   add(value: T): number {
     const val = new Indexed(value, this.elements.length);
-
-    function divide(lower: number, upper: number, elements: Array<Indexed<T>>, item: Indexed<T>): number {
-      const step = (upper - lower);
-      if (step < 1) {
-        elements.splice(lower, 0, item);
-        return item.index;
-      }
-
-      const half = step / 2 | 0;
-      const idx = lower + step;
-      const elm = elements[idx];
-      const cmp = elm.compare(val);
-      if (cmp < 0) {
-        return divide(idx, upper, elements, item);
-      }
-
-      if (cmp > 0) {
-        return divide(lower, idx, elements, item);
-      }
-
-      if (cmp === 0) {
-        return elm.index;
-      }
-    }
 
     return divide(0, this.elements.length -1, this.elements, val);
   }
