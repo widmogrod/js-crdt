@@ -64,7 +64,7 @@ __export(require("./utils"));
 __export(require("./order/index"));
 __export(require("./text/index"));
 
-},{"./functions":1,"./increment":2,"./order/index":5,"./text/index":9,"./utils":11}],4:[function(require,module,exports){
+},{"./functions":1,"./increment":2,"./order/index":5,"./text/index":11,"./utils":14}],4:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const utils_1 = require("../utils");
@@ -124,7 +124,7 @@ class Discrete {
 }
 exports.Discrete = Discrete;
 
-},{"../utils":11}],5:[function(require,module,exports){
+},{"../utils":14}],5:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
@@ -164,105 +164,30 @@ exports.Timestamp = Timestamp;
 },{}],7:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-class Leaf {
-    constructor(value) {
-        this.value = value;
+class NaiveArrayList {
+    constructor(array) {
+        this.array = array || [];
     }
-    get leaf() {
-        return this;
+    insert(at, item) {
+        const clone = this.array.slice(0);
+        clone.splice(at, 0, item);
+        return new NaiveArrayList(clone);
     }
-    get left() {
-        return null;
+    get(at) {
+        return this.array[at];
     }
-    get right() {
-        return null;
+    size() {
+        return this.array.length;
     }
-    find(fn) {
-        if (fn(this.value)) {
-            return this.value;
-        }
-    }
-    add(item) {
-        const cmp = this.value.compare(item);
-        if (cmp === 0) {
-            return this;
-        }
-        else if (cmp < 0) {
-            return new Branch(new Leaf(item), this);
-        }
-        else if (cmp > 0) {
-            return new Branch(this, null, new Leaf(item));
-        }
-    }
-    reduce(fn, base) {
-        return fn(base, this);
+    reduce(fn, aggregator) {
+        return this.array.reduce(fn, aggregator);
     }
 }
-class Branch {
-    constructor(leaf, left, right) {
-        this.leaf = leaf;
-        this.left = left;
-        this.right = right;
-    }
-    find(fn) {
-        if (fn(this.leaf.value)) {
-            return this.leaf.value;
-        }
-        if (this.left) {
-            const fl = this.left.find(fn);
-            if (fl)
-                return fl;
-        }
-        if (this.right) {
-            const fr = this.right.find(fn);
-            if (fr)
-                return fr;
-        }
-    }
-    add(item) {
-        const cmp = this.leaf.value.compare(item);
-        if (cmp === 0) {
-            return this;
-        }
-        else if (cmp < 0) {
-            if (this.right) {
-                return this.left
-                    ? new Branch(this.leaf, this.left.add(item), this.right)
-                    : new Branch(this.leaf, new Leaf(item), this.right);
-            }
-            else {
-                return this.left
-                    ? new Branch(new Leaf(item), this.left.left, this.leaf)
-                    : new Branch(new Leaf(item), this.leaf, null);
-            }
-        }
-        else if (cmp > 0) {
-            if (this.left) {
-                return this.right
-                    ? new Branch(this.leaf, this.left, this.right.add(item))
-                    : new Branch(this.leaf, this.left, new Leaf(item));
-            }
-            else {
-                return this.right
-                    ? new Branch(new Leaf(item), this.leaf, this.right.right)
-                    : new Branch(new Leaf(item), null, this.leaf);
-            }
-        }
-    }
-    reduce(fn, base) {
-        base = fn(base, this.leaf);
-        if (this.left) {
-            base = this.left.reduce(fn, base);
-        }
-        if (this.right) {
-            base = this.right.reduce(fn, base);
-        }
-        return base;
-    }
-}
-function increment(value) {
-    return value + 1;
-}
+exports.NaiveArrayList = NaiveArrayList;
+
+},{}],8:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 class Indexed {
     constructor(value, index) {
         this.value = value;
@@ -272,83 +197,87 @@ class Indexed {
         return this.value.compare(b.value);
     }
 }
-class SortedSetFast {
-    constructor() {
-        this.count = 0;
+exports.Indexed = Indexed;
+class SetMap {
+    constructor(keys, values) {
+        this.keys = keys;
+        this.values = values;
     }
-    get length() {
-        return this.reduce(increment, 0);
+    set(key, value) {
+        const result = this.keys.add(new Indexed(key, this.keys.size()));
+        return new SetMap(result.result, this.values.set(result.value.index, value));
     }
-    add(value) {
-        const val = new Indexed(value, this.count);
-        if (!this.elements) {
-            this.elements = new Leaf(val);
+    get(key) {
+        const result = this.keys.add(new Indexed(key, this.keys.size()));
+        if (result.result === this.keys) {
+            return null;
         }
-        else {
-            this.elements = this.elements.add(val);
-            if (this.length > this.count) {
-                this.count++;
-            }
-        }
-        val.index = this.count;
-        return this.count;
+        return this.values.get(result.value.index);
     }
-    index(idx) {
-        return this.elements
-            ? this.elements.find(({ index }) => index === idx).value
-            : null;
+    merge(b) {
+        return b.reduce((aggregator, item, key) => {
+            return aggregator.set(key, item);
+        }, this);
     }
-    reduce(fn, accumulator) {
-        if (!this.elements) {
-            return accumulator;
-        }
-        return this.elements.reduce((accumulator, item) => {
-            return fn(accumulator, item.value, item.value.index);
-        }, accumulator);
+    reduce(fn, aggregator) {
+        return this.keys.reduce((aggregator, key) => {
+            return fn(aggregator, this.values.get(key.index), key.value);
+        }, aggregator);
     }
 }
-exports.SortedSetFast = SortedSetFast;
+exports.SetMap = SetMap;
+
+},{}],9:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+function divide(lower, upper, elements, item, onNew, onExists) {
+    const step = (upper - lower);
+    if (step < 1) {
+        return onNew(item, elements, lower);
+    }
+    const half = step / 2 | 0;
+    const idx = lower + step;
+    const elm = elements.get(idx);
+    const cmp = elm.compare(item);
+    if (cmp < 0) {
+        return divide(idx, upper, elements, item, onNew, onExists);
+    }
+    if (cmp > 0) {
+        return divide(lower, idx, elements, item, onNew, onExists);
+    }
+    return onExists(elm, elements);
+}
+class Tuple {
+    constructor(result, value) {
+        this.result = result;
+        this.value = value;
+    }
+}
 class SortedSetArray {
-    constructor() {
-        this.elements = [];
+    constructor(elements) {
+        this.elements = elements;
+    }
+    size() {
+        return this.elements.size();
     }
     add(value) {
-        const val = new Indexed(value, this.elements.length);
-        function divide(lower, upper, elements, item) {
-            const step = (upper - lower);
-            if (step < 1) {
-                elements.splice(lower, 0, item);
-                return item.index;
-            }
-            const half = step / 2 | 0;
-            const idx = lower + step;
-            const elm = elements[idx];
-            const cmp = elm.compare(val);
-            if (cmp < 0) {
-                return divide(idx, upper, elements, item);
-            }
-            if (cmp > 0) {
-                return divide(lower, idx, elements, item);
-            }
-            if (cmp === 0) {
-                return elm.index;
-            }
-        }
-        return divide(0, this.elements.length - 1, this.elements, val);
+        return divide(0, this.elements.size() - 1, this.elements, value, (value, elements, lower) => new Tuple(new SortedSetArray(elements.insert(lower, value)), value), (value, elements) => new Tuple(this, value));
     }
-    index(idx) {
-        const r = this.elements.find(({ index }) => index === idx);
-        return r ? r.value : null;
+    has(value) {
+        return divide(0, this.elements.size() - 1, this.elements, value, () => false, () => true);
+    }
+    union(b) {
+        return b.reduce((result, item) => {
+            return result.add(item).result;
+        }, this);
     }
     reduce(fn, accumulator) {
-        return this.elements.reduce((accumulator, item) => {
-            return fn(accumulator, item.value, item.index);
-        }, accumulator);
+        return this.elements.reduce(fn, accumulator);
     }
 }
 exports.SortedSetArray = SortedSetArray;
 
-},{}],8:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const utils_1 = require("../utils");
@@ -368,98 +297,17 @@ class Delete {
 }
 exports.Delete = Delete;
 
-},{"../utils":11}],9:[function(require,module,exports){
+},{"../utils":14}],11:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 Object.defineProperty(exports, "__esModule", { value: true });
-__export(require("./delete"));
 __export(require("./insert"));
-const functions_1 = require("../functions");
-const sorted_set_1 = require("../structures/sorted-set");
-class SortedSet {
-    constructor() {
-        this.elements = [];
-    }
-    add(value) {
-        let index = this.elements.findIndex(({ item }) => {
-            return item.equal(value);
-        });
-        if (-1 === index) {
-            index = this.elements.length;
-            this.elements.push({ item: value, index });
-            this.elements.sort((a, b) => functions_1.compare(a.item, b.item));
-        }
-        return index;
-    }
-    index(idx) {
-        const item = this.elements.find(({ index }) => index === idx);
-        if (item) {
-            return item.item;
-        }
-    }
-    reduce(fn, accumulator) {
-        return this.elements.reduce((accumulator, { item, index }) => {
-            return fn(accumulator, item, index);
-        }, accumulator);
-    }
-}
-class Text {
-    constructor(order, ordersSet, operationsIndex) {
-        this.order = order;
-        this.ordersSet = ordersSet || new sorted_set_1.SortedSetArray();
-        this.operationsIndex = operationsIndex || [];
-        this.index = this.ordersSet.add(order);
-        this.operationsIndex[this.index] =
-            this.operationsIndex[this.index] || [];
-    }
-    next() {
-        return new Text(this.order.next(), this.ordersSet, this.operationsIndex);
-    }
-    apply(operation) {
-        this.operationsIndex[this.index].push(operation);
-    }
-    merge(b) {
-        const ordersIndexA = this.ordersSet;
-        let operationsIndexA = this.operationsIndex.slice(0);
-        operationsIndexA = b.operationsIndex.reduce((operationsIndexA, operationsB, orderIndexB) => {
-            const orderB = b.ordersSet.index(orderIndexB);
-            if (!orderB) {
-                return operationsIndexA;
-            }
-            const index = ordersIndexA.add(orderB);
-            operationsIndexA[index] = operationsB;
-            return operationsIndexA;
-        }, operationsIndexA);
-        return new Text(functions_1.merge(this.order, b.order).next(), ordersIndexA, operationsIndexA);
-    }
-    equal(b) {
-        return this.toString() === b.toString();
-    }
-    reduce(fn, accumulator) {
-        return this.ordersSet.reduce((accumulator, order, orderIndex) => {
-            return this.operationsIndex[orderIndex].reduce((accumulator, operation, index) => {
-                return fn(accumulator, operation, order, index);
-            }, accumulator);
-        }, accumulator);
-    }
-    forEach(fn) {
-        this.ordersSet.reduce((_, order, orderIndex) => {
-            const operations = this.operationsIndex[orderIndex];
-            fn({ order, operations });
-            return _;
-        }, null);
-    }
-    toString() {
-        return this.reduce((accumulator, operation) => {
-            return functions_1.applyOperation(operation, accumulator);
-        }, []).join('');
-    }
-}
-exports.Text = Text;
+__export(require("./delete"));
+__export(require("./text"));
 
-},{"../functions":1,"../structures/sorted-set":7,"./delete":8,"./insert":10}],10:[function(require,module,exports){
+},{"./delete":10,"./insert":12,"./text":13}],12:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const utils_1 = require("../utils");
@@ -477,7 +325,53 @@ class Insert {
 }
 exports.Insert = Insert;
 
-},{"../utils":11}],11:[function(require,module,exports){
+},{"../utils":14}],13:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const functions_1 = require("../functions");
+const set_map_1 = require("../structures/set-map");
+const sorted_set_array_1 = require("../structures/sorted-set-array");
+const naive_array_list_1 = require("../structures/naive-array-list");
+class Text {
+    constructor(order, setMap) {
+        this.order = order;
+        this.setMap = setMap;
+        this.setMap = setMap || new set_map_1.SetMap(new sorted_set_array_1.SortedSetArray(new naive_array_list_1.NaiveArrayList([])), new Map());
+    }
+    next() {
+        return new Text(this.order.next(), this.setMap);
+    }
+    apply(operation) {
+        let value = this.setMap.get(this.order);
+        if (!value) {
+            value = [];
+        }
+        value.push(operation);
+        this.setMap = this.setMap.set(this.order, value);
+    }
+    merge(b) {
+        return new Text(functions_1.merge(this.order, b.order).next(), this.setMap.merge(b.setMap));
+    }
+    equal(b) {
+        return functions_1.equal(this.order, b.order);
+    }
+    reduce(fn, accumulator) {
+        return this.setMap.reduce((accumulator, operations, order) => {
+            return operations.reduce((accumulator, operation) => {
+                return fn(accumulator, operation, order);
+            }, accumulator);
+        }, accumulator);
+    }
+    forEach(fn) {
+        return this.setMap.reduce((_, operations, order) => {
+            fn({ order, operations });
+            return _;
+        }, null);
+    }
+}
+exports.Text = Text;
+
+},{"../functions":1,"../structures/naive-array-list":7,"../structures/set-map":8,"../structures/sorted-set-array":9}],14:[function(require,module,exports){
 'use strict';
 Object.defineProperty(exports, "__esModule", { value: true });
 function between(value, min, max) {

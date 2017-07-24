@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const functions_1 = require("../functions");
 class Leaf {
     constructor(value) {
         this.value = value;
@@ -96,6 +97,34 @@ class Branch {
         return base;
     }
 }
+class SortedSet {
+    constructor() {
+        this.elements = [];
+    }
+    add(value) {
+        let index = this.elements.findIndex(({ item }) => {
+            return item.equal(value);
+        });
+        if (-1 === index) {
+            index = this.elements.length;
+            this.elements.push({ item: value, index });
+            this.elements.sort((a, b) => functions_1.compare(a.item, b.item));
+        }
+        return index;
+    }
+    index(idx) {
+        const item = this.elements.find(({ index }) => index === idx);
+        if (item) {
+            return item.item;
+        }
+    }
+    reduce(fn, accumulator) {
+        return this.elements.reduce((accumulator, { item, index }) => {
+            return fn(accumulator, item, index);
+        }, accumulator);
+    }
+}
+exports.SortedSet = SortedSet;
 function increment(value) {
     return value + 1;
 }
@@ -108,6 +137,7 @@ class Indexed {
         return this.value.compare(b.value);
     }
 }
+exports.Indexed = Indexed;
 class SortedSetFast {
     constructor() {
         this.count = 0;
@@ -144,43 +174,4 @@ class SortedSetFast {
     }
 }
 exports.SortedSetFast = SortedSetFast;
-class SortedSetArray {
-    constructor() {
-        this.elements = [];
-    }
-    add(value) {
-        const val = new Indexed(value, this.elements.length);
-        function divide(lower, upper, elements, item) {
-            const step = (upper - lower);
-            if (step < 1) {
-                elements.splice(lower, 0, item);
-                return item.index;
-            }
-            const half = step / 2 | 0;
-            const idx = lower + step;
-            const elm = elements[idx];
-            const cmp = elm.compare(val);
-            if (cmp < 0) {
-                return divide(idx, upper, elements, item);
-            }
-            if (cmp > 0) {
-                return divide(lower, idx, elements, item);
-            }
-            if (cmp === 0) {
-                return elm.index;
-            }
-        }
-        return divide(0, this.elements.length - 1, this.elements, val);
-    }
-    index(idx) {
-        const r = this.elements.find(({ index }) => index === idx);
-        return r ? r.value : null;
-    }
-    reduce(fn, accumulator) {
-        return this.elements.reduce((accumulator, item) => {
-            return fn(accumulator, item.value, item.index);
-        }, accumulator);
-    }
-}
-exports.SortedSetArray = SortedSetArray;
 //# sourceMappingURL=sorted-set.js.map

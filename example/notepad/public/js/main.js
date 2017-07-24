@@ -44,7 +44,7 @@ function shiftCursorPositionRelativeTo(text, position) {
 }
 
 function serialise(text) {
-  const operations = text.operationsIndex[text.index]
+  const operations = text
     .reduce((result, operation) => {
       let value = operation instanceof crdt.Insert
         ? {type: 'insert', args: [operation.at, operation.value]}
@@ -147,7 +147,7 @@ keyup
       return jef.stream.fromValue(
         selection
           ? new crdt.Delete(pos, selection)
-          : new crdt.Delete(pos-1, 1)
+          : new crdt.Delete(Math.max(0, pos-1), 1)
       );
     }
 
@@ -170,7 +170,7 @@ keyup
   })
   .on(op => bench('key-apply', database.apply, database)(op))
   .on(onFrame(render, (op, start, end) => setCursor([op], start, end)))
-  .timeout(300) // here is issue with empty sends
+  // .timeout(300) // here is issue with empty sends
   .on(_ => {
     const data = bench('key-serialise', serialise)(database);
     database = bench('key-snapshot', snapshot)(database);
@@ -184,8 +184,18 @@ messages
   .on(e => {
     database = bench('ws-merge', database.merge, database)(e);
   })
+  .debounce(10)
   .on(onFrame(render, setCursor))
 ;
+
+function renderer(text) {
+  // const order = text.order;
+  // const val = order.vector[order.id];
+
+  return text.reduce((accumulator, operation) => {
+    return operation.apply(accumulator);
+  }, []).join('');
+}
 
 function onFrame(f1, f2) {
   return (arg) => {
@@ -209,7 +219,7 @@ function setCursor(e, start, end) {
 
 function render() {
     const string = bench('render-string', () => {
-      return database.toString();
+      return renderer(database);
     })();
 
     bench('render-set', () => editorElement.value = string)();

@@ -1,51 +1,45 @@
-var functions_1 = require('../functions');
-var Text = (function () {
-    function Text(order, ordersIndex, operationsIndex) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const functions_1 = require("../functions");
+const set_map_1 = require("../structures/set-map");
+const sorted_set_array_1 = require("../structures/sorted-set-array");
+const naive_array_list_1 = require("../structures/naive-array-list");
+class Text {
+    constructor(order, setMap) {
         this.order = order;
-        this.ordersIndex = ordersIndex || [];
-        this.operationsIndex = operationsIndex || [];
-        this.index = this.ordersIndex.findIndex(function (o) { return o.equal(order); });
-        if (-1 === this.index) {
-            this.index = this.ordersIndex.push(order) - 1;
-        }
-        this.operationsIndex[this.index] =
-            this.operationsIndex[this.index] || [];
+        this.setMap = setMap;
+        this.setMap = setMap || new set_map_1.SetMap(new sorted_set_array_1.SortedSetArray(new naive_array_list_1.NaiveArrayList([])), new Map());
     }
-    Text.prototype.apply = function (operation) {
-        this.operationsIndex[this.index].push(operation);
-    };
-    Text.prototype.merge = function (b) {
-        var ordersIndexA = this.ordersIndex.slice(0);
-        var operationsIndexA = this.operationsIndex.slice(0);
-        operationsIndexA = b.operationsIndex.reduce(function (operationsIndexA, operationsB, orderIndexB) {
-            var orderB = b.ordersIndex[orderIndexB];
-            var notFoundInA = -1 === ordersIndexA.findIndex(function (orderA) { return orderA.equal(orderB); });
-            if (notFoundInA) {
-                var index = ordersIndexA.push(orderB) - 1;
-                operationsIndexA[index] = operationsB;
-            }
-            return operationsIndexA;
-        }, operationsIndexA);
-        return new Text(functions_1.merge(this.order, b.order).next(), ordersIndexA, operationsIndexA);
-    };
-    Text.prototype.equal = function (b) {
-        return this.toString() === b.toString();
-    };
-    Text.prototype.reduce = function (fn, accumulator) {
-        var _this = this;
-        return this.ordersIndex.slice(0).sort(f.compare).reduce(function (accumulator, order) {
-            var orderIndex = _this.ordersIndex.findIndex(function (o) { return o.equal(order); });
-            return _this.operationsIndex[orderIndex].reduce(function (accumulator, operation, index) {
-                return fn(accumulator, operation, order, index);
+    next() {
+        return new Text(this.order.next(), this.setMap);
+    }
+    apply(operation) {
+        let value = this.setMap.get(this.order);
+        if (!value) {
+            value = [];
+        }
+        value.push(operation);
+        this.setMap = this.setMap.set(this.order, value);
+    }
+    merge(b) {
+        return new Text(functions_1.merge(this.order, b.order).next(), this.setMap.merge(b.setMap));
+    }
+    equal(b) {
+        return functions_1.equal(this.order, b.order);
+    }
+    reduce(fn, accumulator) {
+        return this.setMap.reduce((accumulator, operations, order) => {
+            return operations.reduce((accumulator, operation) => {
+                return fn(accumulator, operation, order);
             }, accumulator);
         }, accumulator);
-    };
-    Text.prototype.toString = function () {
-        return this.reduce(function (accumulator, operation) {
-            return functions_1.applyOperation(operation, accumulator);
-        }, []).join('');
-    };
-    return Text;
-})();
+    }
+    forEach(fn) {
+        return this.setMap.reduce((_, operations, order) => {
+            fn({ order, operations });
+            return _;
+        }, null);
+    }
+}
 exports.Text = Text;
 //# sourceMappingURL=text.js.map
