@@ -131,11 +131,46 @@ interface Set<T> {
   index(index: number): T
 }
 
+export class SortedSet<T extends Item<T>> implements Set<T> {
+  elements: any
+
+  constructor() {
+    this.elements = [];
+  }
+
+  add(value: T): number {
+    let index = this.elements.findIndex(({item}) => {
+      return item.equal(value)
+    });
+
+    if (-1 === index) {
+      index = this.elements.length;
+      this.elements.push({item: value, index});
+      this.elements.sort((a, b) => compare(a.item, b.item))
+    }
+
+    return index;
+  }
+
+  index(idx: number): T {
+    const item = this.elements.find(({index}) => index === idx);
+    if (item) {
+      return item.item
+    }
+  }
+
+  reduce<Y>(fn: (Y, T, number) => Y, accumulator: Y): Y {
+    return this.elements.reduce((accumulator, {item, index}) => {
+      return fn(accumulator, item, index);
+    }, accumulator);
+  }
+}
+
 function increment(value: number): number {
   return value + 1;
 }
 
-class Indexed<T extends Item<T>> implements Item<T> {
+export class Indexed<T extends Item<T>> implements Item<T> {
   value: T
   index: number
 
@@ -190,54 +225,6 @@ export class SortedSetFast<T extends Item<T>> implements Set<T> {
 
     return this.elements.reduce((accumulator, item) => {
       return fn(accumulator, item.value, item.value.index);
-    }, accumulator);
-  }
-}
-
-function divide<T extends Item<T>>(lower: number, upper: number, elements: Array<Indexed<T>>, item: Indexed<T>): number {
-  const step = (upper - lower);
-  if (step < 1) {
-    elements.splice(lower, 0, item);
-    return item.index;
-  }
-
-  const half = step / 2 | 0;
-  const idx = lower + step;
-  const elm = elements[idx];
-  const cmp = elm.compare(item);
-  if (cmp < 0) {
-    return divide(idx, upper, elements, item);
-  }
-
-  if (cmp > 0) {
-    return divide(lower, idx, elements, item);
-  }
-
-  if (cmp === 0) {
-    return elm.index;
-  }
-}
-
-export class SortedSetArray<T extends Item<T>> implements Set<T> {
-  elements: Array<Indexed<T>>
-
-  constructor() {
-    this.elements = [];
-  }
-  add(value: T): number {
-    const val = new Indexed(value, this.elements.length);
-
-    return divide(0, this.elements.length -1, this.elements, val);
-  }
-
-  index(idx: number): T {
-    const r = this.elements.find(({index}) => index === idx);
-    return r ? r.value : null;
-  }
-
-  reduce<Y>(fn: (Y, T, number) => Y, accumulator: Y): Y {
-    return this.elements.reduce((accumulator, item) => {
-      return fn(accumulator, item.value, item.index);
     }, accumulator);
   }
 }
