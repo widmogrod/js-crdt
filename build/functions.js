@@ -22,8 +22,6 @@ function applyOperation(operation, data) {
 exports.applyOperation = applyOperation;
 function axioms(assert, a, b, c) {
     // commutative   a + c = c + a                i.e: 1 + 2 = 2 + 1
-    let x = a.merge(b);
-    // let x:CRDT<T> = a.merge(b)
     assert(equal(merge(a, b), merge(b, a)), 'is not commutative');
     // associative   a + (b + c) = (a + b) + c    i.e: 1 + (2 + 3) = (1 + 2) + 3
     assert(equal(merge(a, merge(b, c)), merge(merge(a, b), c)), 'is not associative');

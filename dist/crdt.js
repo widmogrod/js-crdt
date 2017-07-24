@@ -23,8 +23,6 @@ function applyOperation(operation, data) {
 exports.applyOperation = applyOperation;
 function axioms(assert, a, b, c) {
     // commutative   a + c = c + a                i.e: 1 + 2 = 2 + 1
-    let x = a.merge(b);
-    // let x:CRDT<T> = a.merge(b)
     assert(equal(merge(a, b), merge(b, a)), 'is not commutative');
     // associative   a + (b + c) = (a + b) + c    i.e: 1 + (2 + 3) = (1 + 2) + 3
     assert(equal(merge(a, merge(b, c)), merge(merge(a, b), c)), 'is not associative');
@@ -64,7 +62,7 @@ __export(require("./utils"));
 __export(require("./order/index"));
 __export(require("./text/index"));
 
-},{"./functions":1,"./increment":2,"./order/index":5,"./text/index":11,"./utils":14}],4:[function(require,module,exports){
+},{"./functions":1,"./increment":2,"./order/index":5,"./text/index":12,"./utils":15}],4:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const utils_1 = require("../utils");
@@ -124,7 +122,7 @@ class Discrete {
 }
 exports.Discrete = Discrete;
 
-},{"../utils":14}],5:[function(require,module,exports){
+},{"../utils":15}],5:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
@@ -188,6 +186,30 @@ exports.NaiveArrayList = NaiveArrayList;
 },{}],8:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+class NaiveImmutableMap {
+    constructor(data) {
+        this.data = data;
+        this.data = data || {};
+    }
+    set(key, value) {
+        const clone = Object
+            .keys(this.data)
+            .reduce((clone, k) => {
+            clone[k] = this.data[k];
+            return clone;
+        }, {});
+        clone[key] = value;
+        return new NaiveImmutableMap(clone);
+    }
+    get(key) {
+        return this.data[key];
+    }
+}
+exports.NaiveImmutableMap = NaiveImmutableMap;
+
+},{}],9:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 class Indexed {
     constructor(value, index) {
         this.value = value;
@@ -209,7 +231,7 @@ class SetMap {
     }
     get(key) {
         const result = this.keys.add(new Indexed(key, this.keys.size()));
-        if (result.result === this.keys) {
+        if (result.result !== this.keys) {
             return null;
         }
         return this.values.get(result.value.index);
@@ -227,7 +249,7 @@ class SetMap {
 }
 exports.SetMap = SetMap;
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function divide(lower, upper, elements, item, onNew, onExists) {
@@ -236,14 +258,14 @@ function divide(lower, upper, elements, item, onNew, onExists) {
         return onNew(item, elements, lower);
     }
     const half = step / 2 | 0;
-    const idx = lower + step;
+    const idx = lower + half;
     const elm = elements.get(idx);
     const cmp = elm.compare(item);
     if (cmp < 0) {
-        return divide(idx, upper, elements, item, onNew, onExists);
+        return divide(half ? (lower + half) : upper, upper, elements, item, onNew, onExists);
     }
     if (cmp > 0) {
-        return divide(lower, idx, elements, item, onNew, onExists);
+        return divide(lower, half ? (upper - half) : lower, elements, item, onNew, onExists);
     }
     return onExists(elm, elements);
 }
@@ -261,10 +283,10 @@ class SortedSetArray {
         return this.elements.size();
     }
     add(value) {
-        return divide(0, this.elements.size() - 1, this.elements, value, (value, elements, lower) => new Tuple(new SortedSetArray(elements.insert(lower, value)), value), (value, elements) => new Tuple(this, value));
+        return divide(0, this.elements.size(), this.elements, value, (value, elements, lower) => new Tuple(new SortedSetArray(elements.insert(lower, value)), value), (value, elements) => new Tuple(this, value));
     }
     has(value) {
-        return divide(0, this.elements.size() - 1, this.elements, value, () => false, () => true);
+        return divide(0, this.elements.size(), this.elements, value, () => false, () => true);
     }
     union(b) {
         return b.reduce((result, item) => {
@@ -277,7 +299,7 @@ class SortedSetArray {
 }
 exports.SortedSetArray = SortedSetArray;
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const utils_1 = require("../utils");
@@ -297,7 +319,7 @@ class Delete {
 }
 exports.Delete = Delete;
 
-},{"../utils":14}],11:[function(require,module,exports){
+},{"../utils":15}],12:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
@@ -307,7 +329,7 @@ __export(require("./insert"));
 __export(require("./delete"));
 __export(require("./text"));
 
-},{"./delete":10,"./insert":12,"./text":13}],12:[function(require,module,exports){
+},{"./delete":11,"./insert":13,"./text":14}],13:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const utils_1 = require("../utils");
@@ -325,18 +347,19 @@ class Insert {
 }
 exports.Insert = Insert;
 
-},{"../utils":14}],13:[function(require,module,exports){
+},{"../utils":15}],14:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const functions_1 = require("../functions");
 const set_map_1 = require("../structures/set-map");
+const naive_immutable_map_1 = require("../structures/naive-immutable-map");
 const sorted_set_array_1 = require("../structures/sorted-set-array");
 const naive_array_list_1 = require("../structures/naive-array-list");
 class Text {
     constructor(order, setMap) {
         this.order = order;
         this.setMap = setMap;
-        this.setMap = setMap || new set_map_1.SetMap(new sorted_set_array_1.SortedSetArray(new naive_array_list_1.NaiveArrayList([])), new Map());
+        this.setMap = setMap || new set_map_1.SetMap(new sorted_set_array_1.SortedSetArray(new naive_array_list_1.NaiveArrayList([])), new naive_immutable_map_1.NaiveImmutableMap());
     }
     next() {
         return new Text(this.order.next(), this.setMap);
@@ -350,7 +373,7 @@ class Text {
         this.setMap = this.setMap.set(this.order, value);
     }
     merge(b) {
-        return new Text(functions_1.merge(this.order, b.order).next(), this.setMap.merge(b.setMap));
+        return new Text(functions_1.merge(this.order, b.order), this.setMap.merge(b.setMap));
     }
     equal(b) {
         return functions_1.equal(this.order, b.order);
@@ -371,7 +394,7 @@ class Text {
 }
 exports.Text = Text;
 
-},{"../functions":1,"../structures/naive-array-list":7,"../structures/set-map":8,"../structures/sorted-set-array":9}],14:[function(require,module,exports){
+},{"../functions":1,"../structures/naive-array-list":7,"../structures/naive-immutable-map":8,"../structures/set-map":9,"../structures/sorted-set-array":10}],15:[function(require,module,exports){
 'use strict';
 Object.defineProperty(exports, "__esModule", { value: true });
 function between(value, min, max) {
