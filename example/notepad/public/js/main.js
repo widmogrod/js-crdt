@@ -26,10 +26,11 @@ function snapshot(text) {
   return text.next();
 }
 
-function shiftCursorPositionRelativeTo(text, position) {
+function shiftCursorPositionRelativeTo(text, position, diff) {
+  diff = diff |0;
   return text.reduce(({shiftBy, position}, operation) => {
     if (operation instanceof crdt.Insert) {
-      if (operation.at <= position) {
+      if (operation.at <= (position + diff)) {
         shiftBy += operation.value.length;
         position += operation.value.length;
       }
@@ -169,7 +170,7 @@ keyup
     return jef.stream.fromValue(new crdt.Insert(pos, key))
   })
   .on(op => bench('key-apply', database.apply, database)(op))
-  .on(onFrame(render, (op, start, end) => setCursor([op], start, end)))
+  .on(onFrame(render, (op, start, end) => setCursorOnKey([op], start, end)))
   // .timeout(300) // here is issue with empty sends
   .on(_ => {
     const data = bench('key-serialise', serialise)(database);
@@ -185,7 +186,7 @@ messages
     database = bench('ws-merge', database.merge, database)(e);
   })
   .debounce(10)
-  .on(onFrame(render, setCursor))
+  .on(onFrame(render, setCursorOnUpdate))
 ;
 
 function renderer(text) {
@@ -211,9 +212,15 @@ function onFrame(f1, f2) {
   };
 }
 
-function setCursor(e, start, end) {
-  return bench('cursor-calculate', () => {
+function setCursorOnKey(e, start, end) {
+  return bench('cursor-key-calculate', () => {
     return shiftCursorPositionRelativeTo(e, start);
+  })();
+}
+
+function setCursorOnUpdate(e, start, end) {
+  return bench('cursor-up-calculate', () => {
+    return shiftCursorPositionRelativeTo(e, start, -1);
   })();
 }
 
