@@ -44,7 +44,7 @@ function shiftCursorPositionRelativeTo(text, position) {
 }
 
 function serialise(text) {
-  const operations = text
+  const operations = text.setMap.get(text.order)
     .reduce((result, operation) => {
       let value = operation instanceof crdt.Insert
         ? {type: 'insert', args: [operation.at, operation.value]}
