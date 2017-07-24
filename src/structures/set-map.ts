@@ -48,7 +48,7 @@ export class SetMap<K extends Item<K>,V> {
 
   get?(key: K): V {
     const result = this.keys.add(new Indexed(key, this.keys.size()))
-    if (result.result === this.keys) {
+    if (result.result !== this.keys) {
       return null;
     }
 

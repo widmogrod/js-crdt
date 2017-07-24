@@ -1,6 +1,8 @@
+
 import {merge,  equal} from '../functions'
 import {Orderer} from '../order'
 import {SetMap, Indexed} from '../structures/set-map'
+import {NaiveImmutableMap} from '../structures/naive-immutable-map'
 import {SortedSetArray} from '../structures/sorted-set-array'
 import {NaiveArrayList} from '../structures/naive-array-list'
 
@@ -9,7 +11,7 @@ export class Text {
     this.setMap = setMap || new SetMap(
       new SortedSetArray(
         new NaiveArrayList([])),
-      new Map()
+      new NaiveImmutableMap()
     );
   }
 
@@ -33,13 +35,13 @@ export class Text {
 
   merge(b) {
     return new Text(
-      merge(this.order, b.order).next(),
+      merge(this.order, b.order),
       this.setMap.merge(b.setMap)
     );
   }
 
   equal(b) {
-    return equal(this.order,b.order);
+    return equal(this.order, b.order);
   }
 
   reduce(fn, accumulator) {

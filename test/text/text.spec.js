@@ -12,11 +12,7 @@ function create(id, vector) {
 }
 
 function snapshot(text) {
-  return new Text(
-    text.order.next(),
-    text.ordersIndex,
-    text.operationsIndex
-  );
+  return text.next();
 }
 
 function lastPosition(text) {
@@ -31,6 +27,12 @@ function lastPosition(text) {
       return operation.at - operation.length;
     }
   }, 0);
+}
+
+function renderer(text) {
+  return text.reduce((accumulator, operation) => {
+    return operation.apply(accumulator);
+  }, []).join('');
 }
 
 describe('Text', () => {
@@ -57,7 +59,7 @@ describe('Text', () => {
     it('should converge to text', () => {
       const merged = f.merge(f.merge(a, b), c);
 
-      assert.equal(merged.toString(), 'ghidefabc');
+      assert.equal(renderer(merged), 'ghidefabc');
     });
   });
 
@@ -85,7 +87,7 @@ describe('Text', () => {
     it('should converge to text', () => {
       const merged = f.merge(f.merge(a, b), c);
 
-      assert.equal(merged.toString(), 'hiefbc');
+      assert.equal(renderer(merged), 'hiefbc');
     });
   });
 
@@ -96,8 +98,6 @@ describe('Text', () => {
       a = new Text(create('a', origin.vector));
       b = new Text(create('b', origin.vector));
 
-      assert.equal(a.index, 0);
-      assert.equal(b.index, 0);
       assert(a.order.id !== b.order.id);
       assert(!a.order.equal(b.order));
       assert(lastPosition(a) === 0);
@@ -107,8 +107,6 @@ describe('Text', () => {
       b = f.merge(b, a);
       a = snapshot(a);
 
-      assert.equal(a.index, 1);
-      assert.equal(b.index, 2);
       assert(a.order.id !== b.order.id);
       assert(!a.order.equal(b.order));
       assert(lastPosition(a) === 1);
@@ -118,8 +116,6 @@ describe('Text', () => {
       b = f.merge(b, a);
       a = snapshot(a);
 
-      assert.equal(a.index, 2);
-      assert.equal(b.index, 4);
       assert(a.order.id !== b.order.id);
       assert(!a.order.equal(b.order));
       assert(lastPosition(a) === 2);
@@ -130,8 +126,6 @@ describe('Text', () => {
       a = snapshot(a);
 
 
-      assert.equal(a.index, 3);
-      assert.equal(b.index, 6);
       assert(a.order.id !== b.order.id);
       assert(!a.order.equal(b.order));
       assert(lastPosition(a) === 3);
@@ -141,8 +135,6 @@ describe('Text', () => {
       a = f.merge(a, b);
       b = snapshot(b);
 
-      assert.equal(a.index, 8);
-      assert.equal(b.index, 7);
       assert(a.order.id !== b.order.id);
       assert(!a.order.equal(b.order));
       assert(lastPosition(a) === 3);
@@ -152,15 +144,13 @@ describe('Text', () => {
       b = f.merge(b, a);
       a = snapshot(a);
 
-      assert.equal(a.index, 9);
-      assert.equal(b.index, 10);
       assert(a.order.id !== b.order.id);
       assert(!a.order.equal(b.order));
       assert.equal(lastPosition(a), 1);
       assert.equal(lastPosition(b), 4);
 
-      assert.equal(a.toString(), 'caaab');
-      assert.equal(b.toString(), 'caaab');
+      assert.equal(renderer(a), 'caaab');
+      assert.equal(renderer(b), 'caaab');
     });
   });
 });

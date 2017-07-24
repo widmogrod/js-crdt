@@ -1,4 +1,3 @@
-
 type ReduceFunc<R,T> = (aggregator: R, item: T) => R
 
 interface List<T> {
@@ -26,16 +25,16 @@ function divide<T extends Item<T>, R>(
   }
 
   const half = step / 2 | 0;
-  const idx = lower + step;
+  const idx = lower + half;
   const elm = elements.get(idx);
   const cmp = elm.compare(item);
 
   if (cmp < 0) {
-    return divide(idx, upper, elements, item, onNew, onExists);
+    return divide(half ? (lower + half) : upper, upper, elements, item, onNew, onExists);
   }
 
   if (cmp > 0) {
-    return divide(lower, idx, elements, item, onNew, onExists);
+    return divide(lower, half ? (upper - half) : lower, elements, item, onNew, onExists);
   }
 
   return onExists(elm, elements)
@@ -58,7 +57,7 @@ export class SortedSetArray<T extends Item<T>> {
 
   add(value: T): Tuple<SortedSetArray<T>,T> {
     return divide(
-      0, this.elements.size() -1, this.elements, value,
+      0, this.elements.size(), this.elements, value,
       (value, elements, lower) => new Tuple(new SortedSetArray(elements.insert(lower, value)), value),
       (value, elements) => new Tuple(this, value)
     );
@@ -66,7 +65,7 @@ export class SortedSetArray<T extends Item<T>> {
 
   has(value: T): boolean {
     return divide(
-      0, this.elements.size() -1, this.elements, value,
+      0, this.elements.size(), this.elements, value,
       () => false,
       () => true
     );
