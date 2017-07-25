@@ -44,8 +44,6 @@ export type AssertFunc = (boolean, string) => void
 
     export function axioms<T extends CRDT<any>>(assert: AssertFunc, a: T, b: T, c: T): void {
     // commutative   a + c = c + a                i.e: 1 + 2 = 2 + 1
-    let x = a.merge(b)
-    // let x:CRDT<T> = a.merge(b)
     assert(
         equal(merge(a, b), merge(b, a)),
         'is not commutative'

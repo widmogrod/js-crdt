@@ -1,17 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var utils_1 = require("../utils");
-var functions_1 = require("../functions");
-var Insert = (function () {
-    function Insert(at, value) {
-        this.at = at;
+const utils_1 = require("../utils");
+class Insert {
+    constructor(at, value) {
+        this.at = at < 0 ? 0 : at;
         this.value = String(value);
     }
-    Insert.prototype.apply = function (data) {
-        data = utils_1.ensureArrayLength(data, this.at);
-        return functions_1.concat(functions_1.concat(data.slice(0, this.at), this.value.split('')), data.slice(this.at));
-    };
-    return Insert;
-}());
+    apply(data) {
+        let copy = data.slice(0);
+        copy = utils_1.ensureArrayLength(copy, this.at);
+        copy.splice(this.at, 0, ...this.value.split(''));
+        return copy;
+    }
+}
 exports.Insert = Insert;
 //# sourceMappingURL=insert.js.map

@@ -1,4 +1,4 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.crdt = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function merge(a, b) {
@@ -23,8 +23,6 @@ function applyOperation(operation, data) {
 exports.applyOperation = applyOperation;
 function axioms(assert, a, b, c) {
     // commutative   a + c = c + a                i.e: 1 + 2 = 2 + 1
-    var x = a.merge(b);
-    // let x:CRDT<T> = a.merge(b)
     assert(equal(merge(a, b), merge(b, a)), 'is not commutative');
     // associative   a + (b + c) = (a + b) + c    i.e: 1 + (2 + 3) = (1 + 2) + 3
     assert(equal(merge(a, merge(b, c)), merge(merge(a, b), c)), 'is not associative');
@@ -36,21 +34,20 @@ exports.axioms = axioms;
 },{}],2:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var Increment = (function () {
-    function Increment(value) {
+class Increment {
+    constructor(value) {
         this.value = value;
     }
-    Increment.prototype.merge = function (b) {
+    merge(b) {
         return new Increment(Math.max(this.value, b.value));
-    };
-    Increment.prototype.equal = function (b) {
+    }
+    equal(b) {
         return this.value === b.value;
-    };
-    Increment.prototype.increment = function () {
+    }
+    increment() {
         return new Increment(this.value + 1);
-    };
-    return Increment;
-}());
+    }
+}
 exports.Increment = Increment;
 
 },{}],3:[function(require,module,exports){
@@ -65,63 +62,67 @@ __export(require("./utils"));
 __export(require("./order/index"));
 __export(require("./text/index"));
 
-},{"./functions":1,"./increment":2,"./order/index":5,"./text/index":8,"./utils":10}],4:[function(require,module,exports){
+},{"./functions":1,"./increment":2,"./order/index":5,"./text/index":12,"./utils":15}],4:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var utils_1 = require("../utils");
-var Discrete = (function () {
-    function Discrete(id, vector) {
+const utils_1 = require("../utils");
+class Discrete {
+    constructor(id, vector) {
         vector = utils_1.clone(vector);
         vector[id] = vector[id] || 0;
         this.id = id;
         this.vector = vector;
     }
-    Discrete.prototype.next = function () {
-        var vector = utils_1.clone(this.vector);
+    next() {
+        const vector = utils_1.clone(this.vector);
         ++vector[this.id];
         return new Discrete(this.id, vector);
-    };
-    Discrete.prototype.merge = function (b) {
-        var _this = this;
-        var vector = utils_1.union(Object.keys(this.vector), Object.keys(b.vector)).reduce(function (vector, key) {
-            vector[key] = Math.max(_this.vector[key] || 0, b.vector[key] || 0);
+    }
+    merge(b) {
+        const vector = utils_1.union(Object.keys(this.vector), Object.keys(b.vector)).reduce((vector, key) => {
+            vector[key] = Math.max(this.vector[key] || 0, b.vector[key] || 0);
             return vector;
         }, {});
         return new Discrete(this.id, vector);
-    };
-    Discrete.prototype.equal = function (b) {
+    }
+    equal(b) {
         return this.compare(b) === 0;
-    };
-    Discrete.prototype.compare = function (b) {
-        var _this = this;
-        var position = utils_1.common(this.vector, b.vector)
-            .reduce(function (result, key) {
-            return result + (_this.vector[key] - b.vector[key]);
+    }
+    compare(b) {
+        const position = utils_1.common(this.vector, b.vector)
+            .reduce((result, key) => {
+            return result + (this.vector[key] - b.vector[key]);
         }, 0);
-        if (position === 0) {
-            var tipPosition = this.vector[this.id] - b.vector[b.id];
-            if (tipPosition !== 0) {
-                return tipPosition;
-            }
-            var ha = b.vector.hasOwnProperty(this.id);
-            var hb = this.vector.hasOwnProperty(b.id);
-            if (!ha && !hb) {
-                return this.id < b.id ? -1 : 1;
-            }
-            else if (ha && !hb) {
-                return -1;
-            }
-            else if (hb && !ha) {
-                return 1;
-            }
+        if (position !== 0) {
+            return position;
         }
-        return position;
-    };
-    return Discrete;
-}());
+        const difA = utils_1.diff(this.vector, b.vector).length;
+        const difB = utils_1.diff(b.vector, this.vector).length;
+        const dif = difA - difB;
+        if (dif !== 0) {
+            return dif;
+        }
+        const tipPosition = this.vector[this.id] - b.vector[b.id];
+        if (tipPosition !== 0) {
+            return tipPosition;
+        }
+        const ha = b.vector.hasOwnProperty(this.id);
+        const hb = this.vector.hasOwnProperty(b.id);
+        if (!ha && !hb) {
+            return this.id < b.id ? -1 : 1;
+        }
+        else if (ha && !hb) {
+            return -1;
+        }
+        else if (hb && !ha) {
+            return 1;
+        }
+        return 0;
+    }
+}
 exports.Discrete = Discrete;
 
-},{"../utils":10}],5:[function(require,module,exports){
+},{"../utils":15}],5:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
@@ -135,129 +136,265 @@ __export(require("./timestamp"));
 },{"./discrete":4,"./timestamp":6}],6:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var Timestamp = (function () {
-    function Timestamp(bucket, time) {
+class Timestamp {
+    constructor(bucket, time) {
         this.bucket = bucket;
         this.time = time;
     }
-    Timestamp.prototype.next = function () {
+    next() {
         return new Timestamp(this.bucket, this.time + 1);
-    };
-    Timestamp.prototype.compare = function (b) {
+    }
+    compare(b) {
         if (this.bucket === b.bucket) {
             return this.time - b.time;
         }
         return this.bucket < b.bucket ? -1 : 1;
-    };
-    Timestamp.prototype.merge = function (b) {
+    }
+    merge(b) {
         return this;
-    };
-    Timestamp.prototype.equal = function (b) {
+    }
+    equal(b) {
         return false;
-    };
-    return Timestamp;
-}());
+    }
+}
 exports.Timestamp = Timestamp;
 
 },{}],7:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var utils_1 = require("../utils");
-var functions_1 = require("../functions");
-var Delete = (function () {
-    function Delete(at, length) {
+class NaiveArrayList {
+    constructor(array) {
+        this.array = array || [];
+    }
+    insert(at, item) {
+        const clone = this.array.slice(0);
+        clone.splice(at, 0, item);
+        return new NaiveArrayList(clone);
+    }
+    get(at) {
+        return this.array[at];
+    }
+    size() {
+        return this.array.length;
+    }
+    reduce(fn, aggregator) {
+        return this.array.reduce(fn, aggregator);
+    }
+}
+exports.NaiveArrayList = NaiveArrayList;
+
+},{}],8:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+class NaiveImmutableMap {
+    constructor(data) {
+        this.data = data;
+        this.data = data || {};
+    }
+    set(key, value) {
+        const clone = Object
+            .keys(this.data)
+            .reduce((clone, k) => {
+            clone[k] = this.data[k];
+            return clone;
+        }, {});
+        clone[key] = value;
+        return new NaiveImmutableMap(clone);
+    }
+    get(key) {
+        return this.data[key];
+    }
+}
+exports.NaiveImmutableMap = NaiveImmutableMap;
+
+},{}],9:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+class Indexed {
+    constructor(value, index) {
+        this.value = value;
+        this.index = index;
+    }
+    compare(b) {
+        return this.value.compare(b.value);
+    }
+}
+exports.Indexed = Indexed;
+class SetMap {
+    constructor(keys, values) {
+        this.keys = keys;
+        this.values = values;
+    }
+    set(key, value) {
+        const result = this.keys.add(new Indexed(key, this.keys.size()));
+        return new SetMap(result.result, this.values.set(result.value.index, value));
+    }
+    get(key) {
+        const result = this.keys.add(new Indexed(key, this.keys.size()));
+        if (result.result !== this.keys) {
+            return null;
+        }
+        return this.values.get(result.value.index);
+    }
+    merge(b) {
+        return b.reduce((aggregator, item, key) => {
+            return aggregator.set(key, item);
+        }, this);
+    }
+    reduce(fn, aggregator) {
+        return this.keys.reduce((aggregator, key) => {
+            return fn(aggregator, this.values.get(key.index), key.value);
+        }, aggregator);
+    }
+}
+exports.SetMap = SetMap;
+
+},{}],10:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+function divide(lower, upper, elements, item, onNew, onExists) {
+    const step = (upper - lower);
+    if (step < 1) {
+        return onNew(item, elements, lower);
+    }
+    const half = step / 2 | 0;
+    const idx = lower + half;
+    const elm = elements.get(idx);
+    const cmp = elm.compare(item);
+    if (cmp < 0) {
+        return divide(half ? (lower + half) : upper, upper, elements, item, onNew, onExists);
+    }
+    if (cmp > 0) {
+        return divide(lower, half ? (upper - half) : lower, elements, item, onNew, onExists);
+    }
+    return onExists(elm, elements);
+}
+class Tuple {
+    constructor(result, value) {
+        this.result = result;
+        this.value = value;
+    }
+}
+class SortedSetArray {
+    constructor(elements) {
+        this.elements = elements;
+    }
+    size() {
+        return this.elements.size();
+    }
+    add(value) {
+        return divide(0, this.elements.size(), this.elements, value, (value, elements, lower) => new Tuple(new SortedSetArray(elements.insert(lower, value)), value), (value, elements) => new Tuple(this, value));
+    }
+    has(value) {
+        return divide(0, this.elements.size(), this.elements, value, () => false, () => true);
+    }
+    union(b) {
+        return b.reduce((result, item) => {
+            return result.add(item).result;
+        }, this);
+    }
+    reduce(fn, accumulator) {
+        return this.elements.reduce(fn, accumulator);
+    }
+}
+exports.SortedSetArray = SortedSetArray;
+
+},{}],11:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const utils_1 = require("../utils");
+class Delete {
+    constructor(at, length) {
         this.at = at;
         this.length = length;
     }
-    Delete.prototype.apply = function (data) {
-        data = utils_1.ensureArrayLength(data, this.at);
-        return functions_1.concat(data.slice(0, this.at), data.slice(this.at + this.length));
-    };
-    return Delete;
-}());
+    apply(data) {
+        if (this.at < 0)
+            return data;
+        let copy = data.slice(0);
+        copy = utils_1.ensureArrayLength(copy, this.at);
+        copy.splice(this.at, this.length);
+        return copy;
+    }
+}
 exports.Delete = Delete;
 
-},{"../functions":1,"../utils":10}],8:[function(require,module,exports){
+},{"../utils":15}],12:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 Object.defineProperty(exports, "__esModule", { value: true });
-__export(require("./delete"));
 __export(require("./insert"));
-var functions_1 = require("../functions");
-// type Operation = Insert | Delete
-// type OrdersIndex = Array<Operation>
-// type OperationsIndex<T> = Array<Orderer<Text<T>>
-var Text = (function () {
-    function Text(order, ordersIndex, operationsIndex) {
-        this.order = order;
-        this.ordersIndex = ordersIndex || [];
-        this.operationsIndex = operationsIndex || [];
-        this.index = this.ordersIndex.findIndex(function (o) { return o.equal(order); });
-        if (-1 === this.index) {
-            this.index = this.ordersIndex.push(order) - 1;
-        }
-        this.operationsIndex[this.index] =
-            this.operationsIndex[this.index] || [];
-    }
-    Text.prototype.apply = function (operation) {
-        this.operationsIndex[this.index].push(operation);
-    };
-    Text.prototype.merge = function (b) {
-        var ordersIndexA = this.ordersIndex.slice(0);
-        var operationsIndexA = this.operationsIndex.slice(0);
-        operationsIndexA = b.operationsIndex.reduce(function (operationsIndexA, operationsB, orderIndexB) {
-            var orderB = b.ordersIndex[orderIndexB];
-            var notFoundInA = -1 === ordersIndexA.findIndex(function (orderA) { return orderA.equal(orderB); });
-            if (notFoundInA) {
-                var index = ordersIndexA.push(orderB) - 1;
-                operationsIndexA[index] = operationsB;
-            }
-            return operationsIndexA;
-        }, operationsIndexA);
-        return new Text(functions_1.merge(this.order, b.order).next(), ordersIndexA, operationsIndexA);
-    };
-    Text.prototype.equal = function (b) {
-        return this.toString() === b.toString();
-    };
-    Text.prototype.reduce = function (fn, accumulator) {
-        var _this = this;
-        return this.ordersIndex.slice(0).sort(functions_1.compare).reduce(function (accumulator, order) {
-            var orderIndex = _this.ordersIndex.findIndex(function (o) { return o.equal(order); });
-            return _this.operationsIndex[orderIndex].reduce(function (accumulator, operation, index) {
-                return fn(accumulator, operation, order, index);
-            }, accumulator);
-        }, accumulator);
-    };
-    Text.prototype.toString = function () {
-        return this.reduce(function (accumulator, operation) {
-            return functions_1.applyOperation(operation, accumulator);
-        }, []).join('');
-    };
-    return Text;
-}());
-exports.Text = Text;
+__export(require("./delete"));
+__export(require("./text"));
 
-},{"../functions":1,"./delete":7,"./insert":9}],9:[function(require,module,exports){
+},{"./delete":11,"./insert":13,"./text":14}],13:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var utils_1 = require("../utils");
-var functions_1 = require("../functions");
-var Insert = (function () {
-    function Insert(at, value) {
-        this.at = at;
+const utils_1 = require("../utils");
+class Insert {
+    constructor(at, value) {
+        this.at = at < 0 ? 0 : at;
         this.value = String(value);
     }
-    Insert.prototype.apply = function (data) {
-        data = utils_1.ensureArrayLength(data, this.at);
-        return functions_1.concat(functions_1.concat(data.slice(0, this.at), this.value.split('')), data.slice(this.at));
-    };
-    return Insert;
-}());
+    apply(data) {
+        let copy = data.slice(0);
+        copy = utils_1.ensureArrayLength(copy, this.at);
+        copy.splice(this.at, 0, ...this.value.split(''));
+        return copy;
+    }
+}
 exports.Insert = Insert;
 
-},{"../functions":1,"../utils":10}],10:[function(require,module,exports){
+},{"../utils":15}],14:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const functions_1 = require("../functions");
+const set_map_1 = require("../structures/set-map");
+const naive_immutable_map_1 = require("../structures/naive-immutable-map");
+const sorted_set_array_1 = require("../structures/sorted-set-array");
+const naive_array_list_1 = require("../structures/naive-array-list");
+class Text {
+    constructor(order, setMap) {
+        this.order = order;
+        this.setMap = setMap;
+        this.setMap = setMap || new set_map_1.SetMap(new sorted_set_array_1.SortedSetArray(new naive_array_list_1.NaiveArrayList([])), new naive_immutable_map_1.NaiveImmutableMap());
+    }
+    next() {
+        return new Text(this.order.next(), this.setMap);
+    }
+    apply(operation) {
+        let value = this.setMap.get(this.order);
+        if (!value) {
+            value = [];
+        }
+        value.push(operation);
+        this.setMap = this.setMap.set(this.order, value);
+    }
+    merge(b) {
+        return new Text(functions_1.merge(this.order, b.order), this.setMap.merge(b.setMap));
+    }
+    equal(b) {
+        return functions_1.equal(this.order, b.order);
+    }
+    reduce(fn, accumulator) {
+        return this.setMap.reduce((accumulator, operations, order) => {
+            return operations.reduce((accumulator, operation) => {
+                return fn(accumulator, operation, order);
+            }, accumulator);
+        }, accumulator);
+    }
+    forEach(fn) {
+        return this.setMap.reduce((_, operations, order) => {
+            fn({ order, operations });
+            return _;
+        }, null);
+    }
+}
+exports.Text = Text;
+
+},{"../functions":1,"../structures/naive-array-list":7,"../structures/naive-immutable-map":8,"../structures/set-map":9,"../structures/sorted-set-array":10}],15:[function(require,module,exports){
 'use strict';
 Object.defineProperty(exports, "__esModule", { value: true });
 function between(value, min, max) {
@@ -283,7 +420,7 @@ function sortNumbers(a, b) {
 exports.sortNumbers = sortNumbers;
 function clone(obj) {
     var target = {};
-    for (var i in obj) {
+    for (const i in obj) {
         if (obj.hasOwnProperty(i)) {
             target[i] = obj[i];
         }
@@ -303,7 +440,7 @@ function union(a, b) {
 }
 exports.union = union;
 function common(a, b) {
-    return Object.keys(a).reduce(function (r, k) {
+    return Object.keys(a).reduce((r, k) => {
         if (b.hasOwnProperty(k)) {
             r.push(k);
         }
@@ -311,5 +448,15 @@ function common(a, b) {
     }, []).sort();
 }
 exports.common = common;
+function diff(a, b) {
+    return Object.keys(a).reduce((r, k) => {
+        if (!b.hasOwnProperty(k)) {
+            r.push(k);
+        }
+        return r;
+    }, []);
+}
+exports.diff = diff;
 
-},{}]},{},[3]);
+},{}]},{},[3])(3)
+});

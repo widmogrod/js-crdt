@@ -1,19 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var Increment = (function () {
-    function Increment(value) {
+class Increment {
+    constructor(value) {
         this.value = value;
     }
-    Increment.prototype.merge = function (b) {
+    merge(b) {
         return new Increment(Math.max(this.value, b.value));
-    };
-    Increment.prototype.equal = function (b) {
+    }
+    equal(b) {
         return this.value === b.value;
-    };
-    Increment.prototype.increment = function () {
+    }
+    increment() {
         return new Increment(this.value + 1);
-    };
-    return Increment;
-}());
+    }
+}
 exports.Increment = Increment;
 //# sourceMappingURL=increment.js.map

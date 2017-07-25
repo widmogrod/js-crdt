@@ -1,5 +1,4 @@
 import { ensureArrayLength } from '../utils';
-import { concat, Applicator } from '../functions';
 
 export class Delete {
     at: number
@@ -10,11 +9,11 @@ export class Delete {
     }
 
     apply(data) {
-        data = ensureArrayLength(data, this.at);
+        if (this.at < 0) return data
 
-        return concat(
-            data.slice(0, this.at),
-            data.slice(this.at + this.length)
-        );
+        let copy = data.slice(0);
+        copy = ensureArrayLength(copy, this.at);
+        copy.splice(this.at, this.length);
+        return copy;
     }
 }
