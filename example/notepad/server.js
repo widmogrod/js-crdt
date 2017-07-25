@@ -25,13 +25,13 @@ function serialise(order, operations) {
   return JSON.stringify(
     operations
     .reduce((result, operation) => {
-      let value = operation instanceof Insert
+      const value = operation instanceof Insert
         ? {type: 'insert', args: [operation.at, operation.value]}
         : {type: 'delete', args: [operation.at, operation.length]}
       ;
 
       result.operations.push(value);
-      return result
+      return result;
     }, {
       operations: [],
       order: {
@@ -39,7 +39,7 @@ function serialise(order, operations) {
         vector: order.vector,
       }
     })
-   );
+  );
 }
 
 function deserialise(string) {
@@ -51,8 +51,8 @@ function deserialise(string) {
       ? new Insert(args[0], args[1])
       : new Delete(args[0], args[1]);
 
-    text.apply(operation)
-    return text
+    text.apply(operation);
+    return text;
   }, new Text(new Discrete(id, vector)));
 }
 
@@ -62,12 +62,12 @@ let database = new Text(new Discrete('server', {}));
 wss.on('connection', function connection(ws) {
   // Restore database state
   database.forEach(({order, operations}) => {
-    ws.send(serialise(order, operations))
+    ws.send(serialise(order, operations));
   });
 
   ws.on('message', function incoming(data) {
     // Update database state
-    database = database.merge(deserialise(data))
+    database = database.merge(deserialise(data));
 
     // Broadcast to everyone else.
     wss.clients.forEach(function each(client) {
@@ -80,5 +80,8 @@ wss.on('connection', function connection(ws) {
 
 server.on('request', app);
 server.listen(app.get('port'), function listening() {
-  console.log('Listening on %d', server.address().port);
+  const host = server.address().address;
+  const port = server.address().port;
+
+  console.log('Listening at http://%s:%s', host, port)
 });
