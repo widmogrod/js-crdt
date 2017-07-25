@@ -1,1 +1,1 @@
-web: cd example; node server.js
+web: cd example/notepad; node server.js
