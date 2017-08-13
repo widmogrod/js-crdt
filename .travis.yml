@@ -12,3 +12,12 @@ script:
 
 notifications:
   email: false
+
+deploy:
+  provider: npm
+  email: "EMAIL_ADDRESS"
+  api_key: "NPM_AUTH_TOKEN"
+  tag: next
+  on:
+    tags: true
+    all_branches: true
