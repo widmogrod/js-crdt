@@ -13,6 +13,9 @@ script:
 notifications:
   email: false
 
+before_deploy:
+- npm run deploy
+
 deploy:
   provider: npm
   email: "EMAIL_ADDRESS"
@@ -20,4 +23,4 @@ deploy:
   tag: next
   on:
     tags: true
-    all_branches: true
+    branch: master
