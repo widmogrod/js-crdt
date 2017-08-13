@@ -5,6 +5,7 @@ interface List<T> {
   get?(at: number): T
   size(): number
   reduce<R>(fn: ReduceFunc<R,T>, aggregator: R): R
+  mempty(): List<T>
 }
 
 interface Item<T> {
@@ -51,6 +52,10 @@ export class SortedSetArray<T extends Item<T>> {
     this.elements = elements;
   }
 
+  mempty(): SortedSetArray<T> {
+    return new SortedSetArray(this.elements.mempty());
+  }
+
   size(): number {
     return this.elements.size();
   }
@@ -75,6 +80,29 @@ export class SortedSetArray<T extends Item<T>> {
     return b.reduce((result: SortedSetArray<T>, item: T): SortedSetArray<T> => {
       return result.add(item).result;
     }, this);
+  }
+
+  intersect(b: SortedSetArray<T>): SortedSetArray<T> {
+    return b.reduce((result: SortedSetArray<T>, item: T): SortedSetArray<T> => {
+      return this.has(item) ? result.add(item).result : result;
+    }, this.mempty());
+  }
+
+  difference(b: SortedSetArray<T>): SortedSetArray<T> {
+    return this.reduce((result: SortedSetArray<T>, item: T): SortedSetArray<T> => {
+      return b.has(item) ? result : result.add(item).result;
+    }, this.mempty())
+  }
+
+  equal(b: SortedSetArray<T>): boolean {
+    if (this.size() != b.size()) {
+      return false;
+    }
+
+    // TODO reduce is not optimal, because it iterates till the end of set
+    return b.reduce((equal: boolean, item: T): boolean => {
+      return equal ? this.has(item) : equal;
+    }, true);
   }
 
   reduce<R>(fn: ReduceFunc<R,T>, accumulator: R): R {

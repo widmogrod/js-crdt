@@ -2,7 +2,7 @@
   "name": "js-crdt",
   "version": "1.0.0",
   "description": "CRDT Conflict-free Replication Data Type",
-  "main": "src/index.js",
+  "main": "build/index.js",
   "scripts": {
     "pretest": "npm run build",
     "test": "mocha",

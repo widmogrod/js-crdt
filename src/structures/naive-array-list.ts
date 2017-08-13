@@ -23,4 +23,8 @@ export class NaiveArrayList<T> {
   reduce<R>(fn: ReduceFunc<R,T>, aggregator: R): R {
     return this.array.reduce(fn, aggregator);
   }
+
+  mempty(): NaiveArrayList<T> {
+    return new NaiveArrayList()
+  }
 }

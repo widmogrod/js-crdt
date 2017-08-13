@@ -18,6 +18,9 @@ class NaiveArrayList {
     reduce(fn, aggregator) {
         return this.array.reduce(fn, aggregator);
     }
+    mempty() {
+        return new NaiveArrayList();
+    }
 }
 exports.NaiveArrayList = NaiveArrayList;
 //# sourceMappingURL=naive-array-list.js.map

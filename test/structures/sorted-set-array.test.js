@@ -1,6 +1,7 @@
 const assert = require('assert');
 const {SortedSetArray} = require('../../src/structures/sorted-set-array');
 const {NaiveArrayList} = require('../../src/structures/naive-array-list');
+const {axioms} = require('../../src/structures/set-axioms');
 
 class Cmp {
   constructor(value) {
@@ -46,5 +47,14 @@ describe('SortedSetArray', () => {
     assert(set4.size() === 3);
     assert(set5 === set4);
     assert(set5.size() === 3);
+  });
+
+
+  it('should obey set axioms', () => {
+    const s1 = new SortedSetArray(new NaiveArrayList([]));
+    const s2 = s1.add(a).result;
+    const s3 = s1.add(b).result.add(c).result;
+
+    axioms(assert, s1, s2, s3);
   });
 });
