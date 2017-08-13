@@ -40,9 +40,9 @@ export function applyOperation<T1, T2>(operation: Applicator<T1, T2>, data: T2):
 
 export interface CRDT<T> extends Merger<T>, Equaler<T> { }
 
-export type AssertFunc = (boolean, string) => void
+export type AssertFunc = (boolean, string) => void;
 
-    export function axioms<T extends CRDT<any>>(assert: AssertFunc, a: T, b: T, c: T): void {
+export function axioms<T extends CRDT<any>>(assert: AssertFunc, a: T, b: T, c: T): void {
     // commutative   a + c = c + a                i.e: 1 + 2 = 2 + 1
     assert(
         equal(merge(a, b), merge(b, a)),
