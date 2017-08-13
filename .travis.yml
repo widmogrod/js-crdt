@@ -14,7 +14,7 @@ notifications:
   email: false
 
 before_deploy:
-- npm run deploy
+- npm run dist
 
 deploy:
   provider: npm
