@@ -27,6 +27,9 @@ class SortedSetArray {
     constructor(elements) {
         this.elements = elements;
     }
+    mempty() {
+        return new SortedSetArray(this.elements.mempty());
+    }
     size() {
         return this.elements.size();
     }
@@ -40,6 +43,25 @@ class SortedSetArray {
         return b.reduce((result, item) => {
             return result.add(item).result;
         }, this);
+    }
+    intersect(b) {
+        return b.reduce((result, item) => {
+            return this.has(item) ? result.add(item).result : result;
+        }, this.mempty());
+    }
+    difference(b) {
+        return this.reduce((result, item) => {
+            return b.has(item) ? result : result.add(item).result;
+        }, this.mempty());
+    }
+    equal(b) {
+        if (this.size() != b.size()) {
+            return false;
+        }
+        // TODO reduce is not optimal, because it iterates till the end of set
+        return b.reduce((equal, item) => {
+            return equal ? this.has(item) : equal;
+        }, true);
     }
     reduce(fn, accumulator) {
         return this.elements.reduce(fn, accumulator);
