@@ -1,66 +1,66 @@
 'use strict';
 
 export function between(value: number, min: number, max: number): boolean {
-    if (value <= min) {
-        return false;
-    } else if (value >= max) {
-        return false;
-    }
+  if (value <= min) {
+    return false;
+  } else if (value >= max) {
+    return false;
+  }
 
-    return true;
+  return true;
 }
 
 export function ensureArrayLength<T>(array: Array<T>, len: number): Array<T> {
-    if (array.length < len) {
-        array.length = len;
-    }
+  if (array.length < len) {
+    array.length = len;
+  }
 
-    return array;
+  return array;
 }
 
 export function sortNumbers(a: number, b: number): number {
-    return a - b;
+  return a - b;
 }
 
 export function clone<T>(obj: T): T {
-    var target = (<T>{});
+  var target = (<T>{});
 
-    for (const i in obj) {
-        if (obj.hasOwnProperty(i)) {
-            target[i] = obj[i];
-        }
+  for (const i in obj) {
+    if (obj.hasOwnProperty(i)) {
+      target[i] = obj[i];
     }
+  }
 
-    return target;
+  return target;
 }
 
 function keyToMap(r: any, i: any): any {
-    r[i] = true;
-    return r;
+  r[i] = true;
+  return r;
 };
 
 export function union(a: any, b: any): any {
-    a = a.reduce(keyToMap, {})
-    b = b.reduce(keyToMap, a)
-    return Object.keys(b);
+  a = a.reduce(keyToMap, {})
+  b = b.reduce(keyToMap, a)
+  return Object.keys(b);
 }
 
 export function common<T>(a: T, b: T): Array<T> {
-    return Object.keys(a).reduce((r, k) => {
-        if (b.hasOwnProperty(k)) {
-            r.push(k);
-        }
+  return Object.keys(a).reduce((r, k) => {
+    if (b.hasOwnProperty(k)) {
+      r.push(k);
+    }
 
-        return r;
-    }, []).sort();
+    return r;
+  }, []).sort();
 }
 
 export function diff<T>(a: T, b:T): Array<T> {
-    return Object.keys(a).reduce((r, k) => {
-        if (!b.hasOwnProperty(k)) {
-            r.push(k);
-        }
+  return Object.keys(a).reduce((r, k) => {
+    if (!b.hasOwnProperty(k)) {
+      r.push(k);
+    }
 
-        return r;
-    }, []);
+    return r;
+  }, []);
 }
