@@ -5,6 +5,8 @@ class Delete {
     constructor(at, length) {
         this.at = at;
         this.length = length;
+        this.at = at;
+        this.length = length;
     }
     apply(data) {
         if (this.at < 0)

@@ -3,6 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const utils_1 = require("../utils");
 class Insert {
     constructor(at, value) {
+        this.at = at;
+        this.value = value;
         this.at = at < 0 ? 0 : at;
         this.value = String(value);
     }

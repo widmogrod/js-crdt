@@ -1,9 +1,7 @@
 import { ensureArrayLength } from '../utils';
 
 export class Delete {
-    at: number
-    length: number
-    constructor(at: number, length: number) {
+    constructor(public at: number, public length: number) {
         this.at = at;
         this.length = length;
     }
