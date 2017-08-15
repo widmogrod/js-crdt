@@ -4,6 +4,8 @@ class Timestamp {
     constructor(bucket, time) {
         this.bucket = bucket;
         this.time = time;
+        this.bucket = bucket;
+        this.time = time;
     }
     next() {
         return new Timestamp(this.bucket, this.time + 1);

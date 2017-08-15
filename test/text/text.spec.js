@@ -1,41 +1,15 @@
 'use strict';
 
-const Text = require('../../build/text').Text;
-const Insert = require('../../build/text').Insert;
-const Delete = require('../../build/text').Delete;
-const Discrete = require('../../build/order/discrete').Discrete;
+const {Text, Insert, Delete, snapshot, renderString} = require('../../build/text');
+const {VectorClock} = require('../../build/order/vector-clock');
 const f = require('../../build/functions');
 const assert = require('assert');
 
 function create(id, vector) {
-  return new Discrete(id, vector);
+  return new VectorClock(id, vector);
 }
 
-function snapshot(text) {
-  return text.next();
-}
-
-function lastPosition(text) {
-  return text.reduce(function(position, operation, order) {
-    if (order.id !== text.order.id) {
-      return position;
-    }
-
-    if (operation instanceof Insert) {
-      return operation.at + operation.value.length;
-    } else {
-      return operation.at - operation.length;
-    }
-  }, 0);
-}
-
-function renderer(text) {
-  return text.reduce((accumulator, operation) => {
-    return operation.apply(accumulator);
-  }, []).join('');
-}
-
-describe('Text', () => {
+describe('text.Text', () => {
   const origin = create('origin', {origin: 0});
 
   describe('axioms for ordered inserts', () => {
@@ -59,7 +33,7 @@ describe('Text', () => {
     it('should converge to text', () => {
       const merged = f.merge(f.merge(a, b), c);
 
-      assert.equal(renderer(merged), 'ghidefabc');
+      assert.equal(renderString(merged), 'ghidefabc');
     });
   });
 
@@ -87,7 +61,7 @@ describe('Text', () => {
     it('should converge to text', () => {
       const merged = f.merge(f.merge(a, b), c);
 
-      assert.equal(renderer(merged), 'hiefbc');
+      assert.equal(renderString(merged), 'hiefbc');
     });
   });
 
@@ -100,8 +74,6 @@ describe('Text', () => {
 
       assert(a.order.id !== b.order.id);
       assert(!a.order.equal(b.order));
-      assert(lastPosition(a) === 0);
-      assert(lastPosition(b) === 0);
 
       a.apply(new Insert(0, 'a'));
       b = f.merge(b, a);
@@ -109,8 +81,6 @@ describe('Text', () => {
 
       assert(a.order.id !== b.order.id);
       assert(!a.order.equal(b.order));
-      assert(lastPosition(a) === 1);
-      assert(lastPosition(b) === 0);
 
       a.apply(new Insert(1, 'a'));
       b = f.merge(b, a);
@@ -118,8 +88,6 @@ describe('Text', () => {
 
       assert(a.order.id !== b.order.id);
       assert(!a.order.equal(b.order));
-      assert(lastPosition(a) === 2);
-      assert(lastPosition(b) === 0);
 
       a.apply(new Insert(2, 'a'));
       b = f.merge(b, a);
@@ -128,8 +96,6 @@ describe('Text', () => {
 
       assert(a.order.id !== b.order.id);
       assert(!a.order.equal(b.order));
-      assert(lastPosition(a) === 3);
-      assert(lastPosition(b) === 0);
 
       b.apply(new Insert(3, 'b'));
       a = f.merge(a, b);
@@ -137,8 +103,6 @@ describe('Text', () => {
 
       assert(a.order.id !== b.order.id);
       assert(!a.order.equal(b.order));
-      assert(lastPosition(a) === 3);
-      assert(lastPosition(b) === 4);
 
       a.apply(new Insert(0, 'c'));
       b = f.merge(b, a);
@@ -146,11 +110,9 @@ describe('Text', () => {
 
       assert(a.order.id !== b.order.id);
       assert(!a.order.equal(b.order));
-      assert.equal(lastPosition(a), 1);
-      assert.equal(lastPosition(b), 4);
 
-      assert.equal(renderer(a), 'caaab');
-      assert.equal(renderer(b), 'caaab');
+      assert.equal(renderString(a), 'caaab');
+      assert.equal(renderString(b), 'caaab');
     });
   });
 });

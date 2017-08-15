@@ -1,9 +1,9 @@
 'use strict';
 
-const Insert = require('../../build/text/insert').Insert;
+const {Insert, operationToArray} = require('../../build/text/index');
 const assert = require('assert');
 
-describe('Text.insert', () => {
+describe('text.Insert', () => {
   describe('Insert operation, applied on data', () => {
     const useCases = {
       'should insert as first element': {
@@ -39,7 +39,7 @@ describe('Text.insert', () => {
         const operation = new Insert(useCase.at, useCase.value);
 
         assert.deepEqual(
-          operation.apply(useCase.data),
+          operationToArray(useCase.data, operation),
           useCase.expected
         );
       });

@@ -1,11 +1,13 @@
 "use strict";
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
 Object.defineProperty(exports, "__esModule", { value: true });
-__export(require("./functions"));
-__export(require("./increment"));
-__export(require("./utils"));
-__export(require("./order/index"));
-__export(require("./text/index"));
+const functions = require("./functions");
+exports.functions = functions;
+const increment = require("./increment");
+exports.increment = increment;
+const utils = require("./utils");
+exports.utils = utils;
+const order = require("./order/index");
+exports.order = order;
+const text = require("./text/index");
+exports.text = text;
 //# sourceMappingURL=index.js.map

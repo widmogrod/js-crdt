@@ -16,10 +16,6 @@ function concat(a, b) {
     return a.concat(b);
 }
 exports.concat = concat;
-function applyOperation(operation, data) {
-    return operation.apply(data);
-}
-exports.applyOperation = applyOperation;
 function axioms(assert, a, b, c) {
     // commutative   a + c = c + a                i.e: 1 + 2 = 2 + 1
     assert(equal(merge(a, b), merge(b, a)), 'is not commutative');

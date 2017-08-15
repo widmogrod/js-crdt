@@ -1,9 +1,9 @@
 'use strict';
 
-const Delete = require('../../build/text/delete').Delete;
+const {Delete, operationToArray} = require('../../build/text/index');
 const assert = require('assert');
 
-describe('Text.Delete', () => {
+describe('text.Delete', () => {
   describe('Delete operation, applied on data', () => {
     const useCases = {
       'should remove first element': {
@@ -39,7 +39,7 @@ describe('Text.Delete', () => {
         const operation = new Delete(useCase.at, useCase.length);
 
         assert.deepEqual(
-          operation.apply(useCase.data),
+          operationToArray(useCase.data, operation),
           useCase.expected
         );
       });

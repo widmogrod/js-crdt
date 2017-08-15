@@ -1,13 +1,12 @@
-
 import {merge,  equal} from '../functions'
-import {Orderer} from '../order'
+import {Orderer} from './orderer'
 import {SetMap, Indexed} from '../structures/set-map'
 import {NaiveImmutableMap} from '../structures/naive-immutable-map'
 import {SortedSetArray} from '../structures/sorted-set-array'
 import {NaiveArrayList} from '../structures/naive-array-list'
 
-export class Text {
-  constructor(public order: Orderer<any>, public setMap?: SetMap<Orderer<any>, any>) {
+export class Text<T> {
+  constructor(public order: Orderer<any>, public setMap?: SetMap<Orderer<any>, T[]>) {
     this.setMap = setMap || new SetMap(
       new SortedSetArray(
         new NaiveArrayList([])),
@@ -15,14 +14,14 @@ export class Text {
     );
   }
 
-  next() {
+  next(): Text<T> {
     return new Text(
       this.order.next(),
       this.setMap,
     );
   }
 
-  apply(operation) {
+  apply(operation: T) {
     let value = this.setMap.get(this.order);
 
     if (!value) {
@@ -33,29 +32,20 @@ export class Text {
     this.setMap = this.setMap.set(this.order, value);
   }
 
-  merge(b) {
+  merge(b: Text<T>): Text<T> {
     return new Text(
       merge(this.order, b.order),
       this.setMap.merge(b.setMap)
     );
   }
 
-  equal(b) {
+  equal(b: Text<T>): boolean {
     return equal(this.order, b.order);
   }
 
-  reduce(fn, accumulator) {
+  reduce<R>(fn: (aggregator: R, operations: T[], order: Orderer<any>) => R, accumulator): R {
     return this.setMap.reduce((accumulator, operations, order) => {
-      return operations.reduce((accumulator, operation) => {
-        return fn(accumulator, operation, order);
-      }, accumulator);
+      return fn(accumulator, operations, order);
     }, accumulator);
-  }
-
-  forEach(fn) {
-    return this.setMap.reduce((_, operations, order) => {
-      fn({order, operations})
-      return _;
-    }, null);
   }
 }

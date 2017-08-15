@@ -1,8 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const utils_1 = require("../utils");
-class Discrete {
+class VectorClock {
     constructor(id, vector) {
+        this.id = id;
+        this.vector = vector;
         vector = utils_1.clone(vector);
         vector[id] = vector[id] || 0;
         this.id = id;
@@ -11,14 +13,14 @@ class Discrete {
     next() {
         const vector = utils_1.clone(this.vector);
         ++vector[this.id];
-        return new Discrete(this.id, vector);
+        return new VectorClock(this.id, vector);
     }
     merge(b) {
         const vector = utils_1.union(Object.keys(this.vector), Object.keys(b.vector)).reduce((vector, key) => {
             vector[key] = Math.max(this.vector[key] || 0, b.vector[key] || 0);
             return vector;
         }, {});
-        return new Discrete(this.id, vector);
+        return new VectorClock(this.id, vector);
     }
     equal(b) {
         return this.compare(b) === 0;
@@ -55,5 +57,5 @@ class Discrete {
         return 0;
     }
 }
-exports.Discrete = Discrete;
-//# sourceMappingURL=discrete.js.map
+exports.VectorClock = VectorClock;
+//# sourceMappingURL=vector-clock.js.map

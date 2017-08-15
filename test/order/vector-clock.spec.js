@@ -1,14 +1,14 @@
 'use strict';
 
-const Discrete = require('../../build/order').Discrete;
+const {VectorClock} = require('../../build/order');
 const f = require('../../build/functions');
 const assert = require('assert');
 
 function d(id, vector) {
-  return new Discrete(id, vector);
+  return new VectorClock(id, vector);
 }
 
-describe('order/Discrete', () => {
+describe('order/VectorClock', () => {
   const o = d('origin', {origin: 0});
   const a0 = d('a', o.vector);
   const b0 = d('b', o.vector);

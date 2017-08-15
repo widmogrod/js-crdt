@@ -1,6 +1,6 @@
 'use strict';
 
-const Timestamp = require('../../build/order').Timestamp;
+const {Timestamp} = require('../../build/order');
 const f = require('../../build/functions');
 const assert = require('assert');
 

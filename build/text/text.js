@@ -30,16 +30,8 @@ class Text {
     }
     reduce(fn, accumulator) {
         return this.setMap.reduce((accumulator, operations, order) => {
-            return operations.reduce((accumulator, operation) => {
-                return fn(accumulator, operation, order);
-            }, accumulator);
+            return fn(accumulator, operations, order);
         }, accumulator);
-    }
-    forEach(fn) {
-        return this.setMap.reduce((_, operations, order) => {
-            fn({ order, operations });
-            return _;
-        }, null);
     }
 }
 exports.Text = Text;
