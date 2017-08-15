@@ -16,22 +16,24 @@ function snapshot(text) {
 }
 
 function lastPosition(text) {
-  return text.reduce(function(position, operation, order) {
+  return text.reduce(function(position, operations, order) {
     if (order.id !== text.order.id) {
       return position;
     }
 
-    if (operation instanceof Insert) {
-      return operation.at + operation.value.length;
-    } else {
-      return operation.at - operation.length;
-    }
+    return operations.reduce((position, operation) => {
+      if (operation instanceof Insert) {
+        return operation.at + operation.value.length;
+      } else {
+        return operation.at - operation.length;
+      }
+    }, position);
   }, 0);
 }
 
 function renderer(text) {
-  return text.reduce((accumulator, operation) => {
-    return operation.apply(accumulator);
+  return text.reduce((accumulator, operations) => {
+    return operations.reduce((accumulator, operation) => operation.apply(accumulator), accumulator);
   }, []).join('');
 }
 
