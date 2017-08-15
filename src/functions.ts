@@ -30,14 +30,6 @@ export function concat<T>(a: Concater<T>, b: Concater<T>): Concater<T> {
   return a.concat(b)
 }
 
-export interface Applicator<T1, T2> {
-  apply(b: T2): T1
-}
-
-export function applyOperation<T1, T2>(operation: Applicator<T1, T2>, data: T2): T1 {
-  return operation.apply(data);
-}
-
 export interface CRDT<T> extends Merger<T>, Equaler<T> { }
 
 export type AssertFunc = (boolean, string) => void;

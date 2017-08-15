@@ -9,7 +9,7 @@ function create(id, vector) {
   return new VectorClock(id, vector);
 }
 
-describe('Text', () => {
+describe('text.Text', () => {
   const origin = create('origin', {origin: 0});
 
   describe('axioms for ordered inserts', () => {
