@@ -1,14 +1,12 @@
 'use strict';
 
-const Text = require('../../build/text').Text;
-const Insert = require('../../build/text').Insert;
-const Delete = require('../../build/text').Delete;
-const Discrete = require('../../build/order/discrete').Discrete;
+const {Text, Insert, Delete} = require('../../build/text');
+const {VectorClock} = require('../../build/order/vector-clock');
 const f = require('../../build/functions');
 const assert = require('assert');
 
 function create(id, vector) {
-  return new Discrete(id, vector);
+  return new VectorClock(id, vector);
 }
 
 function snapshot(text) {

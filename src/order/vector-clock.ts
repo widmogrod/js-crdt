@@ -4,7 +4,7 @@ import {clone, union, common, diff} from '../utils'
 type Key = string
 type Vector = { [id: string]: number }
 
-export class Discrete implements Orderer<Discrete>{
+export class VectorClock implements Orderer<VectorClock>{
   id: Key
   vector: Vector
   constructor(id, vector) {
@@ -20,10 +20,10 @@ export class Discrete implements Orderer<Discrete>{
 
     ++vector[this.id];
 
-    return new Discrete(this.id, vector);
+    return new VectorClock(this.id, vector);
   }
 
-  merge(b: Discrete): Discrete {
+  merge(b: VectorClock): VectorClock {
     const vector = union(
       Object.keys(this.vector),
       Object.keys(b.vector)
@@ -36,14 +36,14 @@ export class Discrete implements Orderer<Discrete>{
       return vector;
     }, {});
 
-    return new Discrete(this.id, vector);
+    return new VectorClock(this.id, vector);
   }
 
-  equal(b: Discrete): boolean {
+  equal(b: VectorClock): boolean {
     return this.compare(b) === 0;
   }
 
-  compare(b: Discrete): number {
+  compare(b: VectorClock): number {
     const position = common(this.vector, b.vector)
       .reduce((result, key: any) => {
         return result + (this.vector[key] - b.vector[key]);
