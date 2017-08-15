@@ -3,6 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const utils_1 = require("../utils");
 class VectorClock {
     constructor(id, vector) {
+        this.id = id;
+        this.vector = vector;
         vector = utils_1.clone(vector);
         vector[id] = vector[id] || 0;
         this.id = id;

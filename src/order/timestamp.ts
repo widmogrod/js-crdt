@@ -1,17 +1,15 @@
-import {Orderer} from './domain'
+import {Orderer} from './orderer'
 
 export type Bucket = string
 export type Time = number
 
 export class Timestamp implements Orderer<Timestamp> {
-  bucket: Bucket
-  time: Time
-  constructor(bucket, time) {
+  constructor(public bucket: Bucket, public time: Time) {
     this.bucket = bucket;
     this.time = time;
   }
 
-  next() {
+  next(): Timestamp {
     return new Timestamp(this.bucket, this.time + 1);
   }
 

@@ -1,13 +1,11 @@
-import {Orderer} from './domain'
+import {Orderer} from './orderer'
 import {clone, union, common, diff} from '../utils'
 
 type Key = string
 type Vector = { [id: string]: number }
 
 export class VectorClock implements Orderer<VectorClock>{
-  id: Key
-  vector: Vector
-  constructor(id, vector) {
+  constructor(public id: Key, public vector: Vector) {
     vector = clone(vector);
     vector[id] = vector[id] || 0;
 
@@ -15,7 +13,7 @@ export class VectorClock implements Orderer<VectorClock>{
     this.vector = vector;
   }
 
-  next() {
+  next(): VectorClock {
     const vector = clone(this.vector);
 
     ++vector[this.id];
@@ -78,6 +76,5 @@ export class VectorClock implements Orderer<VectorClock>{
     }
 
     return 0;
-
   }
 }

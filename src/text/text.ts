@@ -1,5 +1,5 @@
 import {merge,  equal} from '../functions'
-import {Orderer} from '../order'
+import {Orderer} from './orderer'
 import {SetMap, Indexed} from '../structures/set-map'
 import {NaiveImmutableMap} from '../structures/naive-immutable-map'
 import {SortedSetArray} from '../structures/sorted-set-array'
