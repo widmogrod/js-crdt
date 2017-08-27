@@ -4,5 +4,4 @@ function __export(m) {
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./vector-clock"));
-__export(require("./timestamp"));
 //# sourceMappingURL=index.js.map
