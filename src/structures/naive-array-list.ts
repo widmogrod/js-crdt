@@ -12,6 +12,12 @@ export class NaiveArrayList<T> {
     return new NaiveArrayList(clone);
   }
 
+  remove(at: number): NaiveArrayList<T> {
+    const clone = this.array.slice(0);
+    clone.splice(at, 1);
+    return new NaiveArrayList(clone);
+  }
+
   get?(at: number): T {
     return this.array[at];
   }

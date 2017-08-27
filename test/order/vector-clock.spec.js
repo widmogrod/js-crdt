@@ -1,7 +1,7 @@
 'use strict';
 
 const {VectorClock} = require('../../build/order');
-const f = require('../../build/functions');
+const {compare, axioms} = require('../../build/functions');
 const assert = require('assert');
 
 function d(id, vector) {
@@ -36,20 +36,20 @@ describe('order/VectorClock', () => {
   const orderOfEvents = [o, a0, b0, c0, c1, b1a0, b2a0, a1, a2b1, a3b1, c2];
 
   it('should have deterministic order', () => {
-    assert.deepEqual(f.compare(o, a0), -1);
-    assert.deepEqual(f.compare(a0, b0), -1);
-    assert.deepEqual(f.compare(b0, c0), -1);
-    assert.deepEqual(f.compare(c0, c1), -1);
-    assert.deepEqual(f.compare(c0, b1a0), -1);
-    assert.deepEqual(f.compare(c1, b1a0), -1);
-    assert.deepEqual(f.compare(b1a0, b2a0), -1);
-    assert.deepEqual(f.compare(b2a0, a1 ), -1);
-    assert.deepEqual(f.compare(a1, a2b1 ), -1);
-    assert.deepEqual(f.compare(a2b1, a3b1 ), -1);
-    assert.deepEqual(f.compare(a3b1, c2), -1);
+    assert.deepEqual(compare(o, a0), -1);
+    assert.deepEqual(compare(a0, b0), -1);
+    assert.deepEqual(compare(b0, c0), -1);
+    assert.deepEqual(compare(c0, c1), -1);
+    assert.deepEqual(compare(c0, b1a0), -1);
+    assert.deepEqual(compare(c1, b1a0), -1);
+    assert.deepEqual(compare(b1a0, b2a0), -1);
+    assert.deepEqual(compare(b2a0, a1 ), -1);
+    assert.deepEqual(compare(a1, a2b1 ), -1);
+    assert.deepEqual(compare(a2b1, a3b1 ), -1);
+    assert.deepEqual(compare(a3b1, c2), -1);
 
     assert.deepEqual(
-      [o, a0, b0, c0, b1a0, b2a0, a1, c2, a2b1, c1, a3b1].sort(f.compare),
+      [o, a0, b0, c0, b1a0, b2a0, a1, c2, a2b1, c1, a3b1].sort(compare),
       orderOfEvents
     );
   });
@@ -107,13 +107,13 @@ describe('order/VectorClock', () => {
 
     it(name, () => {
       assert.deepEqual(
-        f.compare(useCase.a, useCase.b),
+        compare(useCase.a, useCase.b),
         useCase.expected
       );
     });
   });
 
   it('should obey CRDTs axioms', () => {
-    f.axioms(assert, a0, c0, a3b1);
+    axioms(assert, a0, c0, a3b1);
   });
 });

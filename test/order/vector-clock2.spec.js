@@ -1,0 +1,85 @@
+'use strict';
+
+const {VectorClock2, Id} = require('../../build/order');
+const {SortedSetArray} = require('../../src/structures/sorted-set-array');
+const {NaiveArrayList} = require('../../src/structures/naive-array-list');
+const {compare, axioms} = require('../../build/functions');
+const assert = require('assert');
+
+function d(id, vector) {
+  return new VectorClock2(
+    new Id(id, 0),
+    vector
+  );
+}
+
+describe('order/VectorClock2', () => {
+  const set1 = new SortedSetArray(new NaiveArrayList([]));
+  const a0 = d('a', set1);
+  const b0 = d('b', set1);
+  const c0 = d('c', set1);
+
+  // Actor A do work
+  const a1 = a0.next();
+  // Actor B merge changes send by A (a:1)
+  const b1a1 = b0.next().merge(a1);
+  // Actor B do work
+  const b2a1 = b1a1.next();
+  // Actor A merge changes send by B (b:2 a:1)
+  const a2b2 = a1.next().merge(b2a1);
+  // Actor A make snapshot of changes
+  const a3b2 = a2b2.next();
+  // Actor C start geting new messages
+  const c2a3b2 = c0.next().merge(a3b2).next().merge(b2a1);
+
+  describe('deterministic order', () => {
+    const rand = () => Math.random() > 0.5 ? -1 : 1;
+    const useCases = {
+      'should existit for actor A':  {
+        in: [a0, a1, a2b2, a3b2].sort(rand),
+        out: [a0, a1, a2b2, a3b2]
+      },
+      'should existit for actor B':  {
+        in: [b0, b1a1, b2a1].sort(rand),
+        out: [b0, b1a1, b2a1]
+      },
+      'should existit for actor C':  {
+        in: [c0, c2a3b2].sort(rand),
+        out: [c0, c2a3b2]
+      },
+    };
+
+    Object.keys(useCases).forEach(name => {
+      const useCase = useCases[name];
+      it(name, () => {
+        assert.deepEqual(
+          useCase.in.sort(compare),
+          useCase.out
+        );
+      });
+    });
+  });
+
+  const useCases = {
+    'same version should be equal': {
+      a: a1,
+      b: a1,
+      expected: 0
+    },
+  };
+
+  Object.keys(useCases).forEach(name => {
+    const useCase = useCases[name];
+
+    it(name, () => {
+      assert.deepEqual(
+        compare(useCase.a, useCase.b),
+        useCase.expected
+      );
+    });
+  });
+
+  it('should obey CRDTs axioms', () => {
+    axioms(assert, a0, c0, a3b2);
+  });
+});

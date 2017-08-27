@@ -2,6 +2,7 @@ type ReduceFunc<R,T> = (aggregator: R, item: T) => R
 
 interface List<T> {
   insert(at: number, item: T): List<T>
+  remove(at: number): List<T>
   get?(at: number): T
   size(): number
   reduce<R>(fn: ReduceFunc<R,T>, aggregator: R): R
@@ -18,7 +19,7 @@ function divide<T extends Item<T>, R>(
   elements: List<T>,
   item: T,
   onNew: (item: T, elements: List<T>, lower: number) => R,
-  onExists: (item: T, elements: List<T>) => R,
+  onExists: (item: T, elements: List<T>, index: number) => R,
 ): R {
   const step = (upper - lower);
   if (step < 1) {
@@ -38,7 +39,7 @@ function divide<T extends Item<T>, R>(
     return divide(lower, half ? (upper - half) : lower, elements, item, onNew, onExists);
   }
 
-  return onExists(elm, elements)
+  return onExists(elm, elements, idx)
 }
 
 class Tuple<A,B> {
@@ -63,8 +64,16 @@ export class SortedSetArray<T extends Item<T>> {
   add(value: T): Tuple<SortedSetArray<T>,T> {
     return divide(
       0, this.elements.size(), this.elements, value,
-      (value, elements, lower) => new Tuple(new SortedSetArray(elements.insert(lower, value)), value),
-      (value, elements) => new Tuple(this, value)
+      (item, elements, lower) => new Tuple(new SortedSetArray(elements.insert(lower, item)), item),
+      (item, elements) => new Tuple(this, item)
+    );
+  }
+
+  remove(value: T): Tuple<SortedSetArray<T>,T> {
+    return divide(
+      0, this.elements.size(), this.elements, value,
+      (item, elements, lower) => new Tuple(this, value),
+      (item, elements, index) => new Tuple(new SortedSetArray(elements.remove(index)), item)
     );
   }
 

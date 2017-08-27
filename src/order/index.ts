@@ -1,2 +1,2 @@
 export * from './vector-clock';
-export * from './timestamp';
+export * from './vector-clock2';

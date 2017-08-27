@@ -9,6 +9,11 @@ class NaiveArrayList {
         clone.splice(at, 0, item);
         return new NaiveArrayList(clone);
     }
+    remove(at) {
+        const clone = this.array.slice(0);
+        clone.splice(at, 1);
+        return new NaiveArrayList(clone);
+    }
     get(at) {
         return this.array[at];
     }

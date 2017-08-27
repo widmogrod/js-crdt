@@ -15,7 +15,7 @@ function divide(lower, upper, elements, item, onNew, onExists) {
     if (cmp > 0) {
         return divide(lower, half ? (upper - half) : lower, elements, item, onNew, onExists);
     }
-    return onExists(elm, elements);
+    return onExists(elm, elements, idx);
 }
 class Tuple {
     constructor(result, value) {
@@ -34,7 +34,10 @@ class SortedSetArray {
         return this.elements.size();
     }
     add(value) {
-        return divide(0, this.elements.size(), this.elements, value, (value, elements, lower) => new Tuple(new SortedSetArray(elements.insert(lower, value)), value), (value, elements) => new Tuple(this, value));
+        return divide(0, this.elements.size(), this.elements, value, (item, elements, lower) => new Tuple(new SortedSetArray(elements.insert(lower, item)), item), (item, elements) => new Tuple(this, item));
+    }
+    remove(value) {
+        return divide(0, this.elements.size(), this.elements, value, (item, elements, lower) => new Tuple(this, value), (item, elements, index) => new Tuple(new SortedSetArray(elements.remove(index)), item));
     }
     has(value) {
         return divide(0, this.elements.size(), this.elements, value, () => false, () => true);
