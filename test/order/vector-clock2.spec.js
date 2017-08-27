@@ -1,6 +1,6 @@
 'use strict';
 
-const {VectorClock2, Dummy} = require('../../build/order');
+const {VectorClock2, Id} = require('../../build/order');
 const {SortedSetArray} = require('../../src/structures/sorted-set-array');
 const {NaiveArrayList} = require('../../src/structures/naive-array-list');
 const {compare, axioms} = require('../../build/functions');
@@ -8,7 +8,7 @@ const assert = require('assert');
 
 function d(id, vector) {
   return new VectorClock2(
-    new Dummy(id, 0),
+    new Id(id, 0),
     vector
   );
 }

@@ -1,14 +1,6 @@
 import {Orderer} from './orderer'
-import {clone, union, common, diff} from '../utils'
-
-type Key = string
-type Vector = { [id: string]: number }
 
 type ReduceFunc<R,T> = (aggregator: R, item: T) => R
-
-interface Item<T> {
-  compare(b: Item<T>): number
-}
 
 interface Tuple<A,B> {
   result: A
@@ -23,42 +15,35 @@ interface SortedSet<T> {
   difference(b: SortedSet<T>): SortedSet<T>
   reduce<R>(fn: ReduceFunc<R,T>, aggregator: R): R
   mempty(): SortedSet<T>
-  size(): number
 }
 
-interface MMap<K, V> {
-  set(K,V): MMap<K,V>
-  get?(K): V
-  reduce<R>(fn: ReduceFunc<R,V>, aggregator: R): R
-}
-
+type Key = string
 type Version = number;
 
-// D/1 < D2 < E/3
-export class Dummy {
+export class Id {
   constructor(public key: Key, public version: Version) {
     this.key = key;
     this.version = version;
   }
 
-  next(): Dummy {
-    return new Dummy(
+  next(): Id {
+    return new Id(
       this.key,
       this.version + 1
     );
   }
 
-  compare(b: Dummy): number {
+  compare(b: Id): number {
     return this.key.localeCompare(b.key);
   }
 
   toString(): string {
-    return `D(${this.key}, ${this.version})`
+    return `Id(${this.key},${this.version})`
   }
 }
 
 export class VectorClock2 implements Orderer<VectorClock2>{
-  constructor(public id: Dummy, public vector: SortedSet<Dummy>) {
+  constructor(public id: Id, public vector: SortedSet<Id>) {
     this.id = id;
     let {result, value} = vector.add(id);
 
@@ -73,7 +58,7 @@ export class VectorClock2 implements Orderer<VectorClock2>{
 
   toString(): string {
     const a = this.vector.reduce((r, i) => r + i.toString(), '')
-    return `V2(${this.id},${a})`;
+    return `VectorClock2(${this.id},${a})`;
   }
 
   next(): VectorClock2 {

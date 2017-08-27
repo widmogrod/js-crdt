@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-// D/1 < D2 < E/3
-class Dummy {
+class Id {
     constructor(key, version) {
         this.key = key;
         this.version = version;
@@ -9,16 +8,16 @@ class Dummy {
         this.version = version;
     }
     next() {
-        return new Dummy(this.key, this.version + 1);
+        return new Id(this.key, this.version + 1);
     }
     compare(b) {
         return this.key.localeCompare(b.key);
     }
     toString() {
-        return `D(${this.key}, ${this.version})`;
+        return `Id(${this.key},${this.version})`;
     }
 }
-exports.Dummy = Dummy;
+exports.Id = Id;
 class VectorClock2 {
     constructor(id, vector) {
         this.id = id;
@@ -34,7 +33,7 @@ class VectorClock2 {
     }
     toString() {
         const a = this.vector.reduce((r, i) => r + i.toString(), '');
-        return `V2(${this.id},${a})`;
+        return `VectorClock2(${this.id},${a})`;
     }
     next() {
         return new VectorClock2(this.id.next(), this.vector.remove(this.id).result.add(this.id.next()).result);
