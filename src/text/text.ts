@@ -1,18 +1,15 @@
 import {merge,  equal} from '../functions'
 import {Orderer} from './orderer'
-import {SetMap, Indexed} from '../structures/set-map'
-import {NaiveImmutableMap} from '../structures/naive-immutable-map'
-import {SortedSetArray} from '../structures/sorted-set-array'
-import {NaiveArrayList} from '../structures/naive-array-list'
+
+export interface SetMap<K,V> {
+  set(key: K, value: V): SetMap<K,V>
+  get?(key: K): V
+  merge(b: SetMap<K,V>): SetMap<K,V>
+  reduce<R>(fn: (aggregator: R, values: V, key: K) => R, aggregator: R): R
+}
 
 export class Text<T> {
-  constructor(public order: Orderer<any>, public setMap?: SetMap<Orderer<any>, T[]>) {
-    this.setMap = setMap || new SetMap(
-      new SortedSetArray(
-        new NaiveArrayList([])),
-      new NaiveImmutableMap()
-    );
-  }
+  constructor(public order: Orderer<any>, public setMap: SetMap<Orderer<any>, T[]>) {}
 
   next(): Text<T> {
     return new Text(

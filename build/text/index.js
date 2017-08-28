@@ -7,4 +7,5 @@ __export(require("./insert"));
 __export(require("./delete"));
 __export(require("./text"));
 __export(require("./utils"));
+__export(require("./factory"));
 //# sourceMappingURL=index.js.map
