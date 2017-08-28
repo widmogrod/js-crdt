@@ -12,6 +12,7 @@ function toArray(text) {
 }
 exports.toArray = toArray;
 const utils_1 = require("../utils");
+// TODO make it nicer
 function operationToArray(data, op) {
     if (op instanceof insert_1.Insert) {
         let copy = data.slice(0);
