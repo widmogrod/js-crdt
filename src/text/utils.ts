@@ -16,10 +16,11 @@ export function toArray(text: Text<Operation>): string[] {
 
 import {ensureArrayLength} from '../utils';
 
-interface Buffer <T>extends Array<T> {
+interface Buffer <T> extends Array<T> {
 
 }
 
+// TODO make it nicer
 export function operationToArray(data: Buffer<string>, op: Operation): Buffer<string> {
   if (op instanceof Insert) {
     let copy = data.slice(0);
