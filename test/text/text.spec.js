@@ -2,7 +2,7 @@
 
 const {Insert, Delete, snapshot, renderString, createFromOrderer} = require('../../build/text');
 const {VectorClock} = require('../../build/order/vector-clock');
-const f = require('../../build/functions');
+const {merge, axioms} = require('../../build/functions');
 const assert = require('assert');
 
 function createOrderer(id, vector) {
@@ -27,11 +27,11 @@ describe('text.Text', () => {
     });
 
     it('should obey CRDT axioms', () => {
-      f.axioms(assert, a, b, c);
+      axioms(assert, a, b, c);
     });
 
     it('should converge to text', () => {
-      const merged = f.merge(f.merge(a, b), c);
+      const merged = merge(merge(a, b), c);
 
       assert.equal(renderString(merged), 'ghidefabc');
     });
@@ -55,11 +55,11 @@ describe('text.Text', () => {
     });
 
     it('should obey CRDT axioms', () => {
-      f.axioms(assert, a, b, c);
+      axioms(assert, a, b, c);
     });
 
     it('should converge to text', () => {
-      const merged = f.merge(f.merge(a, b), c);
+      const merged = merge(merge(a, b), c);
 
       assert.equal(renderString(merged), 'hiefbc');
     });
@@ -76,21 +76,21 @@ describe('text.Text', () => {
       assert(!a.order.equal(b.order));
 
       a.apply(new Insert(0, 'a'));
-      b = f.merge(b, a);
+      b = merge(b, a);
       a = snapshot(a);
 
       assert(a.order.id !== b.order.id);
       assert(!a.order.equal(b.order));
 
       a.apply(new Insert(1, 'a'));
-      b = f.merge(b, a);
+      b = merge(b, a);
       a = snapshot(a);
 
       assert(a.order.id !== b.order.id);
       assert(!a.order.equal(b.order));
 
       a.apply(new Insert(2, 'a'));
-      b = f.merge(b, a);
+      b = merge(b, a);
       a = snapshot(a);
 
 
@@ -98,14 +98,14 @@ describe('text.Text', () => {
       assert(!a.order.equal(b.order));
 
       b.apply(new Insert(3, 'b'));
-      a = f.merge(a, b);
+      a = merge(a, b);
       b = snapshot(b);
 
       assert(a.order.id !== b.order.id);
       assert(!a.order.equal(b.order));
 
       a.apply(new Insert(0, 'c'));
-      b = f.merge(b, a);
+      b = merge(b, a);
       a = snapshot(a);
 
       assert(a.order.id !== b.order.id);
