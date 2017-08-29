@@ -55,12 +55,14 @@ const increment = require("./increment");
 exports.increment = increment;
 const utils = require("./utils");
 exports.utils = utils;
-const order = require("./order/index");
+const order = require("./order");
 exports.order = order;
-const text = require("./text/index");
+const text = require("./text");
 exports.text = text;
+const structures = require("./structures");
+exports.structures = structures;
 
-},{"./functions":1,"./increment":2,"./order/index":4,"./text/index":13,"./utils":17}],4:[function(require,module,exports){
+},{"./functions":1,"./increment":2,"./order":4,"./structures":7,"./text":15,"./utils":19}],4:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
@@ -131,7 +133,7 @@ class VectorClock {
 }
 exports.VectorClock = VectorClock;
 
-},{"../utils":17}],6:[function(require,module,exports){
+},{"../utils":19}],6:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Id {
@@ -212,6 +214,18 @@ exports.VectorClock2 = VectorClock2;
 
 },{}],7:[function(require,module,exports){
 "use strict";
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+Object.defineProperty(exports, "__esModule", { value: true });
+__export(require("./naive-array-list"));
+__export(require("./naive-immutable-map"));
+__export(require("./set-axioms"));
+__export(require("./set-map"));
+__export(require("./sorted-set-array"));
+
+},{"./naive-array-list":8,"./naive-immutable-map":9,"./set-axioms":10,"./set-map":11,"./sorted-set-array":12}],8:[function(require,module,exports){
+"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class NaiveArrayList {
     constructor(array) {
@@ -242,7 +256,7 @@ class NaiveArrayList {
 }
 exports.NaiveArrayList = NaiveArrayList;
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class NaiveImmutableMap {
@@ -266,7 +280,32 @@ class NaiveImmutableMap {
 }
 exports.NaiveImmutableMap = NaiveImmutableMap;
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+function equal(a, b) {
+    return a.equal(b);
+}
+function union(a, b) {
+    return a.union(b);
+}
+function intersect(a, b) {
+    return a.intersect(b);
+}
+function difference(a, b) {
+    return a.difference(b);
+}
+function axioms(assert, a, b, c) {
+    assert(equal(union(union(a, b), c), union(a, union(b, c))), 'associative union');
+    assert(equal(intersect(intersect(a, b), c), intersect(a, intersect(b, c))), 'associative intersect');
+    assert(equal(union(a, intersect(b, c)), union(intersect(a, b), intersect(a, c))), 'union distributes over intersection');
+    assert(equal(intersect(a, union(b, c)), intersect(union(a, b), union(a, c))), 'intersection distributes over union');
+    assert(equal(difference(a, union(b, c)), intersect(difference(a, b), difference(a, c))), 'De Morgan\'s law for union');
+    assert(equal(difference(a, intersect(b, c)), union(difference(a, b), difference(a, c))), 'De Morgan\'s law for intersect');
+}
+exports.axioms = axioms;
+
+},{}],11:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Indexed {
@@ -308,7 +347,7 @@ class SetMap {
 }
 exports.SetMap = SetMap;
 
-},{}],10:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function divide(lower, upper, elements, item, onNew, onExists) {
@@ -383,7 +422,7 @@ class SortedSetArray {
 }
 exports.SortedSetArray = SortedSetArray;
 
-},{}],11:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Delete {
@@ -396,7 +435,7 @@ class Delete {
 }
 exports.Delete = Delete;
 
-},{}],12:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const text_1 = require("./text");
@@ -409,7 +448,7 @@ function createFromOrderer(order) {
 }
 exports.createFromOrderer = createFromOrderer;
 
-},{"../structures/naive-array-list":7,"../structures/naive-immutable-map":8,"../structures/set-map":9,"../structures/sorted-set-array":10,"./text":15}],13:[function(require,module,exports){
+},{"../structures/naive-array-list":8,"../structures/naive-immutable-map":9,"../structures/set-map":11,"../structures/sorted-set-array":12,"./text":17}],15:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
@@ -421,7 +460,7 @@ __export(require("./text"));
 __export(require("./utils"));
 __export(require("./factory"));
 
-},{"./delete":11,"./factory":12,"./insert":14,"./text":15,"./utils":16}],14:[function(require,module,exports){
+},{"./delete":13,"./factory":14,"./insert":16,"./text":17,"./utils":18}],16:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Insert {
@@ -434,7 +473,7 @@ class Insert {
 }
 exports.Insert = Insert;
 
-},{}],15:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const functions_1 = require("../functions");
@@ -468,7 +507,7 @@ class Text {
 }
 exports.Text = Text;
 
-},{"../functions":1}],16:[function(require,module,exports){
+},{"../functions":1}],18:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const insert_1 = require("./insert");
@@ -510,7 +549,7 @@ function renderString(text) {
 }
 exports.renderString = renderString;
 
-},{"../utils":17,"./insert":14}],17:[function(require,module,exports){
+},{"../utils":19,"./insert":16}],19:[function(require,module,exports){
 'use strict';
 Object.defineProperty(exports, "__esModule", { value: true });
 function between(value, min, max) {
