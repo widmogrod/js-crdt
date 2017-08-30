@@ -15,6 +15,7 @@ interface SortedSet<T> {
   difference(b: SortedSet<T>): SortedSet<T>
   reduce<R>(fn: ReduceFunc<R,T>, aggregator: R): R
   mempty(): SortedSet<T>
+  size(): number
 }
 
 type Key = string
@@ -49,7 +50,7 @@ export class VectorClock2 implements Orderer<VectorClock2>{
 
     if (result === vector) {
       if (id.version > value.version) {
-        result = vector.remove(id).result.add(id).result;
+        result = vector.remove(value).result.add(id).result;
       }
     }
 
@@ -69,47 +70,82 @@ export class VectorClock2 implements Orderer<VectorClock2>{
   }
 
   equal(b: VectorClock2): boolean {
-    return this.compare(b) === 0;
+    if (this.vector.size() !== b.vector.size()) {
+      return false;
+    }
+
+    return this.vector.reduce((eq, item) => {
+      if (eq) {
+        const {result, value} = b.vector.add(item);
+        if (result === b.vector) {
+          return value.version === item.version;
+        }
+      }
+
+      return false;
+    }, true);
   }
 
   compare(b: VectorClock2): number {
-    return this.vector
+    if (this.lessThan(b)) {
+      return -1;
+    }
+
+    if (b.lessThan(this)) {
+      return 1;
+    }
+
+    if (this.equal(b)) {
+      return 0;
+    }
+
+    // then it's councurent
+    // right now I don't have such compare option
+    // so tie braking approach is to compare ID's
+    return this.id.compare(b.id);
+  }
+
+  lessThan(b: VectorClock2): boolean {
+    // VC(a) < VC(b) IF
+    //   forall VC(a)[i] <= VC(b)[i]
+    //   and exists VC(a)[i] < VC(b)[i]]
+    const {everyLEQ, anyLT} = this.vector
       .intersect(b.vector)
-      .reduce((cmp, item) => {
-        if (cmp === -1) {
-          return cmp;
-        }
+      .reduce(({everyLEQ, anyLT}, item) => {
+        const rA = this.vector.add(item).value;
+        const rB = b.vector.add(item).value;
 
-        const rA = this.vector.add(item);
-        const rB = b.vector.add(item);
+        anyLT = anyLT ? anyLT : rA.version < rB.version;
+        everyLEQ = everyLEQ ? rA.version <= rB.version : everyLEQ;
 
-        cmp = rA.value.version - rB.value.version;
+        return {everyLEQ, anyLT}
+      }, {
+        everyLEQ: true,
+        anyLT: false,
+      });
 
-        return cmp;
-      }, 0);
+    return everyLEQ && (anyLT || (this.vector.size() < b.vector.size()));
   }
 
   merge(b: VectorClock2): VectorClock2 {
     const c = this.vector
-      .union(b.vector)
-      .reduce(({result, prev}, item) => {
-        if (prev) {
-          if (prev.key !== item.key) {
-            result = result.add(prev).result;
-          } else if (prev.version > item.version ) {
-            item = prev;
+      .reduce((s, item) => {
+        const {result, value} = b.vector.add(item);
+        if (result === b.vector) {
+          if (value.version > item.version) {
+            return s.add(value).result;
+          } else {
+            return s.add(item).result;
           }
         }
 
-        return {result, prev: item}
-      }, {
-        result: this.vector.mempty(),
-        prev: null,
-      });
+        return s.add(item).result;
+      }, this.vector.mempty())
+      .union(b.vector);
 
     return new VectorClock2(
       this.id,
-      c.result.add(c.prev).result
+      c,
     );
   }
 }

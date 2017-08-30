@@ -162,7 +162,7 @@ class VectorClock2 {
         let { result, value } = vector.add(id);
         if (result === vector) {
             if (id.version > value.version) {
-                result = vector.remove(id).result.add(id).result;
+                result = vector.remove(value).result.add(id).result;
             }
         }
         this.vector = result;
@@ -175,39 +175,68 @@ class VectorClock2 {
         return new VectorClock2(this.id.next(), this.vector.remove(this.id).result.add(this.id.next()).result);
     }
     equal(b) {
-        return this.compare(b) === 0;
+        if (this.vector.size() !== b.vector.size()) {
+            return false;
+        }
+        return this.vector.reduce((eq, item) => {
+            if (eq) {
+                const { result, value } = b.vector.add(item);
+                if (result === b.vector) {
+                    return value.version === item.version;
+                }
+            }
+            return false;
+        }, true);
     }
     compare(b) {
-        return this.vector
+        if (this.lessThan(b)) {
+            return -1;
+        }
+        if (b.lessThan(this)) {
+            return 1;
+        }
+        if (this.equal(b)) {
+            return 0;
+        }
+        // then it's councurent
+        // right now I don't have such compare option
+        // so tie braking approach is to compare ID's
+        return this.id.compare(b.id);
+    }
+    lessThan(b) {
+        // VC(a) < VC(b) IF
+        //   forall VC(a)[i] <= VC(b)[i]
+        //   and exists VC(a)[i] < VC(b)[i]]
+        const { everyLEQ, anyLT } = this.vector
             .intersect(b.vector)
-            .reduce((cmp, item) => {
-            if (cmp === -1) {
-                return cmp;
-            }
-            const rA = this.vector.add(item);
-            const rB = b.vector.add(item);
-            cmp = rA.value.version - rB.value.version;
-            return cmp;
-        }, 0);
+            .reduce(({ everyLEQ, anyLT }, item) => {
+            const rA = this.vector.add(item).value;
+            const rB = b.vector.add(item).value;
+            anyLT = anyLT ? anyLT : rA.version < rB.version;
+            everyLEQ = everyLEQ ? rA.version <= rB.version : everyLEQ;
+            return { everyLEQ, anyLT };
+        }, {
+            everyLEQ: true,
+            anyLT: false,
+        });
+        return everyLEQ && (anyLT || (this.vector.size() < b.vector.size()));
     }
     merge(b) {
         const c = this.vector
-            .union(b.vector)
-            .reduce(({ result, prev }, item) => {
-            if (prev) {
-                if (prev.key !== item.key) {
-                    result = result.add(prev).result;
+            .reduce((s, item) => {
+            const { result, value } = b.vector.add(item);
+            if (result === b.vector) {
+                if (value.version > item.version) {
+                    return s.add(value).result;
                 }
-                else if (prev.version > item.version) {
-                    item = prev;
+                else {
+                    return s.add(item).result;
                 }
             }
-            return { result, prev: item };
-        }, {
-            result: this.vector.mempty(),
-            prev: null,
-        });
-        return new VectorClock2(this.id, c.result.add(c.prev).result);
+            return s.add(item).result;
+        }, this.vector.mempty())
+            .union(b.vector);
+        return new VectorClock2(this.id, c);
     }
 }
 exports.VectorClock2 = VectorClock2;
@@ -398,8 +427,8 @@ class SortedSetArray {
         }, this);
     }
     intersect(b) {
-        return b.reduce((result, item) => {
-            return this.has(item) ? result.add(item).result : result;
+        return this.reduce((result, item) => {
+            return b.has(item) ? result.add(item).result : result;
         }, this.mempty());
     }
     difference(b) {

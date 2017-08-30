@@ -66,6 +66,16 @@ describe('order/VectorClock2', () => {
       b: a1,
       expected: 0
     },
+    'previous version should be before than next': {
+      a: a1,
+      b: a0,
+      expected: 1
+    },
+    'next version should be after than previous': {
+      a: a0,
+      b: a1,
+      expected: -1
+    },
   };
 
   Object.keys(useCases).forEach(name => {
