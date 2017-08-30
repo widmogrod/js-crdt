@@ -128,24 +128,22 @@ export class VectorClock2 implements Orderer<VectorClock2>{
   }
 
   merge(b: VectorClock2): VectorClock2 {
-    const c = this.vector
-      .reduce((s, item) => {
-        const {result, value} = b.vector.add(item);
-        if (result === b.vector) {
-          if (value.version > item.version) {
-            return s.add(value).result;
-          } else {
-            return s.add(item).result;
-          }
+    const vector = this.vector.reduce((vector, item) => {
+      const {result, value} = b.vector.add(item);
+      if (result === b.vector) {
+        if (value.version > item.version) {
+          return vector.add(value).result;
+        } else {
+          return vector.add(item).result;
         }
+      }
 
-        return s.add(item).result;
-      }, this.vector.mempty())
-      .union(b.vector);
+      return vector.add(item).result;
+    }, this.vector.mempty());
 
     return new VectorClock2(
       this.id,
-      c,
+      vector.union(b.vector)
     );
   }
 }
