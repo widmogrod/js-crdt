@@ -222,21 +222,19 @@ class VectorClock2 {
         return everyLEQ && (anyLT || (this.vector.size() < b.vector.size()));
     }
     merge(b) {
-        const c = this.vector
-            .reduce((s, item) => {
+        const vector = this.vector.reduce((vector, item) => {
             const { result, value } = b.vector.add(item);
             if (result === b.vector) {
                 if (value.version > item.version) {
-                    return s.add(value).result;
+                    return vector.add(value).result;
                 }
                 else {
-                    return s.add(item).result;
+                    return vector.add(item).result;
                 }
             }
-            return s.add(item).result;
-        }, this.vector.mempty())
-            .union(b.vector);
-        return new VectorClock2(this.id, c);
+            return vector.add(item).result;
+        }, this.vector.mempty());
+        return new VectorClock2(this.id, vector.union(b.vector));
     }
 }
 exports.VectorClock2 = VectorClock2;
