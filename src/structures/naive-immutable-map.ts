@@ -1,4 +1,4 @@
-type Key = string | number;
+export type Key = string | number;
 
 export class NaiveImmutableMap<V> {
   constructor(private data?: any) {

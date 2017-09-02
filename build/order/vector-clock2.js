@@ -1,20 +1,20 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Id {
-    constructor(key, version) {
-        this.key = key;
+    constructor(node, version) {
+        this.node = node;
         this.version = version;
-        this.key = key;
+        this.node = node;
         this.version = version;
     }
     next() {
-        return new Id(this.key, this.version + 1);
+        return new Id(this.node, this.version + 1);
     }
     compare(b) {
-        return this.key.localeCompare(b.key);
+        return this.node.localeCompare(b.node);
     }
     toString() {
-        return `Id(${this.key},${this.version})`;
+        return `Id(${this.node},${this.version})`;
     }
 }
 exports.Id = Id;

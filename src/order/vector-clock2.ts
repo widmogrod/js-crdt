@@ -1,50 +1,50 @@
 import {Orderer} from './orderer'
 
-type ReduceFunc<R,T> = (aggregator: R, item: T) => R
+export type VectorSortedSetReduceFunc<R,T> = (aggregator: R, item: T) => R
 
-interface Tuple<A,B> {
+export interface VectorSortedSetTuple<A,B> {
   result: A
   value: B
 }
 
-interface SortedSet<T> {
-  add(item: T): Tuple<SortedSet<T>,T>
-  remove(item: T): Tuple<SortedSet<T>,T>
-  union(b: SortedSet<T>): SortedSet<T>
-  intersect(b: SortedSet<T>): SortedSet<T>
-  difference(b: SortedSet<T>): SortedSet<T>
-  reduce<R>(fn: ReduceFunc<R,T>, aggregator: R): R
-  mempty(): SortedSet<T>
+export interface VectorSortedSet<T> {
+  add(item: T): VectorSortedSetTuple<VectorSortedSet<T>,T>
+  remove(item: T): VectorSortedSetTuple<VectorSortedSet<T>,T>
+  union(b: VectorSortedSet<T>): VectorSortedSet<T>
+  intersect(b: VectorSortedSet<T>): VectorSortedSet<T>
+  difference(b: VectorSortedSet<T>): VectorSortedSet<T>
+  reduce<R>(fn: VectorSortedSetReduceFunc<R,T>, aggregator: R): R
+  mempty(): VectorSortedSet<T>
   size(): number
 }
 
-type Key = string
-type Version = number;
+export type Node = string
+export type Version = number;
 
 export class Id {
-  constructor(public key: Key, public version: Version) {
-    this.key = key;
+  constructor(public node: Node, public version: Version) {
+    this.node = node;
     this.version = version;
   }
 
   next(): Id {
     return new Id(
-      this.key,
+      this.node,
       this.version + 1
     );
   }
 
   compare(b: Id): number {
-    return this.key.localeCompare(b.key);
+    return this.node.localeCompare(b.node);
   }
 
   toString(): string {
-    return `Id(${this.key},${this.version})`
+    return `Id(${this.node},${this.version})`
   }
 }
 
 export class VectorClock2 implements Orderer<VectorClock2>{
-  constructor(public id: Id, public vector: SortedSet<Id>) {
+  constructor(public id: Id, public vector: VectorSortedSet<Id>) {
     this.id = id;
     let {result, value} = vector.add(id);
 

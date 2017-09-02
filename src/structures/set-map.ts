@@ -1,26 +1,26 @@
-type ReduceFunc<R,T> = (aggregator: R, item: T) => R
+export type ReduceFunc<R,T> = (aggregator: R, item: T) => R
 
-interface Item<T> {
-  compare(b: Item<T>): number
+export interface MapSetKey<T> {
+  compare(b: MapSetKey<T>): number
 }
 
-interface Tuple<A,B> {
+export interface KeysTuple<A,B> {
   result: A
   value: B
 }
 
-interface Set<T> {
-  add(item: T): Tuple<Set<T>,T>
+export interface KeysSet<T> {
+  add(item: T): KeysTuple<KeysSet<T>,T>
   reduce<R>(fn: ReduceFunc<R,T>, accumulator: R): R
   size(): number
 }
 
-interface Map<K,V> {
+export interface Map<K,V> {
   set(key: K, value:V): Map<K,V>
   get?(key: K): V
 }
 
-export class Indexed<T extends Item<T>> implements Item<T> {
+export class Indexed<T extends MapSetKey<T>> implements MapSetKey<T> {
   value: T
   index: number
 
@@ -34,8 +34,8 @@ export class Indexed<T extends Item<T>> implements Item<T> {
   }
 }
 
-export class SetMap<K extends Item<K>,V> {
-  constructor(private keys?: Set<Indexed<K>>, private values?: Map<number, V>) {}
+export class SetMap<K extends MapSetKey<K>,V> {
+  constructor(private keys?: KeysSet<Indexed<K>>, private values?: Map<number, V>) {}
 
   set(key: K, value: V): SetMap<K,V> {
     const result = this.keys.add(new Indexed(key, this.keys.size()))

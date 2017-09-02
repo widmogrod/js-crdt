@@ -17,12 +17,14 @@ function divide(lower, upper, elements, item, onNew, onExists) {
     }
     return onExists(elm, elements, idx);
 }
+exports.divide = divide;
 class Tuple {
     constructor(result, value) {
         this.result = result;
         this.value = value;
     }
 }
+exports.Tuple = Tuple;
 class SortedSetArray {
     constructor(elements) {
         this.elements = elements;

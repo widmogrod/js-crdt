@@ -1,4 +1,4 @@
-type ReduceFunc<R,T> = (aggregator: R, item: T) => R
+export type ListReduceFunc<R,T> = (aggregator: R, item: T) => R
 
 export class NaiveArrayList<T> {
   array: T[]
@@ -26,7 +26,7 @@ export class NaiveArrayList<T> {
     return this.array.length;
   }
 
-  reduce<R>(fn: ReduceFunc<R,T>, aggregator: R): R {
+  reduce<R>(fn: ListReduceFunc<R,T>, aggregator: R): R {
     return this.array.reduce(fn, aggregator);
   }
 
