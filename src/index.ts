@@ -5,7 +5,7 @@ import * as order from './order';
 import * as text from './text';
 import * as structures from './structures';
 
-export {
+export default {
   text,
   order,
   utils,
