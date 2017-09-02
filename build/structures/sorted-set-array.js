@@ -48,8 +48,8 @@ class SortedSetArray {
         }, this);
     }
     intersect(b) {
-        return b.reduce((result, item) => {
-            return this.has(item) ? result.add(item).result : result;
+        return this.reduce((result, item) => {
+            return b.has(item) ? result.add(item).result : result;
         }, this.mempty());
     }
     difference(b) {

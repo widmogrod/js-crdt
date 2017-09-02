@@ -92,8 +92,8 @@ export class SortedSetArray<T extends Item<T>> {
   }
 
   intersect(b: SortedSetArray<T>): SortedSetArray<T> {
-    return b.reduce((result: SortedSetArray<T>, item: T): SortedSetArray<T> => {
-      return this.has(item) ? result.add(item).result : result;
+    return this.reduce((result: SortedSetArray<T>, item: T): SortedSetArray<T> => {
+      return b.has(item) ? result.add(item).result : result;
     }, this.mempty());
   }
 
