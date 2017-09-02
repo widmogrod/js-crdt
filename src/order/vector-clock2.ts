@@ -18,28 +18,28 @@ export interface SortedSet<T> {
   size(): number
 }
 
-export type Key = string
+export type Node = string
 export type Version = number;
 
 export class Id {
-  constructor(public key: Key, public version: Version) {
-    this.key = key;
+  constructor(public node: Node, public version: Version) {
+    this.node = node;
     this.version = version;
   }
 
   next(): Id {
     return new Id(
-      this.key,
+      this.node,
       this.version + 1
     );
   }
 
   compare(b: Id): number {
-    return this.key.localeCompare(b.key);
+    return this.node.localeCompare(b.node);
   }
 
   toString(): string {
-    return `Id(${this.key},${this.version})`
+    return `Id(${this.node},${this.version})`
   }
 }
 

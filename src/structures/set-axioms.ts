@@ -1,10 +1,3 @@
-export type ReduceFunc<R,T> = (aggregator: R, item: T) => R
-
-export interface Tuple<A,B> {
-  result: A
-  value: B
-}
-
 export interface Set<T> {
   equal(b: Set<T>): boolean
   union(b: Set<T>): Set<T>
