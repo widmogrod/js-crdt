@@ -1,20 +1,20 @@
 import {Orderer} from './orderer'
 
-export type ReduceFunc<R,T> = (aggregator: R, item: T) => R
+export type VectorSortedSetReduceFunc<R,T> = (aggregator: R, item: T) => R
 
-export interface Tuple<A,B> {
+export interface VectorSortedSetTuple<A,B> {
   result: A
   value: B
 }
 
-export interface SortedSet<T> {
-  add(item: T): Tuple<SortedSet<T>,T>
-  remove(item: T): Tuple<SortedSet<T>,T>
-  union(b: SortedSet<T>): SortedSet<T>
-  intersect(b: SortedSet<T>): SortedSet<T>
-  difference(b: SortedSet<T>): SortedSet<T>
-  reduce<R>(fn: ReduceFunc<R,T>, aggregator: R): R
-  mempty(): SortedSet<T>
+export interface VectorSortedSet<T> {
+  add(item: T): VectorSortedSetTuple<VectorSortedSet<T>,T>
+  remove(item: T): VectorSortedSetTuple<VectorSortedSet<T>,T>
+  union(b: VectorSortedSet<T>): VectorSortedSet<T>
+  intersect(b: VectorSortedSet<T>): VectorSortedSet<T>
+  difference(b: VectorSortedSet<T>): VectorSortedSet<T>
+  reduce<R>(fn: VectorSortedSetReduceFunc<R,T>, aggregator: R): R
+  mempty(): VectorSortedSet<T>
   size(): number
 }
 
@@ -44,7 +44,7 @@ export class Id {
 }
 
 export class VectorClock2 implements Orderer<VectorClock2>{
-  constructor(public id: Id, public vector: SortedSet<Id>) {
+  constructor(public id: Id, public vector: VectorSortedSet<Id>) {
     this.id = id;
     let {result, value} = vector.add(id);
 
