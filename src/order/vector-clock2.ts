@@ -1,13 +1,13 @@
 import {Orderer} from './orderer'
 
-type ReduceFunc<R,T> = (aggregator: R, item: T) => R
+export type ReduceFunc<R,T> = (aggregator: R, item: T) => R
 
-interface Tuple<A,B> {
+export interface Tuple<A,B> {
   result: A
   value: B
 }
 
-interface SortedSet<T> {
+export interface SortedSet<T> {
   add(item: T): Tuple<SortedSet<T>,T>
   remove(item: T): Tuple<SortedSet<T>,T>
   union(b: SortedSet<T>): SortedSet<T>
@@ -18,8 +18,8 @@ interface SortedSet<T> {
   size(): number
 }
 
-type Key = string
-type Version = number;
+export type Key = string
+export type Version = number;
 
 export class Id {
   constructor(public key: Key, public version: Version) {

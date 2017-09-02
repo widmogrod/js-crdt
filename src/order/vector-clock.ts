@@ -1,8 +1,8 @@
 import {Orderer} from './orderer'
 import {clone, union, common, diff} from '../utils'
 
-type Key = string
-type Vector = { [id: string]: number }
+export type Key = string
+export type Vector = { [id: string]: number }
 
 export class VectorClock implements Orderer<VectorClock>{
   constructor(public id: Key, public vector: Vector) {

@@ -1,6 +1,6 @@
-type ReduceFunc<R,T> = (aggregator: R, item: T) => R
+export type ReduceFunc<R,T> = (aggregator: R, item: T) => R
 
-interface List<T> {
+export interface List<T> {
   insert(at: number, item: T): List<T>
   remove(at: number): List<T>
   get?(at: number): T
@@ -9,11 +9,11 @@ interface List<T> {
   mempty(): List<T>
 }
 
-interface Item<T> {
+export interface Item<T> {
   compare(b: Item<T>): number
 }
 
-function divide<T extends Item<T>, R>(
+export function divide<T extends Item<T>, R>(
   lower: number,
   upper: number,
   elements: List<T>,
@@ -42,7 +42,7 @@ function divide<T extends Item<T>, R>(
   return onExists(elm, elements, idx)
 }
 
-class Tuple<A,B> {
+export class Tuple<A,B> {
   constructor(public result: A, public value: B) {}
 }
 

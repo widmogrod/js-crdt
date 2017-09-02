@@ -6,7 +6,7 @@ export function snapshot<T>(text: Text<T>): Text<T> {
   return text.next();
 }
 
-type Operation = Insert | Delete;
+export type Operation = Insert | Delete;
 
 export function toArray(text: Text<Operation>): string[] {
   return text.reduce((accumulator, operations) => {
@@ -16,7 +16,7 @@ export function toArray(text: Text<Operation>): string[] {
 
 import {ensureArrayLength} from '../utils';
 
-interface Buffer <T> extends Array<T> {
+export interface Buffer <T> extends Array<T> {
 
 }
 

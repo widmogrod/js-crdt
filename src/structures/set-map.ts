@@ -1,21 +1,21 @@
-type ReduceFunc<R,T> = (aggregator: R, item: T) => R
+export type ReduceFunc<R,T> = (aggregator: R, item: T) => R
 
-interface Item<T> {
+export interface Item<T> {
   compare(b: Item<T>): number
 }
 
-interface Tuple<A,B> {
+export interface Tuple<A,B> {
   result: A
   value: B
 }
 
-interface Set<T> {
+export interface Set<T> {
   add(item: T): Tuple<Set<T>,T>
   reduce<R>(fn: ReduceFunc<R,T>, accumulator: R): R
   size(): number
 }
 
-interface Map<K,V> {
+export interface Map<K,V> {
   set(key: K, value:V): Map<K,V>
   get?(key: K): V
 }

@@ -1,4 +1,4 @@
-type ReduceFunc<R,T> = (aggregator: R, item: T) => R
+export type ReduceFunc<R,T> = (aggregator: R, item: T) => R
 
 export class NaiveArrayList<T> {
   array: T[]
