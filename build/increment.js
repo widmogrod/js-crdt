@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 class Increment {
     constructor(value) {
         this.value = value;
+        this.value = value;
     }
     merge(b) {
         return new Increment(Math.max(this.value, b.value));

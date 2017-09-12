@@ -1,23 +1,13 @@
 'use strict';
 
-const {VectorClock2, Id} = require('../../build/order');
-const {SortedSetArray} = require('../../src/structures/sorted-set-array');
-const {NaiveArrayList} = require('../../src/structures/naive-array-list');
+const {createVectorClock2} = require('../../build/order');
 const {compare, axioms} = require('../../build/functions');
 const assert = require('assert');
 
-function d(id, vector) {
-  return new VectorClock2(
-    new Id(id, 0),
-    vector
-  );
-}
-
 describe('order/VectorClock2', () => {
-  const set1 = new SortedSetArray(new NaiveArrayList([]));
-  const a0 = d('a', set1);
-  const b0 = d('b', set1);
-  const c0 = d('c', set1);
+  const a0 = createVectorClock2('a', 0);
+  const b0 = createVectorClock2('b', 0);
+  const c0 = createVectorClock2('c', 0);
 
   // Actor A do work
   const a1 = a0.next();
