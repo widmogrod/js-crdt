@@ -1,4 +1,4 @@
-import {Orderer} from './orderer'
+import {Orderer} from './orderer';
 
 export type VectorSortedSetReduceFunc<R,T> = (aggregator: R, item: T) => R
 
@@ -18,7 +18,7 @@ export interface VectorSortedSet<T> {
   size(): number
 }
 
-export type Node = string
+export type Node = string;
 export type Version = number;
 
 export class Id {
