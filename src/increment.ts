@@ -1,8 +1,7 @@
-import {CRDT} from './functions'
+import {CRDT} from './functions';
 
 export class Increment implements CRDT<Increment> {
-  value: number
-  constructor(value: number) {
+  constructor(public value: number) {
     this.value = value;
   }
   merge(b: Increment) {

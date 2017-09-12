@@ -33,6 +33,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 class Increment {
     constructor(value) {
         this.value = value;
+        this.value = value;
     }
     merge(b) {
         return new Increment(Math.max(this.value, b.value));
@@ -64,7 +65,19 @@ exports.default = {
     structures
 };
 
-},{"./functions":1,"./increment":2,"./order":4,"./structures":7,"./text":15,"./utils":19}],4:[function(require,module,exports){
+},{"./functions":1,"./increment":2,"./order":5,"./structures":8,"./text":16,"./utils":20}],4:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const vector_clock2_1 = require("./vector-clock2");
+const sorted_set_array_1 = require("../structures/sorted-set-array");
+const naive_array_list_1 = require("../structures/naive-array-list");
+const emptyVector = new sorted_set_array_1.SortedSetArray(new naive_array_list_1.NaiveArrayList([]));
+function createVectorClock2(id, version, vector) {
+    return new vector_clock2_1.VectorClock2(new vector_clock2_1.Id(id, version ? version : 0), vector ? vector : emptyVector);
+}
+exports.createVectorClock2 = createVectorClock2;
+
+},{"../structures/naive-array-list":9,"../structures/sorted-set-array":13,"./vector-clock2":7}],5:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
@@ -72,8 +85,9 @@ function __export(m) {
 Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./vector-clock"));
 __export(require("./vector-clock2"));
+__export(require("./factory"));
 
-},{"./vector-clock":5,"./vector-clock2":6}],5:[function(require,module,exports){
+},{"./factory":4,"./vector-clock":6,"./vector-clock2":7}],6:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const utils_1 = require("../utils");
@@ -135,7 +149,7 @@ class VectorClock {
 }
 exports.VectorClock = VectorClock;
 
-},{"../utils":19}],6:[function(require,module,exports){
+},{"../utils":20}],7:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Id {
@@ -241,7 +255,7 @@ class VectorClock2 {
 }
 exports.VectorClock2 = VectorClock2;
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
@@ -253,7 +267,7 @@ __export(require("./set-axioms"));
 __export(require("./set-map"));
 __export(require("./sorted-set-array"));
 
-},{"./naive-array-list":8,"./naive-immutable-map":9,"./set-axioms":10,"./set-map":11,"./sorted-set-array":12}],8:[function(require,module,exports){
+},{"./naive-array-list":9,"./naive-immutable-map":10,"./set-axioms":11,"./set-map":12,"./sorted-set-array":13}],9:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class NaiveArrayList {
@@ -285,7 +299,7 @@ class NaiveArrayList {
 }
 exports.NaiveArrayList = NaiveArrayList;
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class NaiveImmutableMap {
@@ -309,7 +323,7 @@ class NaiveImmutableMap {
 }
 exports.NaiveImmutableMap = NaiveImmutableMap;
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function equal(a, b) {
@@ -334,7 +348,7 @@ function axioms(assert, a, b, c) {
 }
 exports.axioms = axioms;
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Indexed {
@@ -376,7 +390,7 @@ class SetMap {
 }
 exports.SetMap = SetMap;
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function divide(lower, upper, elements, item, onNew, onExists) {
@@ -453,7 +467,7 @@ class SortedSetArray {
 }
 exports.SortedSetArray = SortedSetArray;
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Delete {
@@ -466,7 +480,7 @@ class Delete {
 }
 exports.Delete = Delete;
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const text_1 = require("./text");
@@ -479,7 +493,7 @@ function createFromOrderer(order) {
 }
 exports.createFromOrderer = createFromOrderer;
 
-},{"../structures/naive-array-list":8,"../structures/naive-immutable-map":9,"../structures/set-map":11,"../structures/sorted-set-array":12,"./text":17}],15:[function(require,module,exports){
+},{"../structures/naive-array-list":9,"../structures/naive-immutable-map":10,"../structures/set-map":12,"../structures/sorted-set-array":13,"./text":18}],16:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
@@ -491,7 +505,7 @@ __export(require("./text"));
 __export(require("./utils"));
 __export(require("./factory"));
 
-},{"./delete":13,"./factory":14,"./insert":16,"./text":17,"./utils":18}],16:[function(require,module,exports){
+},{"./delete":14,"./factory":15,"./insert":17,"./text":18,"./utils":19}],17:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Insert {
@@ -504,7 +518,7 @@ class Insert {
 }
 exports.Insert = Insert;
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const functions_1 = require("../functions");
@@ -538,7 +552,7 @@ class Text {
 }
 exports.Text = Text;
 
-},{"../functions":1}],18:[function(require,module,exports){
+},{"../functions":1}],19:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const insert_1 = require("./insert");
@@ -580,7 +594,7 @@ function renderString(text) {
 }
 exports.renderString = renderString;
 
-},{"../utils":19,"./insert":16}],19:[function(require,module,exports){
+},{"../utils":20,"./insert":17}],20:[function(require,module,exports){
 'use strict';
 Object.defineProperty(exports, "__esModule", { value: true });
 function between(value, min, max) {
