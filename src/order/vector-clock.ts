@@ -43,7 +43,7 @@ export class Id {
   }
 }
 
-export class VectorClock2 implements Orderer<VectorClock2> {
+export class VectorClock implements Orderer<VectorClock> {
   constructor(public id: Id, public vector: VectorSortedSet<Id>) {
     this.id = id;
     /* tslint:disable: prefer-const */
@@ -60,17 +60,17 @@ export class VectorClock2 implements Orderer<VectorClock2> {
 
   public toString(): string {
     const a = this.vector.reduce((r, i) => r + i.toString(), "");
-    return `VectorClock2(${this.id},${a})`;
+    return `VectorClock(${this.id},${a})`;
   }
 
-  public next(): VectorClock2 {
-    return new VectorClock2(
+  public next(): VectorClock {
+    return new VectorClock(
       this.id.next(),
       this.vector.remove(this.id).result.add(this.id.next()).result,
     );
   }
 
-  public equal(b: VectorClock2): boolean {
+  public equal(b: VectorClock): boolean {
     if (this.vector.size() !== b.vector.size()) {
       return false;
     }
@@ -87,7 +87,7 @@ export class VectorClock2 implements Orderer<VectorClock2> {
     }, true);
   }
 
-  public compare(b: VectorClock2): number {
+  public compare(b: VectorClock): number {
     if (this.lessThan(b)) {
       return -1;
     }
@@ -106,7 +106,7 @@ export class VectorClock2 implements Orderer<VectorClock2> {
     return this.id.compare(b.id);
   }
 
-  public lessThan(b: VectorClock2): boolean {
+  public lessThan(b: VectorClock): boolean {
     // VC(a) < VC(b) IF
     //   forall VC(a)[i] <= VC(b)[i]
     //   and exists VC(a)[i] < VC(b)[i]]
@@ -128,7 +128,7 @@ export class VectorClock2 implements Orderer<VectorClock2> {
     return everyLEQ && (anyLT || (this.vector.size() < b.vector.size()));
   }
 
-  public merge(b: VectorClock2): VectorClock2 {
+  public merge(b: VectorClock): VectorClock {
     const vector = this.vector.reduce((vector, item) => {
       const {result, value} = b.vector.add(item);
       if (result === b.vector) {
@@ -142,7 +142,7 @@ export class VectorClock2 implements Orderer<VectorClock2> {
       return vector.add(item).result;
     }, this.vector.mempty());
 
-    return new VectorClock2(
+    return new VectorClock(
       this.id,
       vector.union(b.vector),
     );

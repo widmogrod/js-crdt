@@ -1,13 +1,13 @@
 'use strict';
 
-const {createVectorClock2} = require('../../build/order');
+const {createVectorClock} = require('../../build/order');
 const {compare, axioms} = require('../../build/functions');
 const assert = require('assert');
 
-describe('order/VectorClock2', () => {
-  const a0 = createVectorClock2('a', 0);
-  const b0 = createVectorClock2('b', 0);
-  const c0 = createVectorClock2('c', 0);
+describe('order/VectorClock', () => {
+  const a0 = createVectorClock('a', 0);
+  const b0 = createVectorClock('b', 0);
+  const c0 = createVectorClock('c', 0);
 
   // Actor A do work
   const a1 = a0.next();

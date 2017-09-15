@@ -70,23 +70,23 @@ exports.default = {
 Object.defineProperty(exports, "__esModule", { value: true });
 const naive_array_list_1 = require("../structures/naive-array-list");
 const sorted_set_array_1 = require("../structures/sorted-set-array");
-const vector_clock2_1 = require("./vector-clock2");
+const vector_clock_1 = require("./vector-clock");
 const emptyVector = new sorted_set_array_1.SortedSetArray(new naive_array_list_1.NaiveArrayList([]));
-function createVectorClock2(id, version, vector) {
-    return new vector_clock2_1.VectorClock2(new vector_clock2_1.Id(id, version ? version : 0), vector ? vector : emptyVector);
+function createVectorClock(id, version, vector) {
+    return new vector_clock_1.VectorClock(new vector_clock_1.Id(id, version ? version : 0), vector ? vector : emptyVector);
 }
-exports.createVectorClock2 = createVectorClock2;
+exports.createVectorClock = createVectorClock;
 
-},{"../structures/naive-array-list":8,"../structures/sorted-set-array":12,"./vector-clock2":6}],5:[function(require,module,exports){
+},{"../structures/naive-array-list":8,"../structures/sorted-set-array":12,"./vector-clock":6}],5:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 Object.defineProperty(exports, "__esModule", { value: true });
-__export(require("./vector-clock2"));
+__export(require("./vector-clock"));
 __export(require("./factory"));
 
-},{"./factory":4,"./vector-clock2":6}],6:[function(require,module,exports){
+},{"./factory":4,"./vector-clock":6}],6:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Id {
@@ -107,7 +107,7 @@ class Id {
     }
 }
 exports.Id = Id;
-class VectorClock2 {
+class VectorClock {
     constructor(id, vector) {
         this.id = id;
         this.vector = vector;
@@ -123,10 +123,10 @@ class VectorClock2 {
     }
     toString() {
         const a = this.vector.reduce((r, i) => r + i.toString(), "");
-        return `VectorClock2(${this.id},${a})`;
+        return `VectorClock(${this.id},${a})`;
     }
     next() {
-        return new VectorClock2(this.id.next(), this.vector.remove(this.id).result.add(this.id.next()).result);
+        return new VectorClock(this.id.next(), this.vector.remove(this.id).result.add(this.id.next()).result);
     }
     equal(b) {
         if (this.vector.size() !== b.vector.size()) {
@@ -188,10 +188,10 @@ class VectorClock2 {
             }
             return vector.add(item).result;
         }, this.vector.mempty());
-        return new VectorClock2(this.id, vector.union(b.vector));
+        return new VectorClock(this.id, vector.union(b.vector));
     }
 }
-exports.VectorClock2 = VectorClock2;
+exports.VectorClock = VectorClock;
 
 },{}],7:[function(require,module,exports){
 "use strict";
@@ -557,44 +557,6 @@ function sortNumbers(a, b) {
     return a - b;
 }
 exports.sortNumbers = sortNumbers;
-function clone(obj) {
-    var target = {};
-    for (const i in obj) {
-        if (obj.hasOwnProperty(i)) {
-            target[i] = obj[i];
-        }
-    }
-    return target;
-}
-exports.clone = clone;
-function keyToMap(r, i) {
-    r[i] = true;
-    return r;
-}
-function union(a, b) {
-    a = a.reduce(keyToMap, {});
-    b = b.reduce(keyToMap, a);
-    return Object.keys(b);
-}
-exports.union = union;
-function common(a, b) {
-    return Object.keys(a).reduce((r, k) => {
-        if (b.hasOwnProperty(k)) {
-            r.push(k);
-        }
-        return r;
-    }, []).sort();
-}
-exports.common = common;
-function diff(a, b) {
-    return Object.keys(a).reduce((r, k) => {
-        if (!b.hasOwnProperty(k)) {
-            r.push(k);
-        }
-        return r;
-    }, []);
-}
-exports.diff = diff;
 
 },{}]},{},[3])(3)
 });

@@ -1,16 +1,16 @@
 'use strict';
 
 const {Insert, Delete, snapshot, renderString, createFromOrderer} = require('../../build/text');
-const {VectorClock} = require('../../build/order/vector-clock');
+const {VectorClock, createVectorClock} = require('../../build/order');
 const {merge, axioms} = require('../../build/functions');
 const assert = require('assert');
 
 function createOrderer(id, vector) {
-  return new VectorClock(id, vector);
+  return createVectorClock(id, 0, vector)
 }
 
 describe('text.Text', () => {
-  const origin = createOrderer('origin', {origin: 0});
+  const origin = createOrderer('origin');
 
   describe('axioms for ordered inserts', () => {
     let a, b, c;

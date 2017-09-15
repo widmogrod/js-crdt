@@ -21,42 +21,4 @@ function sortNumbers(a, b) {
     return a - b;
 }
 exports.sortNumbers = sortNumbers;
-function clone(obj) {
-    var target = {};
-    for (const i in obj) {
-        if (obj.hasOwnProperty(i)) {
-            target[i] = obj[i];
-        }
-    }
-    return target;
-}
-exports.clone = clone;
-function keyToMap(r, i) {
-    r[i] = true;
-    return r;
-}
-function union(a, b) {
-    a = a.reduce(keyToMap, {});
-    b = b.reduce(keyToMap, a);
-    return Object.keys(b);
-}
-exports.union = union;
-function common(a, b) {
-    return Object.keys(a).reduce((r, k) => {
-        if (b.hasOwnProperty(k)) {
-            r.push(k);
-        }
-        return r;
-    }, []).sort();
-}
-exports.common = common;
-function diff(a, b) {
-    return Object.keys(a).reduce((r, k) => {
-        if (!b.hasOwnProperty(k)) {
-            r.push(k);
-        }
-        return r;
-    }, []);
-}
-exports.diff = diff;
 //# sourceMappingURL=utils.js.map
