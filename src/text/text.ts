@@ -1,46 +1,57 @@
 import {equal,  merge} from "../functions";
 import {Orderer} from "./orderer";
+import {Operation} from "./utils";
 
-export interface SetMap<K, V> {
-  set(key: K, value: V): SetMap<K, V>;
+export interface OrderedMap<K, V> {
+  set(key: K, value: V): OrderedMap<K, V>;
   get?(key: K): V;
-  merge(b: SetMap<K, V>): SetMap<K, V>;
+  merge(b: OrderedMap<K, V>): OrderedMap<K, V>;
   reduce<R>(fn: (aggregator: R, values: V, key: K) => R, aggregator: R): R;
 }
 
-export class Text<T> {
-  constructor(public order: Orderer<any>, public setMap: SetMap<Orderer<any>, T[]>) {}
+export interface OrderedOperations {
+  order: Orderer<any>;
+  operations: Operation[];
+}
 
-  public next(): Text<T> {
+export class Text {
+  constructor(public order: Orderer<any>, public setMap: OrderedMap<Orderer<any>, Operation[]>) {}
+
+  public next(): Text {
     return new Text(
       this.order.next(),
       this.setMap,
     );
   }
 
-  public apply(operation: T) {
-    let value = this.setMap.get(this.order);
+  public apply(operation: Operation): OrderedOperations {
+    let operations = this.setMap.get(this.order);
 
-    if (!value) {
-      value = [];
+    if (!operations) {
+      operations = [] as Operation[];
     }
 
-    value.push(operation);
-    this.setMap = this.setMap.set(this.order, value);
+    operations.push(operation);
+    this.setMap = this.setMap.set(this.order, operations);
+
+    return {
+      operations,
+      order: this.order,
+    };
   }
 
-  public merge(b: Text<T>): Text<T> {
+  public merge(b: Text): Text {
     return new Text(
       merge(this.order, b.order),
       this.setMap.merge(b.setMap),
     );
   }
 
-  public equal(b: Text<T>): boolean {
+  public equal(b: Text): boolean {
     return equal(this.order, b.order);
   }
 
-  public reduce<R>(fn: (aggregator: R, operations: T[], order: Orderer<any>) => R, accumulator): R {
+  public reduce<R>(fn: (aggregator: R, operations: Operation[], order: Orderer<any>) => R, accumulator): R {
     return this.setMap.reduce((accumulator, operations, order) => {
       return fn(accumulator, operations, order);
     }, accumulator);

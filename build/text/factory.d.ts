@@ -1,3 +1,3 @@
 import { Orderer } from "./orderer";
 import { Text } from "./text";
-export declare function createFromOrderer<T>(order: Orderer<any>): Text<T>;
+export declare function createFromOrderer(order: Orderer<any>): Text;

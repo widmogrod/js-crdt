@@ -10,12 +10,16 @@ class Text {
         return new Text(this.order.next(), this.setMap);
     }
     apply(operation) {
-        let value = this.setMap.get(this.order);
-        if (!value) {
-            value = [];
+        let operations = this.setMap.get(this.order);
+        if (!operations) {
+            operations = [];
         }
-        value.push(operation);
-        this.setMap = this.setMap.set(this.order, value);
+        operations.push(operation);
+        this.setMap = this.setMap.set(this.order, operations);
+        return {
+            operations,
+            order: this.order,
+        };
     }
     merge(b) {
         return new Text(functions_1.merge(this.order, b.order), this.setMap.merge(b.setMap));

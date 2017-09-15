@@ -2,13 +2,13 @@ import {Delete} from "./delete";
 import {Insert} from "./insert";
 import {Text} from "./text";
 
-export function snapshot<T>(text: Text<T>): Text<T> {
+export function snapshot(text: Text): Text {
   return text.next();
 }
 
 export type Operation = Insert | Delete;
 
-export function toArray(text: Text<Operation>): string[] {
+export function toArray(text: Text): string[] {
   return text.reduce((accumulator, operations) => {
     return operations.reduce(operationToArray, accumulator);
   }, []);
@@ -38,6 +38,6 @@ export function toString(value: string[]): string {
   return value.join("");
 }
 
-export function renderString(text: Text<Operation>): string {
+export function renderString(text: Text): string {
   return toString(toArray(text));
 }
