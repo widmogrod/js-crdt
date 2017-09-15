@@ -14,7 +14,13 @@ export function toArray(text: Text): string[] {
   }, []);
 }
 
-import {ensureArrayLength} from "../utils";
+export function ensureArrayLength<T>(array: T[], len: number): T[] {
+  if (array.length < len) {
+    array.length = len;
+  }
+
+  return array;
+}
 
 // TODO make it nicer
 export function operationToArray(data: string[], op: Operation): string[] {

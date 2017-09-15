@@ -11,12 +11,18 @@ function toArray(text) {
     }, []);
 }
 exports.toArray = toArray;
-const utils_1 = require("../utils");
+function ensureArrayLength(array, len) {
+    if (array.length < len) {
+        array.length = len;
+    }
+    return array;
+}
+exports.ensureArrayLength = ensureArrayLength;
 // TODO make it nicer
 function operationToArray(data, op) {
     if (op instanceof insert_1.Insert) {
         let copy = data.slice(0);
-        copy = utils_1.ensureArrayLength(copy, op.at);
+        copy = ensureArrayLength(copy, op.at);
         copy.splice(op.at, 0, ...op.value.split(""));
         return copy;
     }
@@ -25,7 +31,7 @@ function operationToArray(data, op) {
             return data;
         }
         let copy = data.slice(0);
-        copy = utils_1.ensureArrayLength(copy, op.at);
+        copy = ensureArrayLength(copy, op.at);
         copy.splice(op.at, op.length);
         return copy;
     }

@@ -30,6 +30,16 @@ export function concat<T>(a: Concater<T>, b: Concater<T>): Concater<T> {
   return a.concat(b);
 }
 
+export function between(value: number, min: number, max: number): boolean {
+  if (value <= min) {
+    return false;
+  } else if (value >= max) {
+    return false;
+  }
+
+  return true;
+}
+
 export interface CRDT<T> extends Merger<T>, Equaler<T> { }
 
 export type AssertFunc = (assertion: boolean, message: string) => void;

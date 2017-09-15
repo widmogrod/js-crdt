@@ -3,7 +3,6 @@ import * as increment from "./increment";
 import * as order from "./order";
 import * as structures from "./structures";
 import * as text from "./text";
-import * as utils from "./utils";
 
 export default {
   functions,
@@ -11,5 +10,4 @@ export default {
   order,
   structures,
   text,
-  utils,
 };

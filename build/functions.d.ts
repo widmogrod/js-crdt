@@ -14,6 +14,7 @@ export interface Concater<T> {
     concat(b: Concater<T>): Concater<T>;
 }
 export declare function concat<T>(a: Concater<T>, b: Concater<T>): Concater<T>;
+export declare function between(value: number, min: number, max: number): boolean;
 export interface CRDT<T> extends Merger<T>, Equaler<T> {
 }
 export declare type AssertFunc = (assertion: boolean, message: string) => void;

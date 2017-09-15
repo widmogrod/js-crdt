@@ -17,6 +17,16 @@ function concat(a, b) {
     return a.concat(b);
 }
 exports.concat = concat;
+function between(value, min, max) {
+    if (value <= min) {
+        return false;
+    }
+    else if (value >= max) {
+        return false;
+    }
+    return true;
+}
+exports.between = between;
 function axioms(assert, a, b, c) {
     // commutative   a + c = c + a                i.e: 1 + 2 = 2 + 1
     assert(equal(merge(a, b), merge(b, a)), "is not commutative");
@@ -55,17 +65,15 @@ const increment = require("./increment");
 const order = require("./order");
 const structures = require("./structures");
 const text = require("./text");
-const utils = require("./utils");
 exports.default = {
     functions,
     increment,
     order,
     structures,
     text,
-    utils,
 };
 
-},{"./functions":1,"./increment":2,"./order":5,"./structures":7,"./text":15,"./utils":19}],4:[function(require,module,exports){
+},{"./functions":1,"./increment":2,"./order":5,"./structures":7,"./text":15}],4:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const naive_array_list_1 = require("../structures/naive-array-list");
@@ -508,12 +516,18 @@ function toArray(text) {
     }, []);
 }
 exports.toArray = toArray;
-const utils_1 = require("../utils");
+function ensureArrayLength(array, len) {
+    if (array.length < len) {
+        array.length = len;
+    }
+    return array;
+}
+exports.ensureArrayLength = ensureArrayLength;
 // TODO make it nicer
 function operationToArray(data, op) {
     if (op instanceof insert_1.Insert) {
         let copy = data.slice(0);
-        copy = utils_1.ensureArrayLength(copy, op.at);
+        copy = ensureArrayLength(copy, op.at);
         copy.splice(op.at, 0, ...op.value.split(""));
         return copy;
     }
@@ -522,7 +536,7 @@ function operationToArray(data, op) {
             return data;
         }
         let copy = data.slice(0);
-        copy = utils_1.ensureArrayLength(copy, op.at);
+        copy = ensureArrayLength(copy, op.at);
         copy.splice(op.at, op.length);
         return copy;
     }
@@ -537,30 +551,5 @@ function renderString(text) {
 }
 exports.renderString = renderString;
 
-},{"../utils":19,"./insert":16}],19:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-function between(value, min, max) {
-    if (value <= min) {
-        return false;
-    }
-    else if (value >= max) {
-        return false;
-    }
-    return true;
-}
-exports.between = between;
-function ensureArrayLength(array, len) {
-    if (array.length < len) {
-        array.length = len;
-    }
-    return array;
-}
-exports.ensureArrayLength = ensureArrayLength;
-function sortNumbers(a, b) {
-    return a - b;
-}
-exports.sortNumbers = sortNumbers;
-
-},{}]},{},[3])(3)
+},{"./insert":16}]},{},[3])(3)
 });

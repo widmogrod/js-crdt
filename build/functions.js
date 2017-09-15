@@ -16,6 +16,16 @@ function concat(a, b) {
     return a.concat(b);
 }
 exports.concat = concat;
+function between(value, min, max) {
+    if (value <= min) {
+        return false;
+    }
+    else if (value >= max) {
+        return false;
+    }
+    return true;
+}
+exports.between = between;
 function axioms(assert, a, b, c) {
     // commutative   a + c = c + a                i.e: 1 + 2 = 2 + 1
     assert(equal(merge(a, b), merge(b, a)), "is not commutative");
