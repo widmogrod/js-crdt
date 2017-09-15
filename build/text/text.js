@@ -22,7 +22,7 @@ class Text {
         };
     }
     merge(b) {
-        return new Text(functions_1.merge(this.order, b.order), this.setMap.merge(b.setMap));
+        return new Text(functions_1.merge(this.order, b.order), functions_1.merge(this.setMap, b.setMap));
     }
     equal(b) {
         return functions_1.equal(this.order, b.order);

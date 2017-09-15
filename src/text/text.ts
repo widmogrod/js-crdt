@@ -43,7 +43,7 @@ export class Text {
   public merge(b: Text): Text {
     return new Text(
       merge(this.order, b.order),
-      this.setMap.merge(b.setMap),
+      merge(this.setMap, b.setMap),
     );
   }
 

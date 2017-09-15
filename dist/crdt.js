@@ -469,22 +469,26 @@ class Text {
         return new Text(this.order.next(), this.setMap);
     }
     apply(operation) {
-        let value = this.setMap.get(this.order);
-        if (!value) {
-            value = [];
+        let operations = this.setMap.get(this.order);
+        if (!operations) {
+            operations = [];
         }
-        value.push(operation);
-        this.setMap = this.setMap.set(this.order, value);
+        operations.push(operation);
+        this.setMap = this.setMap.set(this.order, operations);
+        return {
+            operations,
+            order: this.order,
+        };
     }
     merge(b) {
-        return new Text(functions_1.merge(this.order, b.order), this.setMap.merge(b.setMap));
+        return new Text(functions_1.merge(this.order, b.order), functions_1.merge(this.setMap, b.setMap));
     }
     equal(b) {
         return functions_1.equal(this.order, b.order);
     }
     reduce(fn, accumulator) {
         return this.setMap.reduce((accumulator, operations, order) => {
-            return fn(accumulator, operations, order);
+            return fn(accumulator, { operations, order });
         }, accumulator);
     }
 }
@@ -499,8 +503,8 @@ function snapshot(text) {
 }
 exports.snapshot = snapshot;
 function toArray(text) {
-    return text.reduce((accumulator, operations) => {
-        return operations.reduce(operationToArray, accumulator);
+    return text.reduce((accumulator, item) => {
+        return item.operations.reduce(operationToArray, accumulator);
     }, []);
 }
 exports.toArray = toArray;
