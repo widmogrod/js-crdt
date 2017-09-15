@@ -16,6 +16,7 @@ export declare class Text {
     constructor(order: Orderer<any>, setMap: OrderedMap<Orderer<any>, Operation[]>);
     next(): Text;
     apply(operation: Operation): OrderedOperations;
+    mergeOperations(o: OrderedOperations): Text;
     merge(b: Text): Text;
     equal(b: Text): boolean;
     reduce<R>(fn: (aggregator: R, item: OrderedOperations) => R, accumulator: any): R;

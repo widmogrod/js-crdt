@@ -21,6 +21,9 @@ class Text {
             order: this.order,
         };
     }
+    mergeOperations(o) {
+        return new Text(functions_1.merge(this.order, o.order), this.setMap.set(o.order, o.operations));
+    }
     merge(b) {
         return new Text(functions_1.merge(this.order, b.order), functions_1.merge(this.setMap, b.setMap));
     }

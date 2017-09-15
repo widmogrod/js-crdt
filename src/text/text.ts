@@ -40,6 +40,13 @@ export class Text {
     };
   }
 
+  public mergeOperations(o: OrderedOperations): Text {
+    return new Text(
+      merge(this.order, o.order),
+      this.setMap.set(o.order, o.operations),
+    );
+  }
+
   public merge(b: Text): Text {
     return new Text(
       merge(this.order, b.order),
