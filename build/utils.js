@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function between(value, min, max) {
     if (value <= min) {
@@ -35,7 +35,6 @@ function keyToMap(r, i) {
     r[i] = true;
     return r;
 }
-;
 function union(a, b) {
     a = a.reduce(keyToMap, {});
     b = b.reduce(keyToMap, a);

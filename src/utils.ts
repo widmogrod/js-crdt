@@ -1,5 +1,3 @@
-'use strict';
-
 export function between(value: number, min: number, max: number): boolean {
   if (value <= min) {
     return false;
@@ -10,7 +8,7 @@ export function between(value: number, min: number, max: number): boolean {
   return true;
 }
 
-export function ensureArrayLength<T>(array: Array<T>, len: number): Array<T> {
+export function ensureArrayLength<T>(array: T[], len: number): T[] {
   if (array.length < len) {
     array.length = len;
   }
@@ -23,7 +21,7 @@ export function sortNumbers(a: number, b: number): number {
 }
 
 export function clone<T>(obj: T): T {
-  var target = (<T>{});
+  var target = <T>{};
 
   for (const i in obj) {
     if (obj.hasOwnProperty(i)) {
@@ -37,15 +35,15 @@ export function clone<T>(obj: T): T {
 function keyToMap(r: any, i: any): any {
   r[i] = true;
   return r;
-};
+}
 
 export function union(a: any, b: any): any {
-  a = a.reduce(keyToMap, {})
-  b = b.reduce(keyToMap, a)
+  a = a.reduce(keyToMap, {});
+  b = b.reduce(keyToMap, a);
   return Object.keys(b);
 }
 
-export function common<T>(a: T, b: T): Array<T> {
+export function common<T>(a: T, b: T): T[] {
   return Object.keys(a).reduce((r, k) => {
     if (b.hasOwnProperty(k)) {
       r.push(k);
@@ -55,7 +53,7 @@ export function common<T>(a: T, b: T): Array<T> {
   }, []).sort();
 }
 
-export function diff<T>(a: T, b:T): Array<T> {
+export function diff<T>(a: T, b: T): T[] {
   return Object.keys(a).reduce((r, k) => {
     if (!b.hasOwnProperty(k)) {
       r.push(k);

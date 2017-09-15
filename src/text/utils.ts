@@ -1,6 +1,6 @@
-import {Text} from './text';
-import {Insert} from './insert';
-import {Delete} from './delete';
+import {Delete} from "./delete";
+import {Insert} from "./insert";
+import {Text} from "./text";
 
 export function snapshot<T>(text: Text<T>): Text<T> {
   return text.next();
@@ -14,21 +14,19 @@ export function toArray(text: Text<Operation>): string[] {
   }, []);
 }
 
-import {ensureArrayLength} from '../utils';
-
-export interface Buffer <T> extends Array<T> {
-
-}
+import {ensureArrayLength} from "../utils";
 
 // TODO make it nicer
-export function operationToArray(data: Buffer<string>, op: Operation): Buffer<string> {
+export function operationToArray(data: string[], op: Operation): string[] {
   if (op instanceof Insert) {
     let copy = data.slice(0);
     copy = ensureArrayLength(copy, op.at);
-    copy.splice(op.at, 0, ...op.value.split(''));
+    copy.splice(op.at, 0, ...op.value.split(""));
     return copy;
   } else {
-    if (op.at < 0) return data
+    if (op.at < 0) {
+      return data;
+    }
     let copy = data.slice(0);
     copy = ensureArrayLength(copy, op.at);
     copy.splice(op.at, op.length);
@@ -37,7 +35,7 @@ export function operationToArray(data: Buffer<string>, op: Operation): Buffer<st
 }
 
 export function toString(value: string[]): string {
-  return value.join('');
+  return value.join("");
 }
 
 export function renderString(text: Text<Operation>): string {

@@ -2,16 +2,16 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const functions = require("./functions");
 const increment = require("./increment");
-const utils = require("./utils");
 const order = require("./order");
-const text = require("./text");
 const structures = require("./structures");
+const text = require("./text");
+const utils = require("./utils");
 exports.default = {
-    text,
-    order,
-    utils,
     functions,
     increment,
-    structures
+    order,
+    structures,
+    text,
+    utils,
 };
 //# sourceMappingURL=index.js.map

@@ -2,10 +2,10 @@ export type Key = string | number;
 
 export class NaiveImmutableMap<V> {
   constructor(private data?: any) {
-    this.data = data || {}
+    this.data = data || {};
   }
 
-  set(key: Key, value: V): NaiveImmutableMap<V> {
+  public set(key: Key, value: V): NaiveImmutableMap<V> {
     const clone = Object
     .keys(this.data)
     .reduce((clone, k: Key) => {
@@ -18,8 +18,7 @@ export class NaiveImmutableMap<V> {
     return new NaiveImmutableMap(clone);
   }
 
-  get?(key: Key): V {
+  public get?(key: Key): V {
     return this.data[key];
   }
 }
-

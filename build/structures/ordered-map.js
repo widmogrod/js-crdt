@@ -10,14 +10,14 @@ class Indexed {
     }
 }
 exports.Indexed = Indexed;
-class SetMap {
+class OrderedMap {
     constructor(keys, values) {
         this.keys = keys;
         this.values = values;
     }
     set(key, value) {
         const result = this.keys.add(new Indexed(key, this.keys.size()));
-        return new SetMap(result.result, this.values.set(result.value.index, value));
+        return new OrderedMap(result.result, this.values.set(result.value.index, value));
     }
     get(key) {
         const result = this.keys.add(new Indexed(key, this.keys.size()));
@@ -37,5 +37,5 @@ class SetMap {
         }, aggregator);
     }
 }
-exports.SetMap = SetMap;
-//# sourceMappingURL=set-map.js.map
+exports.OrderedMap = OrderedMap;
+//# sourceMappingURL=ordered-map.js.map

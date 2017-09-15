@@ -16,5 +16,5 @@ export interface Concater<T> {
 export declare function concat<T>(a: Concater<T>, b: Concater<T>): Concater<T>;
 export interface CRDT<T> extends Merger<T>, Equaler<T> {
 }
-export declare type AssertFunc = (boolean, string) => void;
+export declare type AssertFunc = (assertion: boolean, message: string) => void;
 export declare function axioms<T extends CRDT<any>>(assert: AssertFunc, a: T, b: T, c: T): void;

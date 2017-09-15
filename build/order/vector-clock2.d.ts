@@ -1,4 +1,4 @@
-import { Orderer } from './orderer';
+import { Orderer } from "./orderer";
 export declare type VectorSortedSetReduceFunc<R, T> = (aggregator: R, item: T) => R;
 export interface VectorSortedSetTuple<A, B> {
     result: A;

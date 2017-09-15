@@ -23,6 +23,7 @@ class VectorClock2 {
         this.id = id;
         this.vector = vector;
         this.id = id;
+        /* tslint:disable: prefer-const */
         let { result, value } = vector.add(id);
         if (result === vector) {
             if (id.version > value.version) {
@@ -32,7 +33,7 @@ class VectorClock2 {
         this.vector = result;
     }
     toString() {
-        const a = this.vector.reduce((r, i) => r + i.toString(), '');
+        const a = this.vector.reduce((r, i) => r + i.toString(), "");
         return `VectorClock2(${this.id},${a})`;
     }
     next() {
@@ -80,8 +81,8 @@ class VectorClock2 {
             everyLEQ = everyLEQ ? rA.version <= rB.version : everyLEQ;
             return { everyLEQ, anyLT };
         }, {
-            everyLEQ: true,
             anyLT: false,
+            everyLEQ: true,
         });
         return everyLEQ && (anyLT || (this.vector.size() < b.vector.size()));
     }

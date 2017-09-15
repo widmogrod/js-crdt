@@ -1,5 +1,5 @@
 const assert = require('assert');
-const {SetMap} = require('../../src/structures/set-map');
+const {OrderedMap} = require('../../src/structures/ordered-map');
 const {SortedSetArray} = require('../../src/structures/sorted-set-array');
 const {NaiveImmutableMap} = require('../../src/structures/naive-immutable-map');
 const {NaiveArrayList} = require('../../src/structures/naive-array-list');
@@ -13,11 +13,11 @@ class Cmp {
   }
 }
 
-describe('SetMap', () => {
+describe('OrderedMap', () => {
   const a = new Cmp('a');
 
   it('should be immutable', () => {
-    const sm1 = new SetMap(
+    const sm1 = new OrderedMap(
       new SortedSetArray(new NaiveArrayList([])),
       new NaiveImmutableMap()
     );

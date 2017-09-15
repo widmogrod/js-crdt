@@ -17,12 +17,13 @@ function operationToArray(data, op) {
     if (op instanceof insert_1.Insert) {
         let copy = data.slice(0);
         copy = utils_1.ensureArrayLength(copy, op.at);
-        copy.splice(op.at, 0, ...op.value.split(''));
+        copy.splice(op.at, 0, ...op.value.split(""));
         return copy;
     }
     else {
-        if (op.at < 0)
+        if (op.at < 0) {
             return data;
+        }
         let copy = data.slice(0);
         copy = utils_1.ensureArrayLength(copy, op.at);
         copy.splice(op.at, op.length);
@@ -31,7 +32,7 @@ function operationToArray(data, op) {
 }
 exports.operationToArray = operationToArray;
 function toString(value) {
-    return value.join('');
+    return value.join("");
 }
 exports.toString = toString;
 function renderString(text) {

@@ -1,17 +1,16 @@
-import {Text} from './text';
-import {Orderer} from './orderer';
-import {SetMap, Indexed} from '../structures/set-map';
-import {NaiveImmutableMap} from '../structures/naive-immutable-map';
-import {SortedSetArray} from '../structures/sorted-set-array';
-import {NaiveArrayList} from '../structures/naive-array-list';
+import {NaiveArrayList} from "../structures/naive-array-list";
+import {NaiveImmutableMap} from "../structures/naive-immutable-map";
+import {Indexed, OrderedMap} from "../structures/ordered-map";
+import {SortedSetArray} from "../structures/sorted-set-array";
+import {Orderer} from "./orderer";
+import {Text} from "./text";
 
 export function createFromOrderer<T>(order: Orderer<any>): Text<T> {
   return new Text(
     order,
-    new SetMap(
+    new OrderedMap(
       new SortedSetArray(new NaiveArrayList([])),
-      new NaiveImmutableMap()
-    )
+      new NaiveImmutableMap(),
+    ),
   );
 }
-

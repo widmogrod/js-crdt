@@ -19,11 +19,11 @@ function concat(a, b) {
 exports.concat = concat;
 function axioms(assert, a, b, c) {
     // commutative   a + c = c + a                i.e: 1 + 2 = 2 + 1
-    assert(equal(merge(a, b), merge(b, a)), 'is not commutative');
+    assert(equal(merge(a, b), merge(b, a)), "is not commutative");
     // associative   a + (b + c) = (a + b) + c    i.e: 1 + (2 + 3) = (1 + 2) + 3
-    assert(equal(merge(a, merge(b, c)), merge(merge(a, b), c)), 'is not associative');
+    assert(equal(merge(a, merge(b, c)), merge(merge(a, b), c)), "is not associative");
     // idempotent    f(f(a)) = f(a)               i.e: ||a|| = |a|
-    assert(equal(merge(a, a), a), 'is not idempotent');
+    assert(equal(merge(a, a), a), "is not idempotent");
 }
 exports.axioms = axioms;
 
@@ -52,104 +52,41 @@ exports.Increment = Increment;
 Object.defineProperty(exports, "__esModule", { value: true });
 const functions = require("./functions");
 const increment = require("./increment");
-const utils = require("./utils");
 const order = require("./order");
-const text = require("./text");
 const structures = require("./structures");
+const text = require("./text");
+const utils = require("./utils");
 exports.default = {
-    text,
-    order,
-    utils,
     functions,
     increment,
-    structures
+    order,
+    structures,
+    text,
+    utils,
 };
 
-},{"./functions":1,"./increment":2,"./order":5,"./structures":8,"./text":16,"./utils":20}],4:[function(require,module,exports){
+},{"./functions":1,"./increment":2,"./order":5,"./structures":7,"./text":15,"./utils":19}],4:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const vector_clock2_1 = require("./vector-clock2");
-const sorted_set_array_1 = require("../structures/sorted-set-array");
 const naive_array_list_1 = require("../structures/naive-array-list");
+const sorted_set_array_1 = require("../structures/sorted-set-array");
+const vector_clock2_1 = require("./vector-clock2");
 const emptyVector = new sorted_set_array_1.SortedSetArray(new naive_array_list_1.NaiveArrayList([]));
 function createVectorClock2(id, version, vector) {
     return new vector_clock2_1.VectorClock2(new vector_clock2_1.Id(id, version ? version : 0), vector ? vector : emptyVector);
 }
 exports.createVectorClock2 = createVectorClock2;
 
-},{"../structures/naive-array-list":9,"../structures/sorted-set-array":13,"./vector-clock2":7}],5:[function(require,module,exports){
+},{"../structures/naive-array-list":8,"../structures/sorted-set-array":12,"./vector-clock2":6}],5:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 Object.defineProperty(exports, "__esModule", { value: true });
-__export(require("./vector-clock"));
 __export(require("./vector-clock2"));
 __export(require("./factory"));
 
-},{"./factory":4,"./vector-clock":6,"./vector-clock2":7}],6:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const utils_1 = require("../utils");
-class VectorClock {
-    constructor(id, vector) {
-        this.id = id;
-        this.vector = vector;
-        vector = utils_1.clone(vector);
-        vector[id] = vector[id] || 0;
-        this.id = id;
-        this.vector = vector;
-    }
-    next() {
-        const vector = utils_1.clone(this.vector);
-        ++vector[this.id];
-        return new VectorClock(this.id, vector);
-    }
-    merge(b) {
-        const vector = utils_1.union(Object.keys(this.vector), Object.keys(b.vector)).reduce((vector, key) => {
-            vector[key] = Math.max(this.vector[key] || 0, b.vector[key] || 0);
-            return vector;
-        }, {});
-        return new VectorClock(this.id, vector);
-    }
-    equal(b) {
-        return this.compare(b) === 0;
-    }
-    compare(b) {
-        const position = utils_1.common(this.vector, b.vector)
-            .reduce((result, key) => {
-            return result + (this.vector[key] - b.vector[key]);
-        }, 0);
-        if (position !== 0) {
-            return position;
-        }
-        const difA = utils_1.diff(this.vector, b.vector).length;
-        const difB = utils_1.diff(b.vector, this.vector).length;
-        const dif = difA - difB;
-        if (dif !== 0) {
-            return dif;
-        }
-        const tipPosition = this.vector[this.id] - b.vector[b.id];
-        if (tipPosition !== 0) {
-            return tipPosition;
-        }
-        const ha = b.vector.hasOwnProperty(this.id);
-        const hb = this.vector.hasOwnProperty(b.id);
-        if (!ha && !hb) {
-            return this.id < b.id ? -1 : 1;
-        }
-        else if (ha && !hb) {
-            return -1;
-        }
-        else if (hb && !ha) {
-            return 1;
-        }
-        return 0;
-    }
-}
-exports.VectorClock = VectorClock;
-
-},{"../utils":20}],7:[function(require,module,exports){
+},{"./factory":4,"./vector-clock2":6}],6:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Id {
@@ -175,6 +112,7 @@ class VectorClock2 {
         this.id = id;
         this.vector = vector;
         this.id = id;
+        /* tslint:disable: prefer-const */
         let { result, value } = vector.add(id);
         if (result === vector) {
             if (id.version > value.version) {
@@ -184,7 +122,7 @@ class VectorClock2 {
         this.vector = result;
     }
     toString() {
-        const a = this.vector.reduce((r, i) => r + i.toString(), '');
+        const a = this.vector.reduce((r, i) => r + i.toString(), "");
         return `VectorClock2(${this.id},${a})`;
     }
     next() {
@@ -232,8 +170,8 @@ class VectorClock2 {
             everyLEQ = everyLEQ ? rA.version <= rB.version : everyLEQ;
             return { everyLEQ, anyLT };
         }, {
-            everyLEQ: true,
             anyLT: false,
+            everyLEQ: true,
         });
         return everyLEQ && (anyLT || (this.vector.size() < b.vector.size()));
     }
@@ -255,7 +193,7 @@ class VectorClock2 {
 }
 exports.VectorClock2 = VectorClock2;
 
-},{}],8:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
@@ -264,10 +202,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./naive-array-list"));
 __export(require("./naive-immutable-map"));
 __export(require("./set-axioms"));
-__export(require("./set-map"));
+__export(require("./ordered-map"));
 __export(require("./sorted-set-array"));
 
-},{"./naive-array-list":9,"./naive-immutable-map":10,"./set-axioms":11,"./set-map":12,"./sorted-set-array":13}],9:[function(require,module,exports){
+},{"./naive-array-list":8,"./naive-immutable-map":9,"./ordered-map":10,"./set-axioms":11,"./sorted-set-array":12}],8:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class NaiveArrayList {
@@ -299,7 +237,7 @@ class NaiveArrayList {
 }
 exports.NaiveArrayList = NaiveArrayList;
 
-},{}],10:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class NaiveImmutableMap {
@@ -323,32 +261,7 @@ class NaiveImmutableMap {
 }
 exports.NaiveImmutableMap = NaiveImmutableMap;
 
-},{}],11:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-function equal(a, b) {
-    return a.equal(b);
-}
-function union(a, b) {
-    return a.union(b);
-}
-function intersect(a, b) {
-    return a.intersect(b);
-}
-function difference(a, b) {
-    return a.difference(b);
-}
-function axioms(assert, a, b, c) {
-    assert(equal(union(union(a, b), c), union(a, union(b, c))), 'associative union');
-    assert(equal(intersect(intersect(a, b), c), intersect(a, intersect(b, c))), 'associative intersect');
-    assert(equal(union(a, intersect(b, c)), union(intersect(a, b), intersect(a, c))), 'union distributes over intersection');
-    assert(equal(intersect(a, union(b, c)), intersect(union(a, b), union(a, c))), 'intersection distributes over union');
-    assert(equal(difference(a, union(b, c)), intersect(difference(a, b), difference(a, c))), 'De Morgan\'s law for union');
-    assert(equal(difference(a, intersect(b, c)), union(difference(a, b), difference(a, c))), 'De Morgan\'s law for intersect');
-}
-exports.axioms = axioms;
-
-},{}],12:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Indexed {
@@ -361,14 +274,14 @@ class Indexed {
     }
 }
 exports.Indexed = Indexed;
-class SetMap {
+class OrderedMap {
     constructor(keys, values) {
         this.keys = keys;
         this.values = values;
     }
     set(key, value) {
         const result = this.keys.add(new Indexed(key, this.keys.size()));
-        return new SetMap(result.result, this.values.set(result.value.index, value));
+        return new OrderedMap(result.result, this.values.set(result.value.index, value));
     }
     get(key) {
         const result = this.keys.add(new Indexed(key, this.keys.size()));
@@ -388,9 +301,34 @@ class SetMap {
         }, aggregator);
     }
 }
-exports.SetMap = SetMap;
+exports.OrderedMap = OrderedMap;
 
-},{}],13:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+function equal(a, b) {
+    return a.equal(b);
+}
+function union(a, b) {
+    return a.union(b);
+}
+function intersect(a, b) {
+    return a.intersect(b);
+}
+function difference(a, b) {
+    return a.difference(b);
+}
+function axioms(assert, a, b, c) {
+    assert(equal(union(union(a, b), c), union(a, union(b, c))), "associative union");
+    assert(equal(intersect(intersect(a, b), c), intersect(a, intersect(b, c))), "associative intersect");
+    assert(equal(union(a, intersect(b, c)), union(intersect(a, b), intersect(a, c))), "union distributes over intersection");
+    assert(equal(intersect(a, union(b, c)), intersect(union(a, b), union(a, c))), "intersection distributes over union");
+    assert(equal(difference(a, union(b, c)), intersect(difference(a, b), difference(a, c))), "De Morgan's law for union");
+    assert(equal(difference(a, intersect(b, c)), union(difference(a, b), difference(a, c))), "De Morgan's law for intersect");
+}
+exports.axioms = axioms;
+
+},{}],12:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function divide(lower, upper, elements, item, onNew, onExists) {
@@ -398,7 +336,7 @@ function divide(lower, upper, elements, item, onNew, onExists) {
     if (step < 1) {
         return onNew(item, elements, lower);
     }
-    const half = step / 2 | 0;
+    const half = Math.trunc(step / 2);
     const idx = lower + half;
     const elm = elements.get(idx);
     const cmp = elm.compare(item);
@@ -453,7 +391,7 @@ class SortedSetArray {
         }, this.mempty());
     }
     equal(b) {
-        if (this.size() != b.size()) {
+        if (this.size() !== b.size()) {
             return false;
         }
         // TODO reduce is not optimal, because it iterates till the end of set
@@ -467,7 +405,7 @@ class SortedSetArray {
 }
 exports.SortedSetArray = SortedSetArray;
 
-},{}],14:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Delete {
@@ -480,20 +418,20 @@ class Delete {
 }
 exports.Delete = Delete;
 
-},{}],15:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const text_1 = require("./text");
-const set_map_1 = require("../structures/set-map");
-const naive_immutable_map_1 = require("../structures/naive-immutable-map");
-const sorted_set_array_1 = require("../structures/sorted-set-array");
 const naive_array_list_1 = require("../structures/naive-array-list");
+const naive_immutable_map_1 = require("../structures/naive-immutable-map");
+const ordered_map_1 = require("../structures/ordered-map");
+const sorted_set_array_1 = require("../structures/sorted-set-array");
+const text_1 = require("./text");
 function createFromOrderer(order) {
-    return new text_1.Text(order, new set_map_1.SetMap(new sorted_set_array_1.SortedSetArray(new naive_array_list_1.NaiveArrayList([])), new naive_immutable_map_1.NaiveImmutableMap()));
+    return new text_1.Text(order, new ordered_map_1.OrderedMap(new sorted_set_array_1.SortedSetArray(new naive_array_list_1.NaiveArrayList([])), new naive_immutable_map_1.NaiveImmutableMap()));
 }
 exports.createFromOrderer = createFromOrderer;
 
-},{"../structures/naive-array-list":9,"../structures/naive-immutable-map":10,"../structures/set-map":12,"../structures/sorted-set-array":13,"./text":18}],16:[function(require,module,exports){
+},{"../structures/naive-array-list":8,"../structures/naive-immutable-map":9,"../structures/ordered-map":10,"../structures/sorted-set-array":12,"./text":17}],15:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
@@ -505,7 +443,7 @@ __export(require("./text"));
 __export(require("./utils"));
 __export(require("./factory"));
 
-},{"./delete":14,"./factory":15,"./insert":17,"./text":18,"./utils":19}],17:[function(require,module,exports){
+},{"./delete":13,"./factory":14,"./insert":16,"./text":17,"./utils":18}],16:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Insert {
@@ -518,7 +456,7 @@ class Insert {
 }
 exports.Insert = Insert;
 
-},{}],18:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const functions_1 = require("../functions");
@@ -552,7 +490,7 @@ class Text {
 }
 exports.Text = Text;
 
-},{"../functions":1}],19:[function(require,module,exports){
+},{"../functions":1}],18:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const insert_1 = require("./insert");
@@ -572,12 +510,13 @@ function operationToArray(data, op) {
     if (op instanceof insert_1.Insert) {
         let copy = data.slice(0);
         copy = utils_1.ensureArrayLength(copy, op.at);
-        copy.splice(op.at, 0, ...op.value.split(''));
+        copy.splice(op.at, 0, ...op.value.split(""));
         return copy;
     }
     else {
-        if (op.at < 0)
+        if (op.at < 0) {
             return data;
+        }
         let copy = data.slice(0);
         copy = utils_1.ensureArrayLength(copy, op.at);
         copy.splice(op.at, op.length);
@@ -586,7 +525,7 @@ function operationToArray(data, op) {
 }
 exports.operationToArray = operationToArray;
 function toString(value) {
-    return value.join('');
+    return value.join("");
 }
 exports.toString = toString;
 function renderString(text) {
@@ -594,8 +533,8 @@ function renderString(text) {
 }
 exports.renderString = renderString;
 
-},{"../utils":20,"./insert":17}],20:[function(require,module,exports){
-'use strict';
+},{"../utils":19,"./insert":16}],19:[function(require,module,exports){
+"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function between(value, min, max) {
     if (value <= min) {
@@ -632,7 +571,6 @@ function keyToMap(r, i) {
     r[i] = true;
     return r;
 }
-;
 function union(a, b) {
     a = a.reduce(keyToMap, {});
     b = b.reduce(keyToMap, a);

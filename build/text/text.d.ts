@@ -1,4 +1,4 @@
-import { Orderer } from './orderer';
+import { Orderer } from "./orderer";
 export interface SetMap<K, V> {
     set(key: K, value: V): SetMap<K, V>;
     get?(key: K): V;

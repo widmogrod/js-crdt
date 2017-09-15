@@ -21,12 +21,12 @@ export declare class Indexed<T extends MapSetKey<T>> implements MapSetKey<T> {
     constructor(value: T, index: number);
     compare(b: Indexed<T>): number;
 }
-export declare class SetMap<K extends MapSetKey<K>, V> {
+export declare class OrderedMap<K extends MapSetKey<K>, V> {
     private keys;
     private values;
     constructor(keys?: KeysSet<Indexed<K>>, values?: Map<number, V>);
-    set(key: K, value: V): SetMap<K, V>;
+    set(key: K, value: V): OrderedMap<K, V>;
     get?(key: K): V;
-    merge(b: SetMap<K, V>): SetMap<K, V>;
+    merge(b: OrderedMap<K, V>): OrderedMap<K, V>;
     reduce<R>(fn: (aggregator: R, values: V, key: K) => R, aggregator: R): R;
 }

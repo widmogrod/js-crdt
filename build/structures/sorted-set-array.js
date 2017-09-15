@@ -5,7 +5,7 @@ function divide(lower, upper, elements, item, onNew, onExists) {
     if (step < 1) {
         return onNew(item, elements, lower);
     }
-    const half = step / 2 | 0;
+    const half = Math.trunc(step / 2);
     const idx = lower + half;
     const elm = elements.get(idx);
     const cmp = elm.compare(item);
@@ -60,7 +60,7 @@ class SortedSetArray {
         }, this.mempty());
     }
     equal(b) {
-        if (this.size() != b.size()) {
+        if (this.size() !== b.size()) {
             return false;
         }
         // TODO reduce is not optimal, because it iterates till the end of set
