@@ -29,7 +29,7 @@ class Text {
     }
     reduce(fn, accumulator) {
         return this.setMap.reduce((accumulator, operations, order) => {
-            return fn(accumulator, operations, order);
+            return fn(accumulator, { operations, order });
         }, accumulator);
     }
 }

@@ -6,8 +6,8 @@ function snapshot(text) {
 }
 exports.snapshot = snapshot;
 function toArray(text) {
-    return text.reduce((accumulator, operations) => {
-        return operations.reduce(operationToArray, accumulator);
+    return text.reduce((accumulator, item) => {
+        return item.operations.reduce(operationToArray, accumulator);
     }, []);
 }
 exports.toArray = toArray;

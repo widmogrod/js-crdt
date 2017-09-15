@@ -51,9 +51,9 @@ export class Text {
     return equal(this.order, b.order);
   }
 
-  public reduce<R>(fn: (aggregator: R, operations: Operation[], order: Orderer<any>) => R, accumulator): R {
+  public reduce<R>(fn: (aggregator: R, item: OrderedOperations) => R, accumulator): R {
     return this.setMap.reduce((accumulator, operations, order) => {
-      return fn(accumulator, operations, order);
+      return fn(accumulator, {operations, order});
     }, accumulator);
   }
 }

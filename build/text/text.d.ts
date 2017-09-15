@@ -18,5 +18,5 @@ export declare class Text {
     apply(operation: Operation): OrderedOperations;
     merge(b: Text): Text;
     equal(b: Text): boolean;
-    reduce<R>(fn: (aggregator: R, operations: Operation[], order: Orderer<any>) => R, accumulator: any): R;
+    reduce<R>(fn: (aggregator: R, item: OrderedOperations) => R, accumulator: any): R;
 }

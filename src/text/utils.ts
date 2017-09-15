@@ -1,6 +1,6 @@
 import {Delete} from "./delete";
 import {Insert} from "./insert";
-import {Text} from "./text";
+import {OrderedOperations, Text} from "./text";
 
 export function snapshot(text: Text): Text {
   return text.next();
@@ -9,8 +9,8 @@ export function snapshot(text: Text): Text {
 export type Operation = Insert | Delete;
 
 export function toArray(text: Text): string[] {
-  return text.reduce((accumulator, operations) => {
-    return operations.reduce(operationToArray, accumulator);
+  return text.reduce((accumulator: string[], item: OrderedOperations) => {
+    return item.operations.reduce(operationToArray, accumulator);
   }, []);
 }
 
