@@ -27,6 +27,9 @@ class Text {
     merge(b) {
         return new Text(functions_1.merge(this.order, b.order), functions_1.merge(this.setMap, b.setMap));
     }
+    // public diff(b: Text): OrderedOperations[] {
+    //   // TODO
+    // }
     equal(b) {
         return functions_1.equal(this.order, b.order);
     }

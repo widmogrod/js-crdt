@@ -1,6 +1,6 @@
 import {equal,  merge} from "../functions";
 import {Orderer} from "./orderer";
-import {Operation} from "./utils";
+import {Operation} from "./operation";
 
 export interface OrderedMap<K, V> {
   set(key: K, value: V): OrderedMap<K, V>;
@@ -53,6 +53,10 @@ export class Text {
       merge(this.setMap, b.setMap),
     );
   }
+
+  // public diff(b: Text): OrderedOperations[] {
+  //   // TODO
+  // }
 
   public equal(b: Text): boolean {
     return equal(this.order, b.order);

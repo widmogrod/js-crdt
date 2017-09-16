@@ -1,5 +1,5 @@
 import { Orderer } from "./orderer";
-import { Operation } from "./utils";
+import { Operation } from "./operation";
 export interface OrderedMap<K, V> {
     set(key: K, value: V): OrderedMap<K, V>;
     get?(key: K): V;

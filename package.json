@@ -5,8 +5,7 @@
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "scripts": {
-    "pretest": "npm run build",
-    "test": "mocha",
+    "test": "tsc && mocha",
     "build": "./node_modules/.bin/tsc",
     "postbuild": "./node_modules/.bin/tsc -d",
     "browserify": "./node_modules/.bin/browserify --standalone crdt build/index.js > dist/crdt.js",

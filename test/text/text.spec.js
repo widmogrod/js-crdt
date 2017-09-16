@@ -1,6 +1,6 @@
 'use strict';
 
-const {Insert, Delete, snapshot, renderString, createFromOrderer} = require('../../build/text');
+const {Insert, Delete, Selection, snapshot, renderString, createFromOrderer, selectionFunc} = require('../../build/text');
 const {VectorClock, createVectorClock} = require('../../build/order');
 const {merge, axioms} = require('../../build/functions');
 const assert = require('assert');
@@ -113,6 +113,111 @@ describe('text.Text', () => {
 
       assert.equal(renderString(a), 'caaab');
       assert.equal(renderString(b), 'caaab');
+    });
+  });
+
+  describe("selection", () => {
+    let doc = createFromOrderer(createOrderer('a'));
+    let fallback = new Selection("new", 0, 0);
+
+    describe('selection-cursor', () => {
+      it('shoud fallback to default selection-cursor when there is no operations', () => {
+        let result = selectionFunc(doc, fallback);
+        let expected = new Selection("new", 0, 0);
+        assert.deepEqual(result, expected);
+      });
+      it('shoud move selection-cursor when insert done on the same position', () => {
+        let next = doc.next()
+
+        next.apply(new Insert(0, 'abc'));
+
+        let result = selectionFunc(next, fallback);
+        let expected = new Selection("new", 3, 0);
+        assert.deepEqual(result, expected);
+      });
+      it('shoud move selection-cursor when delete done before seletion', () => {
+        let next = doc.next()
+
+        next.apply(new Selection("new", 4, 0));
+        next.apply(new Delete(0, 2));
+
+        let result = selectionFunc(next, fallback);
+        let expected = new Selection("new", 2, 0);
+        assert.deepEqual(result, expected);
+      });
+      it('shoud move chose mose recent selection-cursor if available', () => {
+        let next = doc.next()
+
+        next.apply(new Insert(0, 'abc'));
+        next.apply(new Selection("new", 2, 0));
+
+        let result = selectionFunc(next, fallback);
+        let expected = new Selection("new", 2, 0);
+        assert.deepEqual(result, expected);
+      });
+    });
+
+    describe('selection-range', () => {
+      it('shoud move selection-range when insert done before selection', () => {
+        let next = doc.next()
+
+        next.apply(new Selection("new", 5, 4));
+        next.apply(new Insert(1, 'abc'));
+
+        let result = selectionFunc(next, fallback);
+        let expected = new Selection("new", 8, 4);
+        assert.deepEqual(result, expected);
+      });
+      it('shoud expand selection-range when insert done between selection', () => {
+        let next = doc.next()
+
+        next.apply(new Selection("new", 2, 4));
+        next.apply(new Insert(1, 'abc'));
+
+        let result = selectionFunc(next, fallback);
+        let expected = new Selection("new", 3, 6);
+        assert.deepEqual(result, expected);
+      });
+      it('shoud do not move selection-range when insert done after selection', () => {
+        let next = doc.next()
+
+        next.apply(new Selection("new", 2, 4));
+        next.apply(new Insert(10, 'abc'));
+
+        let result = selectionFunc(next, fallback);
+        let expected = new Selection("new", 2, 4);
+        assert.deepEqual(result, expected);
+      });
+      it('shoud collaps selection-range when delete done between selection', () => {
+        let next = doc.next()
+
+        next.apply(new Selection("new", 2, 6));
+        next.apply(new Delete(3, 2));
+
+        let result = selectionFunc(next, fallback);
+        let expected = new Selection("new", 2, 4);
+        assert.deepEqual(result, expected);
+      });
+      it('shoud move and reduce selection-range when delete done before selection but ends inside selection', () => {
+        let next = doc.next()
+
+        next.apply(new Selection("new", 4, 8));
+        next.apply(new Delete(2, 6));
+
+        let result = selectionFunc(next, fallback);
+        let expected = new Selection("new", 2, 4);
+        assert.deepEqual(result, expected);
+      });
+      it('shoud do not move selection-range when delete done after', () => {
+        let next = doc.next()
+
+        next.apply(new Selection("new", 4, 2));
+        next.apply(new Delete(9, 2));
+
+        let result = selectionFunc(next, fallback);
+        let expected = new Selection("new", 4, 2);
+        assert.deepEqual(result, expected);
+      });
     });
   });
 });
