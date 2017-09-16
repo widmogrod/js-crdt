@@ -63,15 +63,9 @@ export function selectionFunc(text: Text, fallback: Selection): Selection {
 
       if (op instanceof Insert) {
         if (op.at <= selection.at) {
-          if (selection.isBetween(op.endsAt)) {
-            return selection
-              .moveRightBy(selection.at - op.at)
-              .expandBy(op.endsAt - selection.at);
-          } else {
-            return selection
-              .moveRightBy(op.length);
-          }
-        } else if (selection.isBetween(op.at)) {
+          return selection
+            .moveRightBy(op.length);
+        } else if (selection.isInside(op.at)) {
           return selection
             .expandBy(op.length);
         }
@@ -80,8 +74,8 @@ export function selectionFunc(text: Text, fallback: Selection): Selection {
       }
 
       if (op instanceof Delete) {
-        if (op.at < selection.at) {
-          if (selection.isBetween(op.endsAt)) {
+        if (op.at <= selection.at) {
+          if (selection.isInside(op.endsAt)) {
             return selection
               .moveRightBy(op.at - selection.at)
               .expandBy(selection.at - op.endsAt);
@@ -89,7 +83,7 @@ export function selectionFunc(text: Text, fallback: Selection): Selection {
             return selection
               .moveRightBy(-op.length);
           }
-        } else if (selection.isBetween(op.at)) {
+        } else if (selection.isInside(op.at)) {
             return selection
               .expandBy(-op.length);
         }

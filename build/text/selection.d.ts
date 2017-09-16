@@ -7,5 +7,5 @@ export declare class Selection {
     hasSameOrgin(b: Selection): boolean;
     moveRightBy(step: number): Selection;
     expandBy(length: number): Selection;
-    isBetween(position: number): boolean;
+    isInside(position: number): boolean;
 }

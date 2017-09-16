@@ -422,6 +422,7 @@ class Delete {
         this.length = length;
         this.at = at;
         this.length = length;
+        this.endsAt = this.at + length;
     }
 }
 exports.Delete = Delete;
@@ -439,7 +440,7 @@ function createFromOrderer(order) {
 }
 exports.createFromOrderer = createFromOrderer;
 
-},{"../structures/naive-array-list":8,"../structures/naive-immutable-map":9,"../structures/ordered-map":10,"../structures/sorted-set-array":12,"./text":17}],15:[function(require,module,exports){
+},{"../structures/naive-array-list":8,"../structures/naive-immutable-map":9,"../structures/ordered-map":10,"../structures/sorted-set-array":12,"./text":18}],15:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
@@ -447,11 +448,12 @@ function __export(m) {
 Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./insert"));
 __export(require("./delete"));
+__export(require("./selection"));
 __export(require("./text"));
 __export(require("./utils"));
 __export(require("./factory"));
 
-},{"./delete":13,"./factory":14,"./insert":16,"./text":17,"./utils":18}],16:[function(require,module,exports){
+},{"./delete":13,"./factory":14,"./insert":16,"./selection":17,"./text":18,"./utils":19}],16:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Insert {
@@ -460,11 +462,41 @@ class Insert {
         this.value = value;
         this.at = at < 0 ? 0 : at;
         this.value = String(value);
+        this.length = this.value.length;
+        this.endsAt = this.at + this.length;
     }
 }
 exports.Insert = Insert;
 
 },{}],17:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+class Selection {
+    constructor(origin, at, length) {
+        this.origin = origin;
+        this.at = at;
+        this.length = length;
+        this.origin = origin;
+        this.at = at < 0 ? 0 : at;
+        this.length = length < 0 ? 0 : length;
+        this.endsAt = this.at + this.length;
+    }
+    hasSameOrgin(b) {
+        return this.origin === b.origin;
+    }
+    moveRightBy(step) {
+        return new Selection(this.origin, this.at + step, this.length);
+    }
+    expandBy(length) {
+        return new Selection(this.origin, this.at, this.length + length);
+    }
+    isInside(position) {
+        return this.at < position && this.endsAt > position;
+    }
+}
+exports.Selection = Selection;
+
+},{}],18:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const functions_1 = require("../functions");
@@ -494,6 +526,9 @@ class Text {
     merge(b) {
         return new Text(functions_1.merge(this.order, b.order), functions_1.merge(this.setMap, b.setMap));
     }
+    // public diff(b: Text): OrderedOperations[] {
+    //   // TODO
+    // }
     equal(b) {
         return functions_1.equal(this.order, b.order);
     }
@@ -505,10 +540,12 @@ class Text {
 }
 exports.Text = Text;
 
-},{"../functions":1}],18:[function(require,module,exports){
+},{"../functions":1}],19:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const delete_1 = require("./delete");
 const insert_1 = require("./insert");
+const selection_1 = require("./selection");
 function snapshot(text) {
     return text.next();
 }
@@ -534,7 +571,7 @@ function operationToArray(data, op) {
         copy.splice(op.at, 0, ...op.value.split(""));
         return copy;
     }
-    else {
+    else if (op instanceof delete_1.Delete) {
         if (op.at < 0) {
             return data;
         }
@@ -543,6 +580,7 @@ function operationToArray(data, op) {
         copy.splice(op.at, op.length);
         return copy;
     }
+    return data;
 }
 exports.operationToArray = operationToArray;
 function toString(value) {
@@ -553,6 +591,49 @@ function renderString(text) {
     return toString(toArray(text));
 }
 exports.renderString = renderString;
+function selectionFunc(text, fallback) {
+    return text.reduce((accumulator, item) => {
+        return item.operations.reduce((selection, op) => {
+            if (op instanceof selection_1.Selection) {
+                if (op.hasSameOrgin(selection)) {
+                    return op;
+                }
+                return selection;
+            }
+            if (op instanceof insert_1.Insert) {
+                if (op.at <= selection.at) {
+                    return selection
+                        .moveRightBy(op.length);
+                }
+                else if (selection.isInside(op.at)) {
+                    return selection
+                        .expandBy(op.length);
+                }
+                return selection;
+            }
+            if (op instanceof delete_1.Delete) {
+                if (op.at <= selection.at) {
+                    if (selection.isInside(op.endsAt)) {
+                        return selection
+                            .moveRightBy(op.at - selection.at)
+                            .expandBy(selection.at - op.endsAt);
+                    }
+                    else {
+                        return selection
+                            .moveRightBy(-op.length);
+                    }
+                }
+                else if (selection.isInside(op.at)) {
+                    return selection
+                        .expandBy(-op.length);
+                }
+                return selection;
+            }
+            return selection;
+        }, accumulator);
+    }, fallback);
+}
+exports.selectionFunc = selectionFunc;
 
-},{"./insert":16}]},{},[3])(3)
+},{"./delete":13,"./insert":16,"./selection":17}]},{},[3])(3)
 });

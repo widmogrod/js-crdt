@@ -51,7 +51,6 @@ exports.renderString = renderString;
 function selectionFunc(text, fallback) {
     return text.reduce((accumulator, item) => {
         return item.operations.reduce((selection, op) => {
-            console.log({ op });
             if (op instanceof selection_1.Selection) {
                 if (op.hasSameOrgin(selection)) {
                     return op;
@@ -60,25 +59,18 @@ function selectionFunc(text, fallback) {
             }
             if (op instanceof insert_1.Insert) {
                 if (op.at <= selection.at) {
-                    if (selection.isBetween(op.endsAt)) {
-                        return selection
-                            .moveRightBy(selection.at - op.at)
-                            .expandBy(op.endsAt - selection.at);
-                    }
-                    else {
-                        return selection
-                            .moveRightBy(op.length);
-                    }
+                    return selection
+                        .moveRightBy(op.length);
                 }
-                else if (selection.isBetween(op.at)) {
+                else if (selection.isInside(op.at)) {
                     return selection
                         .expandBy(op.length);
                 }
                 return selection;
             }
             if (op instanceof delete_1.Delete) {
-                if (op.at < selection.at) {
-                    if (selection.isBetween(op.endsAt)) {
+                if (op.at <= selection.at) {
+                    if (selection.isInside(op.endsAt)) {
                         return selection
                             .moveRightBy(op.at - selection.at)
                             .expandBy(selection.at - op.endsAt);
@@ -88,7 +80,7 @@ function selectionFunc(text, fallback) {
                             .moveRightBy(-op.length);
                     }
                 }
-                else if (selection.isBetween(op.at)) {
+                else if (selection.isInside(op.at)) {
                     return selection
                         .expandBy(-op.length);
                 }

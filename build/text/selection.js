@@ -19,8 +19,8 @@ class Selection {
     expandBy(length) {
         return new Selection(this.origin, this.at, this.length + length);
     }
-    isBetween(position) {
-        return this.at <= position && this.endsAt >= position;
+    isInside(position) {
+        return this.at < position && this.endsAt > position;
     }
 }
 exports.Selection = Selection;

@@ -7,4 +7,4 @@ export declare function ensureArrayLength<T>(array: T[], len: number): T[];
 export declare function operationToArray(data: string[], op: Operation): string[];
 export declare function toString(value: string[]): string;
 export declare function renderString(text: Text): string;
-export declare function selectionFunc(text: Text, follback: Selection): Selection;
+export declare function selectionFunc(text: Text, fallback: Selection): Selection;

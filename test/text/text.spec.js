@@ -168,14 +168,14 @@ describe('text.Text', () => {
         let expected = new Selection("new", 8, 4);
         assert.deepEqual(result, expected);
       });
-      it('shoud expand selection-range when insert done between selection', () => {
+      it('shoud move selection-range when insert done between selection', () => {
         let next = doc.next()
 
         next.apply(new Selection("new", 2, 4));
-        next.apply(new Insert(1, 'abc'));
+        next.apply(new Insert(3, 'abc'));
 
         let result = selectionFunc(next, fallback);
-        let expected = new Selection("new", 3, 6);
+        let expected = new Selection("new", 2, 7);
         assert.deepEqual(result, expected);
       });
       it('shoud do not move selection-range when insert done after selection', () => {

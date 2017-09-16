@@ -19,7 +19,7 @@ export class Selection {
     return new Selection(this.origin, this.at, this.length + length);
   }
 
-  public isBetween(position: number): boolean {
-    return this.at <= position && this.endsAt >= position;
+  public isInside(position: number): boolean {
+    return this.at < position && this.endsAt > position;
   }
 }
