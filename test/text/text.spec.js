@@ -242,7 +242,6 @@ describe('text.Text', () => {
         "c": new Selection("c", 1, 1),
       };
 
-      console.log(result.data);
       assert.deepEqual(result.data, expected);
     });
   });
