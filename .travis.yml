@@ -1,7 +1,7 @@
 language: node_js
 
 node_js:
-- 8
+- 8.4
 
 before_script:
 - npm install --dev
@@ -15,12 +15,15 @@ notifications:
 
 before_deploy:
 - npm run dist
+
 deploy:
   provider: npm
   email:
     secure: Vj7txX6ZzmJU+4Y/D4qw41Evm2N6G7gOUFGMUKcU+CZcBhL00YCWfEjdQas8JaYlfmZp+InunCz9WWltx8P3oCZRVOOvy7mLMfpvTWUVcbjjo+VgblL6lAnGcaMtjsT/U0Lq/TdCL79nnAi1j11gawXqwF/yi7g31s+2P2yh4j6/EZkIgADfksoRKviXbudCbRpeleKmdadcBQjTCD9G3FRjZ9Pb5UjFMWw4tgJSMzDUQl/nOnROgBpSvGne7CBipySC6G48XVMdamu6D0WO/97KzCSbMmWCSDeUCbuYciLPHr7V+KJTNgssojT1cJQyA2mH7aVb0Qi1ZqOOFRCPzx9BgRQn0Y/4XiffyIUsJWpd0DZEYjwzFuwWNvbi4TkinHqn6cEQ+1+bx1DvxI1qYK0VnA0PyMtC+dsLSjLIuO3UJpnrQLS7W2DU7JrZgFbDKHcEkbM58fZXFxyr9h5lFg9CNeBoPKiDIpxy9GNNRxMZvVzZiTAXYizHixq1sZmuUy9LOZnGmj13iSPC1+o6cWr6ve0rsCUWgH7sXzFEhKOFn3ihBxIyxgceBGWJ5k/v/JAIdoz9wC9gmtzm/oX956srTZdFLt7y6duZ4j3qJbVFsQBVaykiruRi5LNs9yslKaYjNU+mBNcyFIQUwVDOKXKdbQCTYAsP5lrATKMrYHI=
+
   api_key:
     secure: O0Tg8l/IPDfJuw9g1VmlIJjkwOsaglps4jU9zb8wLy+AXtX2IO3wFQrtWUdXlY5I0EPTy3E0uZIlP8+ujeWLtZycHKpPyDiErKkjaEDWt+nUIc71SXMDv/rbo9W8GKTXfCMj4l5Dw4yMNIlP9vwwVMdDXDiGBJD0xH2d7qPX7ad1HqNhGKlganJejfewcYhFJKDqPmKweH0EVuZG9G2uHW0zNZk05w+gd+ko74BlxcJRUCEdZj05KNcsuQpSUuaLh1EM2xj8kMfj5T3WfZ972F/l5btdHTLDMHgY8fwJqJsnbCBDzbhXja2CPvkB/KLmU6fMz88mAiMjSAuRswPpCanp/9PqUGjdCiDCzAgkWitj+opzsiQ1yPvHq0zmjRDKV1OGO9LocByDbpMXKRZmM1mO5N+kiZCrU2y8x2KqoylpFnkNA95rjaIvDWBUvG8raidh8ntIrE3xpFUkTDW+vS7KCP6ccQ5zuft07EAvKCgt+w+gqnj3ecrWTPLfAr1WU+XagKxKWPxJNM4YFIP9QXUJupX9c/r7u3QAkCvZ1mTow83Fq+hfPmS926DbRbXJCVLAwkzNawZ29X2WLWaswRRi6SrN7hy5ZAz/e+mry40bATlUXu5jTUI/HRX9yjfLlqclP8KPPp0q5uxcyUsIOdUrk3CE+bv295o4k+NNLmk=
+
   tag: next
   on:
     tags: true
