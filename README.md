@@ -25,7 +25,7 @@ Basic development requires at least `nodejs@8`.
 
 To quickly start developmen run:
 ```
-npm install --only=dev
+npm install
 npm test
 ```
 

@@ -18,6 +18,11 @@ class NaiveImmutableMap {
     get(key) {
         return this.data[key];
     }
+    reduce(fn, aggregator) {
+        return Object.keys(this.data).reduce((aggregator, key) => {
+            return fn(aggregator, this.data[key], key);
+        }, aggregator);
+    }
 }
 exports.NaiveImmutableMap = NaiveImmutableMap;
 //# sourceMappingURL=naive-immutable-map.js.map

@@ -1,13 +1,18 @@
 language: node_js
+
 node_js:
-- 8.0
+- 8
+
 before_script:
 - npm install --dev
+
 script:
 - npm test
 - npm run lint
+
 notifications:
   email: false
+
 before_deploy:
 - npm run dist
 deploy:

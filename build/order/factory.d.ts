@@ -1,2 +1,2 @@
-import { VectorClock2, Id, Node, Version, VectorSortedSet } from './vector-clock2';
-export declare function createVectorClock2(id: Node, version?: Version, vector?: VectorSortedSet<Id>): VectorClock2;
+import { Id, Node, VectorClock, VectorSortedSet, Version } from "./vector-clock";
+export declare function createVectorClock(id: Node, version?: Version, vector?: VectorSortedSet<Id>): VectorClock;

@@ -17,13 +17,23 @@ function concat(a, b) {
     return a.concat(b);
 }
 exports.concat = concat;
+function between(value, min, max) {
+    if (value <= min) {
+        return false;
+    }
+    else if (value >= max) {
+        return false;
+    }
+    return true;
+}
+exports.between = between;
 function axioms(assert, a, b, c) {
     // commutative   a + c = c + a                i.e: 1 + 2 = 2 + 1
-    assert(equal(merge(a, b), merge(b, a)), 'is not commutative');
+    assert(equal(merge(a, b), merge(b, a)), "is not commutative");
     // associative   a + (b + c) = (a + b) + c    i.e: 1 + (2 + 3) = (1 + 2) + 3
-    assert(equal(merge(a, merge(b, c)), merge(merge(a, b), c)), 'is not associative');
+    assert(equal(merge(a, merge(b, c)), merge(merge(a, b), c)), "is not associative");
     // idempotent    f(f(a)) = f(a)               i.e: ||a|| = |a|
-    assert(equal(merge(a, a), a), 'is not idempotent');
+    assert(equal(merge(a, a), a), "is not idempotent");
 }
 exports.axioms = axioms;
 
@@ -52,104 +62,39 @@ exports.Increment = Increment;
 Object.defineProperty(exports, "__esModule", { value: true });
 const functions = require("./functions");
 const increment = require("./increment");
-const utils = require("./utils");
 const order = require("./order");
-const text = require("./text");
 const structures = require("./structures");
+const text = require("./text");
 exports.default = {
-    text,
-    order,
-    utils,
     functions,
     increment,
-    structures
+    order,
+    structures,
+    text,
 };
 
-},{"./functions":1,"./increment":2,"./order":5,"./structures":8,"./text":16,"./utils":20}],4:[function(require,module,exports){
+},{"./functions":1,"./increment":2,"./order":5,"./structures":7,"./text":15}],4:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const vector_clock2_1 = require("./vector-clock2");
-const sorted_set_array_1 = require("../structures/sorted-set-array");
 const naive_array_list_1 = require("../structures/naive-array-list");
+const sorted_set_array_1 = require("../structures/sorted-set-array");
+const vector_clock_1 = require("./vector-clock");
 const emptyVector = new sorted_set_array_1.SortedSetArray(new naive_array_list_1.NaiveArrayList([]));
-function createVectorClock2(id, version, vector) {
-    return new vector_clock2_1.VectorClock2(new vector_clock2_1.Id(id, version ? version : 0), vector ? vector : emptyVector);
+function createVectorClock(id, version, vector) {
+    return new vector_clock_1.VectorClock(new vector_clock_1.Id(id, version ? version : 0), vector ? vector : emptyVector);
 }
-exports.createVectorClock2 = createVectorClock2;
+exports.createVectorClock = createVectorClock;
 
-},{"../structures/naive-array-list":9,"../structures/sorted-set-array":13,"./vector-clock2":7}],5:[function(require,module,exports){
+},{"../structures/naive-array-list":8,"../structures/sorted-set-array":12,"./vector-clock":6}],5:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./vector-clock"));
-__export(require("./vector-clock2"));
 __export(require("./factory"));
 
-},{"./factory":4,"./vector-clock":6,"./vector-clock2":7}],6:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const utils_1 = require("../utils");
-class VectorClock {
-    constructor(id, vector) {
-        this.id = id;
-        this.vector = vector;
-        vector = utils_1.clone(vector);
-        vector[id] = vector[id] || 0;
-        this.id = id;
-        this.vector = vector;
-    }
-    next() {
-        const vector = utils_1.clone(this.vector);
-        ++vector[this.id];
-        return new VectorClock(this.id, vector);
-    }
-    merge(b) {
-        const vector = utils_1.union(Object.keys(this.vector), Object.keys(b.vector)).reduce((vector, key) => {
-            vector[key] = Math.max(this.vector[key] || 0, b.vector[key] || 0);
-            return vector;
-        }, {});
-        return new VectorClock(this.id, vector);
-    }
-    equal(b) {
-        return this.compare(b) === 0;
-    }
-    compare(b) {
-        const position = utils_1.common(this.vector, b.vector)
-            .reduce((result, key) => {
-            return result + (this.vector[key] - b.vector[key]);
-        }, 0);
-        if (position !== 0) {
-            return position;
-        }
-        const difA = utils_1.diff(this.vector, b.vector).length;
-        const difB = utils_1.diff(b.vector, this.vector).length;
-        const dif = difA - difB;
-        if (dif !== 0) {
-            return dif;
-        }
-        const tipPosition = this.vector[this.id] - b.vector[b.id];
-        if (tipPosition !== 0) {
-            return tipPosition;
-        }
-        const ha = b.vector.hasOwnProperty(this.id);
-        const hb = this.vector.hasOwnProperty(b.id);
-        if (!ha && !hb) {
-            return this.id < b.id ? -1 : 1;
-        }
-        else if (ha && !hb) {
-            return -1;
-        }
-        else if (hb && !ha) {
-            return 1;
-        }
-        return 0;
-    }
-}
-exports.VectorClock = VectorClock;
-
-},{"../utils":20}],7:[function(require,module,exports){
+},{"./factory":4,"./vector-clock":6}],6:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Id {
@@ -170,11 +115,12 @@ class Id {
     }
 }
 exports.Id = Id;
-class VectorClock2 {
+class VectorClock {
     constructor(id, vector) {
         this.id = id;
         this.vector = vector;
         this.id = id;
+        /* tslint:disable: prefer-const */
         let { result, value } = vector.add(id);
         if (result === vector) {
             if (id.version > value.version) {
@@ -184,11 +130,11 @@ class VectorClock2 {
         this.vector = result;
     }
     toString() {
-        const a = this.vector.reduce((r, i) => r + i.toString(), '');
-        return `VectorClock2(${this.id},${a})`;
+        const a = this.vector.reduce((r, i) => r + i.toString(), "");
+        return `VectorClock(${this.id},${a})`;
     }
     next() {
-        return new VectorClock2(this.id.next(), this.vector.remove(this.id).result.add(this.id.next()).result);
+        return new VectorClock(this.id.next(), this.vector.remove(this.id).result.add(this.id.next()).result);
     }
     equal(b) {
         if (this.vector.size() !== b.vector.size()) {
@@ -232,8 +178,8 @@ class VectorClock2 {
             everyLEQ = everyLEQ ? rA.version <= rB.version : everyLEQ;
             return { everyLEQ, anyLT };
         }, {
-            everyLEQ: true,
             anyLT: false,
+            everyLEQ: true,
         });
         return everyLEQ && (anyLT || (this.vector.size() < b.vector.size()));
     }
@@ -250,12 +196,12 @@ class VectorClock2 {
             }
             return vector.add(item).result;
         }, this.vector.mempty());
-        return new VectorClock2(this.id, vector.union(b.vector));
+        return new VectorClock(this.id, vector.union(b.vector));
     }
 }
-exports.VectorClock2 = VectorClock2;
+exports.VectorClock = VectorClock;
 
-},{}],8:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
@@ -264,10 +210,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./naive-array-list"));
 __export(require("./naive-immutable-map"));
 __export(require("./set-axioms"));
-__export(require("./set-map"));
+__export(require("./ordered-map"));
 __export(require("./sorted-set-array"));
 
-},{"./naive-array-list":9,"./naive-immutable-map":10,"./set-axioms":11,"./set-map":12,"./sorted-set-array":13}],9:[function(require,module,exports){
+},{"./naive-array-list":8,"./naive-immutable-map":9,"./ordered-map":10,"./set-axioms":11,"./sorted-set-array":12}],8:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class NaiveArrayList {
@@ -299,7 +245,7 @@ class NaiveArrayList {
 }
 exports.NaiveArrayList = NaiveArrayList;
 
-},{}],10:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class NaiveImmutableMap {
@@ -320,35 +266,15 @@ class NaiveImmutableMap {
     get(key) {
         return this.data[key];
     }
+    reduce(fn, aggregator) {
+        return Object.keys(this.data).reduce((aggregator, key) => {
+            return fn(aggregator, this.data[key], key);
+        }, aggregator);
+    }
 }
 exports.NaiveImmutableMap = NaiveImmutableMap;
 
-},{}],11:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-function equal(a, b) {
-    return a.equal(b);
-}
-function union(a, b) {
-    return a.union(b);
-}
-function intersect(a, b) {
-    return a.intersect(b);
-}
-function difference(a, b) {
-    return a.difference(b);
-}
-function axioms(assert, a, b, c) {
-    assert(equal(union(union(a, b), c), union(a, union(b, c))), 'associative union');
-    assert(equal(intersect(intersect(a, b), c), intersect(a, intersect(b, c))), 'associative intersect');
-    assert(equal(union(a, intersect(b, c)), union(intersect(a, b), intersect(a, c))), 'union distributes over intersection');
-    assert(equal(intersect(a, union(b, c)), intersect(union(a, b), union(a, c))), 'intersection distributes over union');
-    assert(equal(difference(a, union(b, c)), intersect(difference(a, b), difference(a, c))), 'De Morgan\'s law for union');
-    assert(equal(difference(a, intersect(b, c)), union(difference(a, b), difference(a, c))), 'De Morgan\'s law for intersect');
-}
-exports.axioms = axioms;
-
-},{}],12:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Indexed {
@@ -361,14 +287,14 @@ class Indexed {
     }
 }
 exports.Indexed = Indexed;
-class SetMap {
+class OrderedMap {
     constructor(keys, values) {
         this.keys = keys;
         this.values = values;
     }
     set(key, value) {
         const result = this.keys.add(new Indexed(key, this.keys.size()));
-        return new SetMap(result.result, this.values.set(result.value.index, value));
+        return new OrderedMap(result.result, this.values.set(result.value.index, value));
     }
     get(key) {
         const result = this.keys.add(new Indexed(key, this.keys.size()));
@@ -388,9 +314,34 @@ class SetMap {
         }, aggregator);
     }
 }
-exports.SetMap = SetMap;
+exports.OrderedMap = OrderedMap;
 
-},{}],13:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+function equal(a, b) {
+    return a.equal(b);
+}
+function union(a, b) {
+    return a.union(b);
+}
+function intersect(a, b) {
+    return a.intersect(b);
+}
+function difference(a, b) {
+    return a.difference(b);
+}
+function axioms(assert, a, b, c) {
+    assert(equal(union(union(a, b), c), union(a, union(b, c))), "associative union");
+    assert(equal(intersect(intersect(a, b), c), intersect(a, intersect(b, c))), "associative intersect");
+    assert(equal(union(a, intersect(b, c)), union(intersect(a, b), intersect(a, c))), "union distributes over intersection");
+    assert(equal(intersect(a, union(b, c)), intersect(union(a, b), union(a, c))), "intersection distributes over union");
+    assert(equal(difference(a, union(b, c)), intersect(difference(a, b), difference(a, c))), "De Morgan's law for union");
+    assert(equal(difference(a, intersect(b, c)), union(difference(a, b), difference(a, c))), "De Morgan's law for intersect");
+}
+exports.axioms = axioms;
+
+},{}],12:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function divide(lower, upper, elements, item, onNew, onExists) {
@@ -398,7 +349,7 @@ function divide(lower, upper, elements, item, onNew, onExists) {
     if (step < 1) {
         return onNew(item, elements, lower);
     }
-    const half = step / 2 | 0;
+    const half = Math.trunc(step / 2);
     const idx = lower + half;
     const elm = elements.get(idx);
     const cmp = elm.compare(item);
@@ -453,7 +404,7 @@ class SortedSetArray {
         }, this.mempty());
     }
     equal(b) {
-        if (this.size() != b.size()) {
+        if (this.size() !== b.size()) {
             return false;
         }
         // TODO reduce is not optimal, because it iterates till the end of set
@@ -467,7 +418,7 @@ class SortedSetArray {
 }
 exports.SortedSetArray = SortedSetArray;
 
-},{}],14:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Delete {
@@ -476,24 +427,25 @@ class Delete {
         this.length = length;
         this.at = at;
         this.length = length;
+        this.endsAt = this.at + length;
     }
 }
 exports.Delete = Delete;
 
-},{}],15:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const text_1 = require("./text");
-const set_map_1 = require("../structures/set-map");
-const naive_immutable_map_1 = require("../structures/naive-immutable-map");
-const sorted_set_array_1 = require("../structures/sorted-set-array");
 const naive_array_list_1 = require("../structures/naive-array-list");
+const naive_immutable_map_1 = require("../structures/naive-immutable-map");
+const ordered_map_1 = require("../structures/ordered-map");
+const sorted_set_array_1 = require("../structures/sorted-set-array");
+const text_1 = require("./text");
 function createFromOrderer(order) {
-    return new text_1.Text(order, new set_map_1.SetMap(new sorted_set_array_1.SortedSetArray(new naive_array_list_1.NaiveArrayList([])), new naive_immutable_map_1.NaiveImmutableMap()));
+    return new text_1.Text(order, new ordered_map_1.OrderedMap(new sorted_set_array_1.SortedSetArray(new naive_array_list_1.NaiveArrayList([])), new naive_immutable_map_1.NaiveImmutableMap()));
 }
 exports.createFromOrderer = createFromOrderer;
 
-},{"../structures/naive-array-list":9,"../structures/naive-immutable-map":10,"../structures/set-map":12,"../structures/sorted-set-array":13,"./text":18}],16:[function(require,module,exports){
+},{"../structures/naive-array-list":8,"../structures/naive-immutable-map":9,"../structures/ordered-map":10,"../structures/sorted-set-array":12,"./text":18}],15:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
@@ -501,11 +453,12 @@ function __export(m) {
 Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./insert"));
 __export(require("./delete"));
+__export(require("./selection"));
 __export(require("./text"));
 __export(require("./utils"));
 __export(require("./factory"));
 
-},{"./delete":14,"./factory":15,"./insert":17,"./text":18,"./utils":19}],17:[function(require,module,exports){
+},{"./delete":13,"./factory":14,"./insert":16,"./selection":17,"./text":18,"./utils":19}],16:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Insert {
@@ -514,9 +467,39 @@ class Insert {
         this.value = value;
         this.at = at < 0 ? 0 : at;
         this.value = String(value);
+        this.length = this.value.length;
+        this.endsAt = this.at + this.length;
     }
 }
 exports.Insert = Insert;
+
+},{}],17:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+class Selection {
+    constructor(origin, at, length) {
+        this.origin = origin;
+        this.at = at;
+        this.length = length;
+        this.origin = origin;
+        this.at = at < 0 ? 0 : at;
+        this.length = length < 0 ? 0 : length;
+        this.endsAt = this.at + this.length;
+    }
+    hasSameOrgin(b) {
+        return this.origin === b.origin;
+    }
+    moveRightBy(step) {
+        return new Selection(this.origin, this.at + step, this.length);
+    }
+    expandBy(length) {
+        return new Selection(this.origin, this.at, this.length + length);
+    }
+    isInside(position) {
+        return this.at < position && this.endsAt > position;
+    }
+}
+exports.Selection = Selection;
 
 },{}],18:[function(require,module,exports){
 "use strict";
@@ -531,22 +514,29 @@ class Text {
         return new Text(this.order.next(), this.setMap);
     }
     apply(operation) {
-        let value = this.setMap.get(this.order);
-        if (!value) {
-            value = [];
+        let operations = this.setMap.get(this.order);
+        if (!operations) {
+            operations = [];
         }
-        value.push(operation);
-        this.setMap = this.setMap.set(this.order, value);
+        operations.push(operation);
+        this.setMap = this.setMap.set(this.order, operations);
+        return {
+            operations,
+            order: this.order,
+        };
+    }
+    mergeOperations(o) {
+        return new Text(functions_1.merge(this.order, o.order), this.setMap.set(o.order, o.operations));
     }
     merge(b) {
-        return new Text(functions_1.merge(this.order, b.order), this.setMap.merge(b.setMap));
+        return new Text(functions_1.merge(this.order, b.order), functions_1.merge(this.setMap, b.setMap));
     }
     equal(b) {
         return functions_1.equal(this.order, b.order);
     }
     reduce(fn, accumulator) {
         return this.setMap.reduce((accumulator, operations, order) => {
-            return fn(accumulator, operations, order);
+            return fn(accumulator, { operations, order });
         }, accumulator);
     }
 }
@@ -555,58 +545,20 @@ exports.Text = Text;
 },{"../functions":1}],19:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const delete_1 = require("./delete");
 const insert_1 = require("./insert");
+const selection_1 = require("./selection");
+const naive_immutable_map_1 = require("../structures/naive-immutable-map");
 function snapshot(text) {
     return text.next();
 }
 exports.snapshot = snapshot;
 function toArray(text) {
-    return text.reduce((accumulator, operations) => {
-        return operations.reduce(operationToArray, accumulator);
+    return text.reduce((accumulator, item) => {
+        return item.operations.reduce(operationToArray, accumulator);
     }, []);
 }
 exports.toArray = toArray;
-const utils_1 = require("../utils");
-// TODO make it nicer
-function operationToArray(data, op) {
-    if (op instanceof insert_1.Insert) {
-        let copy = data.slice(0);
-        copy = utils_1.ensureArrayLength(copy, op.at);
-        copy.splice(op.at, 0, ...op.value.split(''));
-        return copy;
-    }
-    else {
-        if (op.at < 0)
-            return data;
-        let copy = data.slice(0);
-        copy = utils_1.ensureArrayLength(copy, op.at);
-        copy.splice(op.at, op.length);
-        return copy;
-    }
-}
-exports.operationToArray = operationToArray;
-function toString(value) {
-    return value.join('');
-}
-exports.toString = toString;
-function renderString(text) {
-    return toString(toArray(text));
-}
-exports.renderString = renderString;
-
-},{"../utils":20,"./insert":17}],20:[function(require,module,exports){
-'use strict';
-Object.defineProperty(exports, "__esModule", { value: true });
-function between(value, min, max) {
-    if (value <= min) {
-        return false;
-    }
-    else if (value >= max) {
-        return false;
-    }
-    return true;
-}
-exports.between = between;
 function ensureArrayLength(array, len) {
     if (array.length < len) {
         array.length = len;
@@ -614,49 +566,96 @@ function ensureArrayLength(array, len) {
     return array;
 }
 exports.ensureArrayLength = ensureArrayLength;
-function sortNumbers(a, b) {
-    return a - b;
-}
-exports.sortNumbers = sortNumbers;
-function clone(obj) {
-    var target = {};
-    for (const i in obj) {
-        if (obj.hasOwnProperty(i)) {
-            target[i] = obj[i];
-        }
+// TODO make it nicer
+function operationToArray(data, op) {
+    if (op instanceof insert_1.Insert) {
+        let copy = data.slice(0);
+        copy = ensureArrayLength(copy, op.at);
+        copy.splice(op.at, 0, ...op.value.split(""));
+        return copy;
     }
-    return target;
-}
-exports.clone = clone;
-function keyToMap(r, i) {
-    r[i] = true;
-    return r;
-}
-;
-function union(a, b) {
-    a = a.reduce(keyToMap, {});
-    b = b.reduce(keyToMap, a);
-    return Object.keys(b);
-}
-exports.union = union;
-function common(a, b) {
-    return Object.keys(a).reduce((r, k) => {
-        if (b.hasOwnProperty(k)) {
-            r.push(k);
+    else if (op instanceof delete_1.Delete) {
+        if (op.at < 0) {
+            return data;
         }
-        return r;
-    }, []).sort();
+        let copy = data.slice(0);
+        copy = ensureArrayLength(copy, op.at);
+        copy.splice(op.at, op.length);
+        return copy;
+    }
+    return data;
 }
-exports.common = common;
-function diff(a, b) {
-    return Object.keys(a).reduce((r, k) => {
-        if (!b.hasOwnProperty(k)) {
-            r.push(k);
+exports.operationToArray = operationToArray;
+function toString(value) {
+    return value.join("");
+}
+exports.toString = toString;
+function renderString(text) {
+    return toString(toArray(text));
+}
+exports.renderString = renderString;
+function getSelection(text, fallback) {
+    return text.reduce((s, oo) => {
+        return oo.operations.reduce(selectionUpdate, s);
+    }, fallback);
+}
+exports.getSelection = getSelection;
+function getSelections(text, fallback) {
+    return text.reduce((map, oo) => {
+        return oo.operations.reduce((map, o) => {
+            return map.reduce((map, s, key) => {
+                if (o instanceof selection_1.Selection) {
+                    const xxx = map.get(o.origin);
+                    if (!xxx) {
+                        return map.set(o.origin, o);
+                    }
+                }
+                const next = selectionUpdate(s, o);
+                return map.set(next.origin, next);
+            }, map);
+        }, map);
+    }, new naive_immutable_map_1.NaiveImmutableMap().set(fallback.origin, fallback));
+}
+exports.getSelections = getSelections;
+function selectionUpdate(selection, op) {
+    if (op instanceof selection_1.Selection) {
+        if (op.hasSameOrgin(selection)) {
+            return op;
         }
-        return r;
-    }, []);
+        return selection;
+    }
+    if (op instanceof insert_1.Insert) {
+        if (op.at <= selection.at) {
+            return selection
+                .moveRightBy(op.length);
+        }
+        else if (selection.isInside(op.at)) {
+            return selection
+                .expandBy(op.length);
+        }
+        return selection;
+    }
+    if (op instanceof delete_1.Delete) {
+        if (op.at <= selection.at) {
+            if (selection.isInside(op.endsAt)) {
+                return selection
+                    .moveRightBy(op.at - selection.at)
+                    .expandBy(selection.at - op.endsAt);
+            }
+            else {
+                return selection
+                    .moveRightBy(-op.length);
+            }
+        }
+        else if (selection.isInside(op.at)) {
+            return selection
+                .expandBy(-op.length);
+        }
+        return selection;
+    }
+    return selection;
 }
-exports.diff = diff;
+exports.selectionUpdate = selectionUpdate;
 
-},{}]},{},[3])(3)
+},{"../structures/naive-immutable-map":9,"./delete":13,"./insert":16,"./selection":17}]},{},[3])(3)
 });

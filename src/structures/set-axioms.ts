@@ -1,11 +1,11 @@
 export interface Set<T> {
-  equal(b: Set<T>): boolean
-  union(b: Set<T>): Set<T>
-  intersect(b: Set<T>): Set<T>
-  difference(b: Set<T>): Set<T>
+  equal(b: Set<T>): boolean;
+  union(b: Set<T>): Set<T>;
+  intersect(b: Set<T>): Set<T>;
+  difference(b: Set<T>): Set<T>;
 }
 
-export type AssertFunc = (boolean, string) => void;
+export type AssertFunc = (assertion: boolean, message: string) => void;
 
 function equal<T>(a: Set<T>, b: Set<T>): boolean {
   return a.equal(b);
@@ -26,49 +26,49 @@ function difference<T>(a: Set<T>, b: Set<T>): Set<T> {
 export function axioms<T>(assert: AssertFunc, a: Set<T>, b: Set<T>, c: Set<T>) {
   assert(
     equal(
-      union(union(a,b),c),
-      union(a,union(b,c))
+      union(union(a, b), c),
+      union(a, union(b, c)),
     ),
-    'associative union'
+    "associative union",
   );
 
   assert(
     equal(
-      intersect(intersect(a,b),c),
-      intersect(a,intersect(b,c))
+      intersect(intersect(a, b), c),
+      intersect(a, intersect(b, c)),
     ),
-    'associative intersect'
+    "associative intersect",
   );
 
   assert(
     equal(
-      union(a, intersect(b,c)),
-      union(intersect(a, b), intersect(a, c))
+      union(a, intersect(b, c)),
+      union(intersect(a, b), intersect(a, c)),
     ),
-    'union distributes over intersection'
+    "union distributes over intersection",
   );
 
   assert(
     equal(
-      intersect(a, union(b,c)),
-      intersect(union(a, b), union(a, c))
+      intersect(a, union(b, c)),
+      intersect(union(a, b), union(a, c)),
     ),
-    'intersection distributes over union'
+    "intersection distributes over union",
   );
 
   assert(
     equal(
-      difference(a, union(b,c)),
-      intersect(difference(a, b), difference(a, c))
+      difference(a, union(b, c)),
+      intersect(difference(a, b), difference(a, c)),
     ),
-    'De Morgan\'s law for union'
+    "De Morgan's law for union",
   );
 
   assert(
     equal(
-      difference(a, intersect(b,c)),
-      union(difference(a, b), difference(a, c))
+      difference(a, intersect(b, c)),
+      union(difference(a, b), difference(a, c)),
     ),
-    'De Morgan\'s law for intersect'
+    "De Morgan's law for intersect",
   );
 }

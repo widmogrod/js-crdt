@@ -1,16 +1,16 @@
-import {CRDT} from './functions';
+import {CRDT} from "./functions";
 
 export class Increment implements CRDT<Increment> {
   constructor(public value: number) {
     this.value = value;
   }
-  merge(b: Increment) {
+  public merge(b: Increment) {
     return new Increment(Math.max(this.value, b.value));
   }
-  equal(b: Increment) {
+  public equal(b: Increment) {
     return this.value === b.value;
   }
-  increment() {
+  public increment() {
     return new Increment(this.value + 1);
   }
 }

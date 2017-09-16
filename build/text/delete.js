@@ -6,6 +6,7 @@ class Delete {
         this.length = length;
         this.at = at;
         this.length = length;
+        this.endsAt = this.at + length;
     }
 }
 exports.Delete = Delete;

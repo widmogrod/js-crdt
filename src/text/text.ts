@@ -1,48 +1,66 @@
-import {merge,  equal} from '../functions'
-import {Orderer} from './orderer'
+import {equal, merge} from "../functions";
+import {Orderer} from "./orderer";
+import {Operation} from "./operation";
 
-export interface SetMap<K,V> {
-  set(key: K, value: V): SetMap<K,V>
-  get?(key: K): V
-  merge(b: SetMap<K,V>): SetMap<K,V>
-  reduce<R>(fn: (aggregator: R, values: V, key: K) => R, aggregator: R): R
+export interface OrderedMap<K, V> {
+  set(key: K, value: V): OrderedMap<K, V>;
+  get?(key: K): V;
+  merge(b: OrderedMap<K, V>): OrderedMap<K, V>;
+  reduce<R>(fn: (aggregator: R, values: V, key: K) => R, aggregator: R): R;
 }
 
-export class Text<T> {
-  constructor(public order: Orderer<any>, public setMap: SetMap<Orderer<any>, T[]>) {}
+export interface OrderedOperations {
+  order: Orderer<any>;
+  operations: Operation[];
+}
 
-  next(): Text<T> {
+export class Text {
+  constructor(public order: Orderer<any>, public setMap: OrderedMap<Orderer<any>, Operation[]>) {}
+
+  public next(): Text {
     return new Text(
       this.order.next(),
       this.setMap,
     );
   }
 
-  apply(operation: T) {
-    let value = this.setMap.get(this.order);
+  public apply(operation: Operation): OrderedOperations {
+    let operations = this.setMap.get(this.order);
 
-    if (!value) {
-      value = [];
+    if (!operations) {
+      operations = [] as Operation[];
     }
 
-    value.push(operation);
-    this.setMap = this.setMap.set(this.order, value);
+    operations.push(operation);
+    this.setMap = this.setMap.set(this.order, operations);
+
+    return {
+      operations,
+      order: this.order,
+    };
   }
 
-  merge(b: Text<T>): Text<T> {
+  public mergeOperations(o: OrderedOperations): Text {
     return new Text(
-      merge(this.order, b.order),
-      this.setMap.merge(b.setMap)
+      merge(this.order, o.order),
+      this.setMap.set(o.order, o.operations),
     );
   }
 
-  equal(b: Text<T>): boolean {
+  public merge(b: Text): Text {
+    return new Text(
+      merge(this.order, b.order),
+      merge(this.setMap, b.setMap),
+    );
+  }
+
+  public equal(b: Text): boolean {
     return equal(this.order, b.order);
   }
 
-  reduce<R>(fn: (aggregator: R, operations: T[], order: Orderer<any>) => R, accumulator): R {
+  public reduce<R>(fn: (aggregator: R, item: OrderedOperations) => R, accumulator): R {
     return this.setMap.reduce((accumulator, operations, order) => {
-      return fn(accumulator, operations, order);
+      return fn(accumulator, {operations, order});
     }, accumulator);
   }
 }

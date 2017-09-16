@@ -6,6 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./naive-array-list"));
 __export(require("./naive-immutable-map"));
 __export(require("./set-axioms"));
-__export(require("./set-map"));
+__export(require("./ordered-map"));
 __export(require("./sorted-set-array"));
 //# sourceMappingURL=index.js.map

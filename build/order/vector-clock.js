@@ -1,60 +1,105 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const utils_1 = require("../utils");
+class Id {
+    constructor(node, version) {
+        this.node = node;
+        this.version = version;
+        this.node = node;
+        this.version = version;
+    }
+    next() {
+        return new Id(this.node, this.version + 1);
+    }
+    compare(b) {
+        return this.node.localeCompare(b.node);
+    }
+    toString() {
+        return `Id(${this.node},${this.version})`;
+    }
+}
+exports.Id = Id;
 class VectorClock {
     constructor(id, vector) {
         this.id = id;
         this.vector = vector;
-        vector = utils_1.clone(vector);
-        vector[id] = vector[id] || 0;
         this.id = id;
-        this.vector = vector;
+        /* tslint:disable: prefer-const */
+        let { result, value } = vector.add(id);
+        if (result === vector) {
+            if (id.version > value.version) {
+                result = vector.remove(value).result.add(id).result;
+            }
+        }
+        this.vector = result;
+    }
+    toString() {
+        const a = this.vector.reduce((r, i) => r + i.toString(), "");
+        return `VectorClock(${this.id},${a})`;
     }
     next() {
-        const vector = utils_1.clone(this.vector);
-        ++vector[this.id];
-        return new VectorClock(this.id, vector);
-    }
-    merge(b) {
-        const vector = utils_1.union(Object.keys(this.vector), Object.keys(b.vector)).reduce((vector, key) => {
-            vector[key] = Math.max(this.vector[key] || 0, b.vector[key] || 0);
-            return vector;
-        }, {});
-        return new VectorClock(this.id, vector);
+        return new VectorClock(this.id.next(), this.vector.remove(this.id).result.add(this.id.next()).result);
     }
     equal(b) {
-        return this.compare(b) === 0;
+        if (this.vector.size() !== b.vector.size()) {
+            return false;
+        }
+        return this.vector.reduce((eq, item) => {
+            if (eq) {
+                const { result, value } = b.vector.add(item);
+                if (result === b.vector) {
+                    return value.version === item.version;
+                }
+            }
+            return false;
+        }, true);
     }
     compare(b) {
-        const position = utils_1.common(this.vector, b.vector)
-            .reduce((result, key) => {
-            return result + (this.vector[key] - b.vector[key]);
-        }, 0);
-        if (position !== 0) {
-            return position;
-        }
-        const difA = utils_1.diff(this.vector, b.vector).length;
-        const difB = utils_1.diff(b.vector, this.vector).length;
-        const dif = difA - difB;
-        if (dif !== 0) {
-            return dif;
-        }
-        const tipPosition = this.vector[this.id] - b.vector[b.id];
-        if (tipPosition !== 0) {
-            return tipPosition;
-        }
-        const ha = b.vector.hasOwnProperty(this.id);
-        const hb = this.vector.hasOwnProperty(b.id);
-        if (!ha && !hb) {
-            return this.id < b.id ? -1 : 1;
-        }
-        else if (ha && !hb) {
+        if (this.lessThan(b)) {
             return -1;
         }
-        else if (hb && !ha) {
+        if (b.lessThan(this)) {
             return 1;
         }
-        return 0;
+        if (this.equal(b)) {
+            return 0;
+        }
+        // then it's councurent
+        // right now I don't have such compare option
+        // so tie braking approach is to compare ID's
+        return this.id.compare(b.id);
+    }
+    lessThan(b) {
+        // VC(a) < VC(b) IF
+        //   forall VC(a)[i] <= VC(b)[i]
+        //   and exists VC(a)[i] < VC(b)[i]]
+        const { everyLEQ, anyLT } = this.vector
+            .intersect(b.vector)
+            .reduce(({ everyLEQ, anyLT }, item) => {
+            const rA = this.vector.add(item).value;
+            const rB = b.vector.add(item).value;
+            anyLT = anyLT ? anyLT : rA.version < rB.version;
+            everyLEQ = everyLEQ ? rA.version <= rB.version : everyLEQ;
+            return { everyLEQ, anyLT };
+        }, {
+            anyLT: false,
+            everyLEQ: true,
+        });
+        return everyLEQ && (anyLT || (this.vector.size() < b.vector.size()));
+    }
+    merge(b) {
+        const vector = this.vector.reduce((vector, item) => {
+            const { result, value } = b.vector.add(item);
+            if (result === b.vector) {
+                if (value.version > item.version) {
+                    return vector.add(value).result;
+                }
+                else {
+                    return vector.add(item).result;
+                }
+            }
+            return vector.add(item).result;
+        }, this.vector.mempty());
+        return new VectorClock(this.id, vector.union(b.vector));
     }
 }
 exports.VectorClock = VectorClock;
