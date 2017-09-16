@@ -13,9 +13,6 @@ script:
 notifications:
   email: false
 
-before_deploy:
-- npm run dist
-
 deploy:
   provider: npm
   email:
