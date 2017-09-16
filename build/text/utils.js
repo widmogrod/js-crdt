@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const delete_1 = require("./delete");
 const insert_1 = require("./insert");
 const selection_1 = require("./selection");
+const naive_immutable_map_1 = require("../structures/naive-immutable-map");
 function snapshot(text) {
     return text.next();
 }
@@ -54,6 +55,23 @@ function getSelection(text, fallback) {
     }, fallback);
 }
 exports.getSelection = getSelection;
+function getSelections(text, fallback) {
+    return text.reduce((map, oo) => {
+        return oo.operations.reduce((map, o) => {
+            return map.reduce((map, s, key) => {
+                if (o instanceof selection_1.Selection) {
+                    const xxx = map.get(o.origin);
+                    if (!xxx) {
+                        return map.set(o.origin, o);
+                    }
+                }
+                const next = selectionUpdate(s, o);
+                return map.set(next.origin, next);
+            }, map);
+        }, map);
+    }, new naive_immutable_map_1.NaiveImmutableMap().set(fallback.origin, fallback));
+}
+exports.getSelections = getSelections;
 function selectionUpdate(selection, op) {
     if (op instanceof selection_1.Selection) {
         if (op.hasSameOrgin(selection)) {

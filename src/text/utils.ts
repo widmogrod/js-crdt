@@ -3,6 +3,7 @@ import {Insert} from "./insert";
 import {Selection} from "./selection";
 import {Operation} from "./operation";
 import {OrderedOperations, Text} from "./text";
+import {NaiveImmutableMap} from "../structures/naive-immutable-map";
 
 export function snapshot(text: Text): Text {
   return text.next();
@@ -54,6 +55,30 @@ export function getSelection(text: Text, fallback: Selection): Selection {
   return text.reduce((s: Selection, oo: OrderedOperations): Selection => {
     return oo.operations.reduce<Selection>(selectionUpdate, s);
   }, fallback);
+}
+
+export interface SelectionMap<K, V> {
+  set(key: K, value: V): SelectionMap<K, V>;
+  get?(key: K): V;
+  reduce<R>(fn: (aggregator: R, values: V, key: K) => R, aggregator: R): R;
+}
+
+export function getSelections(text: Text, fallback: Selection): SelectionMap<string, Selection> {
+  return text.reduce((map: SelectionMap<string, Selection>, oo: OrderedOperations): SelectionMap<string, Selection> => {
+    return oo.operations.reduce((map: SelectionMap<string, Selection>, o: Operation) => {
+      return map.reduce((map: SelectionMap<string, Selection>, s: Selection, key: string) => {
+        if (o instanceof Selection) {
+          const xxx = map.get(o.origin);
+          if (!xxx) {
+            return map.set(o.origin, o);
+          }
+        }
+
+        const next = selectionUpdate(s, o);
+        return map.set(next.origin, next);
+      }, map);
+    }, map);
+  }, new NaiveImmutableMap().set(fallback.origin, fallback));
 }
 
 export function selectionUpdate(selection: Selection, op: Operation): Selection {

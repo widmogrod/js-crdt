@@ -1,6 +1,7 @@
 'use strict';
 
-const {Insert, Delete, Selection, snapshot, renderString, createFromOrderer, getSelection} = require('../../build/text');
+const {Insert, Delete, Selection, snapshot, renderString, createFromOrderer} = require('../../build/text');
+const {getSelection, getSelections} = require('../../build/text');
 const {VectorClock, createVectorClock} = require('../../build/order');
 const {merge, axioms} = require('../../build/functions');
 const assert = require('assert');
@@ -116,7 +117,7 @@ describe('text.Text', () => {
     });
   });
 
-  describe("selection", () => {
+  describe("getSelection", () => {
     let doc = createFromOrderer(createOrderer('a'));
     let fallback = new Selection("new", 0, 0);
 
@@ -218,6 +219,31 @@ describe('text.Text', () => {
         let expected = new Selection("new", 4, 2);
         assert.deepEqual(result, expected);
       });
+    });
+  });
+
+  describe("getSelections", () => {
+    let doc = createFromOrderer(createOrderer('a'));
+    let fallback = new Selection("new", 0, 0);
+
+    it('should return all selections', () => {
+      let next = doc.next()
+
+      next.apply(new Selection("a", 4, 2));
+      next.apply(new Selection("b", 0, 0));
+      next.apply(new Selection("b", 1, 1));
+      next.apply(new Selection("c", 1, 1));
+
+      let result = getSelections(next, fallback);
+      let expected = {
+        "new": new Selection("new", 0, 0),
+        "a": new Selection("a", 4, 2),
+        "b": new Selection("b", 1, 1),
+        "c": new Selection("c", 1, 1),
+      };
+
+      console.log(result.data);
+      assert.deepEqual(result.data, expected);
     });
   });
 });

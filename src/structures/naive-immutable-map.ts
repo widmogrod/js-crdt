@@ -21,4 +21,10 @@ export class NaiveImmutableMap<V> {
   public get?(key: Key): V {
     return this.data[key];
   }
+
+  public reduce<R>(fn: (aggregator: R, values: V, key: string) => R, aggregator: R): R {
+    return Object.keys(this.data).reduce((aggregator: R, key: string) => {
+      return fn(aggregator, this.data[key], key);
+    }, aggregator);
+  }
 }
