@@ -1,6 +1,6 @@
 'use strict';
 
-const {Insert, Delete, Selection, snapshot, renderString, createFromOrderer, selectionFunc} = require('../../build/text');
+const {Insert, Delete, Selection, snapshot, renderString, createFromOrderer, getSelection} = require('../../build/text');
 const {VectorClock, createVectorClock} = require('../../build/order');
 const {merge, axioms} = require('../../build/functions');
 const assert = require('assert');
@@ -122,7 +122,7 @@ describe('text.Text', () => {
 
     describe('selection-cursor', () => {
       it('shoud fallback to default selection-cursor when there is no operations', () => {
-        let result = selectionFunc(doc, fallback);
+        let result = getSelection(doc, fallback);
         let expected = new Selection("new", 0, 0);
         assert.deepEqual(result, expected);
       });
@@ -131,7 +131,7 @@ describe('text.Text', () => {
 
         next.apply(new Insert(0, 'abc'));
 
-        let result = selectionFunc(next, fallback);
+        let result = getSelection(next, fallback);
         let expected = new Selection("new", 3, 0);
         assert.deepEqual(result, expected);
       });
@@ -141,7 +141,7 @@ describe('text.Text', () => {
         next.apply(new Selection("new", 4, 0));
         next.apply(new Delete(0, 2));
 
-        let result = selectionFunc(next, fallback);
+        let result = getSelection(next, fallback);
         let expected = new Selection("new", 2, 0);
         assert.deepEqual(result, expected);
       });
@@ -151,7 +151,7 @@ describe('text.Text', () => {
         next.apply(new Insert(0, 'abc'));
         next.apply(new Selection("new", 2, 0));
 
-        let result = selectionFunc(next, fallback);
+        let result = getSelection(next, fallback);
         let expected = new Selection("new", 2, 0);
         assert.deepEqual(result, expected);
       });
@@ -164,7 +164,7 @@ describe('text.Text', () => {
         next.apply(new Selection("new", 5, 4));
         next.apply(new Insert(1, 'abc'));
 
-        let result = selectionFunc(next, fallback);
+        let result = getSelection(next, fallback);
         let expected = new Selection("new", 8, 4);
         assert.deepEqual(result, expected);
       });
@@ -174,7 +174,7 @@ describe('text.Text', () => {
         next.apply(new Selection("new", 2, 4));
         next.apply(new Insert(3, 'abc'));
 
-        let result = selectionFunc(next, fallback);
+        let result = getSelection(next, fallback);
         let expected = new Selection("new", 2, 7);
         assert.deepEqual(result, expected);
       });
@@ -184,7 +184,7 @@ describe('text.Text', () => {
         next.apply(new Selection("new", 2, 4));
         next.apply(new Insert(10, 'abc'));
 
-        let result = selectionFunc(next, fallback);
+        let result = getSelection(next, fallback);
         let expected = new Selection("new", 2, 4);
         assert.deepEqual(result, expected);
       });
@@ -194,7 +194,7 @@ describe('text.Text', () => {
         next.apply(new Selection("new", 2, 6));
         next.apply(new Delete(3, 2));
 
-        let result = selectionFunc(next, fallback);
+        let result = getSelection(next, fallback);
         let expected = new Selection("new", 2, 4);
         assert.deepEqual(result, expected);
       });
@@ -204,7 +204,7 @@ describe('text.Text', () => {
         next.apply(new Selection("new", 4, 8));
         next.apply(new Delete(2, 6));
 
-        let result = selectionFunc(next, fallback);
+        let result = getSelection(next, fallback);
         let expected = new Selection("new", 2, 4);
         assert.deepEqual(result, expected);
       });
@@ -214,7 +214,7 @@ describe('text.Text', () => {
         next.apply(new Selection("new", 4, 2));
         next.apply(new Delete(9, 2));
 
-        let result = selectionFunc(next, fallback);
+        let result = getSelection(next, fallback);
         let expected = new Selection("new", 4, 2);
         assert.deepEqual(result, expected);
       });

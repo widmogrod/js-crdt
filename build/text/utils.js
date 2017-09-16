@@ -48,47 +48,49 @@ function renderString(text) {
     return toString(toArray(text));
 }
 exports.renderString = renderString;
-function selectionFunc(text, fallback) {
-    return text.reduce((accumulator, item) => {
-        return item.operations.reduce((selection, op) => {
-            if (op instanceof selection_1.Selection) {
-                if (op.hasSameOrgin(selection)) {
-                    return op;
-                }
-                return selection;
-            }
-            if (op instanceof insert_1.Insert) {
-                if (op.at <= selection.at) {
-                    return selection
-                        .moveRightBy(op.length);
-                }
-                else if (selection.isInside(op.at)) {
-                    return selection
-                        .expandBy(op.length);
-                }
-                return selection;
-            }
-            if (op instanceof delete_1.Delete) {
-                if (op.at <= selection.at) {
-                    if (selection.isInside(op.endsAt)) {
-                        return selection
-                            .moveRightBy(op.at - selection.at)
-                            .expandBy(selection.at - op.endsAt);
-                    }
-                    else {
-                        return selection
-                            .moveRightBy(-op.length);
-                    }
-                }
-                else if (selection.isInside(op.at)) {
-                    return selection
-                        .expandBy(-op.length);
-                }
-                return selection;
-            }
-            return selection;
-        }, accumulator);
+function getSelection(text, fallback) {
+    return text.reduce((s, oo) => {
+        return oo.operations.reduce(selectionUpdate, s);
     }, fallback);
 }
-exports.selectionFunc = selectionFunc;
+exports.getSelection = getSelection;
+function selectionUpdate(selection, op) {
+    if (op instanceof selection_1.Selection) {
+        if (op.hasSameOrgin(selection)) {
+            return op;
+        }
+        return selection;
+    }
+    if (op instanceof insert_1.Insert) {
+        if (op.at <= selection.at) {
+            return selection
+                .moveRightBy(op.length);
+        }
+        else if (selection.isInside(op.at)) {
+            return selection
+                .expandBy(op.length);
+        }
+        return selection;
+    }
+    if (op instanceof delete_1.Delete) {
+        if (op.at <= selection.at) {
+            if (selection.isInside(op.endsAt)) {
+                return selection
+                    .moveRightBy(op.at - selection.at)
+                    .expandBy(selection.at - op.endsAt);
+            }
+            else {
+                return selection
+                    .moveRightBy(-op.length);
+            }
+        }
+        else if (selection.isInside(op.at)) {
+            return selection
+                .expandBy(-op.length);
+        }
+        return selection;
+    }
+    return selection;
+}
+exports.selectionUpdate = selectionUpdate;
 //# sourceMappingURL=utils.js.map
