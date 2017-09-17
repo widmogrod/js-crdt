@@ -104,29 +104,35 @@ export function selectionUpdate(selection: Selection, op: Operation): Selection 
   }
 
   if (op instanceof Delete) {
-    if (op.at < selection.at) {
-      if (selection.isInside(op.endsAt)) {
-        return selection
-          .moveRightBy(op.at - selection.at)
-          .expandBy(selection.at - op.endsAt);
-      } else if (op.endsAt < selection.at) {
-        return selection
-          .moveRightBy(-op.length);
-      } else {
-        return selection
-          .moveRightBy(op.at - selection.at)
-          .expandBy(-selection.length);
-      }
-    } else if (op.at === selection.at) {
-      return selection
-        .expandBy(selection.at - op.endsAt);
-    } else if (selection.isInside(op.at)) {
-      return selection.isInside(op.endsAt)
-        ? selection.expandBy(op.endsAt - selection.endsAt)
-        : selection.expandBy(selection.endsAt - op.at);
+    // is before selection:
+    //       ssssss
+    //  ddd
+    if (op.endsAt < selection.at) {
+      return selection.moveRightBy(-op.length);
     }
 
-    return selection;
+    // is after selection:
+    //       ssssss
+    //               ddddd
+    if (op.at > selection.endsAt) {
+      return selection;
+    }
+
+    // starts inside selection block:
+    //       ssssss
+    //       dddddddddd
+    //       ddd
+    //         ddd
+    //         ddddddddd
+    if (op.at >= selection.at) {
+      return selection.expandBy(-Math.min(selection.endsAt - op.at, op.length));
+    }
+
+    // ends inside selection:
+    //       ssssss
+    //     dddd
+    //   dddddddd
+    return selection.expandBy(selection.at - op.endsAt).moveRightBy(op.at - selection.at);
   }
 
   return selection;

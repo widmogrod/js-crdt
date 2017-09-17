@@ -261,7 +261,7 @@ describe('text.Text', () => {
           next.apply(new Delete(5, 5));
 
           let result = getSelection(next, fallback);
-          let expected = new Selection("new", 4, 5);
+          let expected = new Selection("new", 4, 1);
           assert.deepEqual(result, expected);
         });
         it('shoud reduce selection-range to cursor when whole selected text is deleted', () => {
