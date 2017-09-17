@@ -628,9 +628,10 @@ function selectionUpdate(selection, op) {
         return selection;
     }
     if (op instanceof insert_1.Insert) {
-        if (op.at < selection.at) {
-            return selection
-                .moveRightBy(op.length);
+        if (op.at <= selection.at) {
+            return selection.isCursor()
+                ? selection
+                : selection.moveRightBy(op.length);
         }
         else if (selection.isInside(op.at)) {
             return selection

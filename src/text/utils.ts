@@ -91,9 +91,10 @@ export function selectionUpdate(selection: Selection, op: Operation): Selection 
   }
 
   if (op instanceof Insert) {
-    if (op.at < selection.at) {
-      return selection
-        .moveRightBy(op.length);
+    if (op.at <= selection.at) {
+      return selection.isCursor()
+        ? selection
+        : selection.moveRightBy(op.length);
     } else if (selection.isInside(op.at)) {
       return selection
         .expandBy(op.length);
