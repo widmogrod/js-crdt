@@ -1,18 +1,20 @@
 export type ReduceFunc<R, T> = (aggregator: R, item: T) => R;
 
-export interface MapSetKey<T> {
-  compare(b: MapSetKey<T>): number;
+export interface OrderedMapKey<T> {
+  compare(b: OrderedMapKey<T>): number;
 }
 
-export interface KeysTuple<A, B> {
+export interface SortedSetTuple<A, B> {
   result: A;
   value: B;
 }
 
-export interface KeysSet<T> {
-  add(item: T): KeysTuple<KeysSet<T>, T>;
+export interface SortedSet<T> {
+  add(item: T): SortedSetTuple<SortedSet<T>, T>;
   reduce<R>(fn: ReduceFunc<R, T>, accumulator: R): R;
   size(): number;
+  from(value: T, inclusive: boolean): SortedSet<T>;
+  to(value: T, inclusive: boolean): SortedSet<T>;
 }
 
 export interface Map<K, V> {
@@ -20,7 +22,7 @@ export interface Map<K, V> {
   get?(key: K): V;
 }
 
-export class Indexed<T extends MapSetKey<T>> implements MapSetKey<T> {
+export class Indexed<T extends OrderedMapKey<T>> implements OrderedMapKey<T> {
   public value: T;
   public index: number;
 
@@ -34,8 +36,8 @@ export class Indexed<T extends MapSetKey<T>> implements MapSetKey<T> {
   }
 }
 
-export class OrderedMap<K extends MapSetKey<K>, V> {
-  constructor(private keys?: KeysSet<Indexed<K>>, private values?: Map<number, V>) {}
+export class OrderedMap<K extends OrderedMapKey<K>, V> {
+  constructor(private keys?: SortedSet<Indexed<K>>, private values?: Map<number, V>) {}
 
   public set(key: K, value: V): OrderedMap<K, V> {
     const result = this.keys.add(new Indexed(key, this.keys.size()));
@@ -65,5 +67,23 @@ export class OrderedMap<K extends MapSetKey<K>, V> {
     return this.keys.reduce((aggregator, key) => {
       return fn(aggregator, this.values.get(key.index), key.value);
     }, aggregator);
+  }
+
+  public from(key: K, inclusive: boolean = true): OrderedMap<K, V> {
+    const result = this.keys.add(new Indexed(key, this.keys.size()));
+
+    return new OrderedMap(
+      this.keys.from(result.value, inclusive),
+      this.values, // TODO Pass all values since those are immutable...
+    );
+  }
+
+  public to(key: K, inclusive: boolean = true): OrderedMap<K, V> {
+    const result = this.keys.add(new Indexed(key, this.keys.size()));
+
+    return new OrderedMap(
+      this.keys.to(result.value, inclusive),
+      this.values, // TODO Pass all values since those are immutable...
+    );
   }
 }

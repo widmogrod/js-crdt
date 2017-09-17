@@ -7,6 +7,8 @@ export interface List<T> {
   size(): number;
   reduce<R>(fn: SetReduceFunc<R, T>, aggregator: R): R;
   mempty(): List<T>;
+  from(position: number): List<T>;
+  to(position: number): List<T>;
 }
 
 export interface Item<T> {
@@ -116,5 +118,21 @@ export class SortedSetArray<T extends Item<T>> {
 
   public reduce<R>(fn: SetReduceFunc<R, T>, accumulator: R): R {
     return this.elements.reduce(fn, accumulator);
+  }
+
+  public from(value: T, inclusive: boolean = true): SortedSetArray<T> {
+    return divide(
+      0, this.elements.size(), this.elements, value,
+      (item, elements, lower) => this.mempty(),
+      (item, elements, index) => new SortedSetArray(this.elements.from(inclusive ? index : (index + 1))),
+    );
+  }
+
+  public to(value: T, inclusive: boolean = true): SortedSetArray<T> {
+    return divide(
+      0, this.elements.size(), this.elements, value,
+      (item, elements, lower) => this.mempty(),
+      (item, elements, index) => new SortedSetArray(this.elements.to(inclusive ? index : (index - 1))),
+    );
   }
 }

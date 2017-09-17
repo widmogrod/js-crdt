@@ -36,6 +36,14 @@ class OrderedMap {
             return fn(aggregator, this.values.get(key.index), key.value);
         }, aggregator);
     }
+    from(key, inclusive = true) {
+        const result = this.keys.add(new Indexed(key, this.keys.size()));
+        return new OrderedMap(this.keys.from(result.value, inclusive), this.values);
+    }
+    to(key, inclusive = true) {
+        const result = this.keys.add(new Indexed(key, this.keys.size()));
+        return new OrderedMap(this.keys.to(result.value, inclusive), this.values);
+    }
 }
 exports.OrderedMap = OrderedMap;
 //# sourceMappingURL=ordered-map.js.map

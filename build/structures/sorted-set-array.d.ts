@@ -6,6 +6,8 @@ export interface List<T> {
     size(): number;
     reduce<R>(fn: SetReduceFunc<R, T>, aggregator: R): R;
     mempty(): List<T>;
+    from(position: number): List<T>;
+    to(position: number): List<T>;
 }
 export interface Item<T> {
     compare(b: Item<T>): number;
@@ -29,4 +31,6 @@ export declare class SortedSetArray<T extends Item<T>> {
     difference(b: SortedSetArray<T>): SortedSetArray<T>;
     equal(b: SortedSetArray<T>): boolean;
     reduce<R>(fn: SetReduceFunc<R, T>, accumulator: R): R;
+    from(value: T, inclusive?: boolean): SortedSetArray<T>;
+    to(value: T, inclusive?: boolean): SortedSetArray<T>;
 }

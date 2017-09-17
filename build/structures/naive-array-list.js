@@ -26,6 +26,16 @@ class NaiveArrayList {
     mempty() {
         return new NaiveArrayList();
     }
+    from(position) {
+        const clone = this.array.slice(0);
+        clone.splice(position);
+        return new NaiveArrayList(clone);
+    }
+    to(position) {
+        const clone = this.array.slice(0, position);
+        clone.splice(position);
+        return new NaiveArrayList(clone);
+    }
 }
 exports.NaiveArrayList = NaiveArrayList;
 //# sourceMappingURL=naive-array-list.js.map

@@ -33,4 +33,16 @@ export class NaiveArrayList<T> {
   public mempty(): NaiveArrayList<T> {
     return new NaiveArrayList();
   }
+
+  public from(position: number): NaiveArrayList<T> {
+    const clone = this.array.slice(0);
+    clone.splice(position);
+    return new NaiveArrayList(clone);
+  }
+
+  public to(position: number): NaiveArrayList<T> {
+    const clone = this.array.slice(0, position);
+    clone.splice(position);
+    return new NaiveArrayList(clone);
+  }
 }
