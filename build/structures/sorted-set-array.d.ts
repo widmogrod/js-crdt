@@ -6,8 +6,8 @@ export interface List<T> {
     size(): number;
     reduce<R>(fn: SetReduceFunc<R, T>, aggregator: R): R;
     mempty(): List<T>;
-    from(position: number): List<T>;
-    to(position: number): List<T>;
+    from(position: number, inclusive: boolean): List<T>;
+    to(position: number, inclusive: boolean): List<T>;
 }
 export interface Item<T> {
     compare(b: Item<T>): number;

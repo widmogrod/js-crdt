@@ -34,13 +34,13 @@ export class NaiveArrayList<T> {
     return new NaiveArrayList();
   }
 
-  public from(position: number): NaiveArrayList<T> {
-    const clone = this.array.slice(position);
+  public from(position: number, inclusive: boolean = true): NaiveArrayList<T> {
+    const clone = this.array.slice(inclusive ? position : position + 1);
     return new NaiveArrayList(clone);
   }
 
-  public to(position: number): NaiveArrayList<T> {
-    const clone = this.array.slice(0, position);
+  public to(position: number, inclusive: boolean = true): NaiveArrayList<T> {
+    const clone = this.array.slice(0, inclusive ? position + 1 : position);
     return new NaiveArrayList(clone);
   }
 }

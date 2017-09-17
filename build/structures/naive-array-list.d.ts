@@ -8,6 +8,6 @@ export declare class NaiveArrayList<T> {
     size(): number;
     reduce<R>(fn: ListReduceFunc<R, T>, aggregator: R): R;
     mempty(): NaiveArrayList<T>;
-    from(position: number): NaiveArrayList<T>;
-    to(position: number): NaiveArrayList<T>;
+    from(position: number, inclusive?: boolean): NaiveArrayList<T>;
+    to(position: number, inclusive?: boolean): NaiveArrayList<T>;
 }

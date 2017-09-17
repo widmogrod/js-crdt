@@ -242,12 +242,12 @@ class NaiveArrayList {
     mempty() {
         return new NaiveArrayList();
     }
-    from(position) {
-        const clone = this.array.slice(position);
+    from(position, inclusive = true) {
+        const clone = this.array.slice(inclusive ? position : position + 1);
         return new NaiveArrayList(clone);
     }
-    to(position) {
-        const clone = this.array.slice(0, position);
+    to(position, inclusive = true) {
+        const clone = this.array.slice(0, inclusive ? position + 1 : position);
         return new NaiveArrayList(clone);
     }
 }
@@ -432,10 +432,10 @@ class SortedSetArray {
         return this.elements.reduce(fn, accumulator);
     }
     from(value, inclusive = true) {
-        return divide(0, this.elements.size(), this.elements, value, (item, elements, lower) => this.mempty(), (item, elements, index) => new SortedSetArray(this.elements.from(inclusive ? index : (index + 1))));
+        return divide(0, this.elements.size(), this.elements, value, (item, elements, lower) => this.mempty(), (item, elements, index) => new SortedSetArray(this.elements.from(index, inclusive)));
     }
     to(value, inclusive = true) {
-        return divide(0, this.elements.size(), this.elements, value, (item, elements, lower) => this.mempty(), (item, elements, index) => new SortedSetArray(this.elements.to(inclusive ? index : (index - 1))));
+        return divide(0, this.elements.size(), this.elements, value, (item, elements, lower) => this.mempty(), (item, elements, index) => new SortedSetArray(this.elements.to(index, inclusive)));
     }
 }
 exports.SortedSetArray = SortedSetArray;

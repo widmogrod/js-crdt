@@ -72,10 +72,10 @@ class SortedSetArray {
         return this.elements.reduce(fn, accumulator);
     }
     from(value, inclusive = true) {
-        return divide(0, this.elements.size(), this.elements, value, (item, elements, lower) => this.mempty(), (item, elements, index) => new SortedSetArray(this.elements.from(inclusive ? index : (index + 1))));
+        return divide(0, this.elements.size(), this.elements, value, (item, elements, lower) => this.mempty(), (item, elements, index) => new SortedSetArray(this.elements.from(index, inclusive)));
     }
     to(value, inclusive = true) {
-        return divide(0, this.elements.size(), this.elements, value, (item, elements, lower) => this.mempty(), (item, elements, index) => new SortedSetArray(this.elements.to(inclusive ? index : (index - 1))));
+        return divide(0, this.elements.size(), this.elements, value, (item, elements, lower) => this.mempty(), (item, elements, index) => new SortedSetArray(this.elements.to(index, inclusive)));
     }
 }
 exports.SortedSetArray = SortedSetArray;
