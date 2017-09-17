@@ -66,17 +66,21 @@ export class Text {
     }, accumulator);
   }
 
-  public from(version: Orderer<any>, inclusive: boolean = true): Text {
-    return new Text(
-      version,
-      this.map.from(version, inclusive),
-    );
+  public from(version: Orderer<any>, inclusive: boolean = true): OrderedOperations[] {
+    return this
+      .map.from(version, inclusive)
+      .reduce((accumulator, operations, order) => {
+        accumulator.push({operations, order});
+        return  accumulator;
+      }, []);
   }
 
-  public to(version: Orderer<any>, inclusive: boolean = true): Text {
-    return new Text(
-      version,
-      this.map.to(version, inclusive),
-    );
+  public to(version: Orderer<any>, inclusive: boolean = true): OrderedOperations[] {
+    return this
+      .map.to(version, inclusive)
+      .reduce((accumulator, operations, order) => {
+        accumulator.push({operations, order});
+        return  accumulator;
+      }, []);
   }
 }

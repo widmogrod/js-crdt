@@ -36,10 +36,20 @@ class Text {
         }, accumulator);
     }
     from(version, inclusive = true) {
-        return new Text(version, this.map.from(version, inclusive));
+        return this
+            .map.from(version, inclusive)
+            .reduce((accumulator, operations, order) => {
+            accumulator.push({ operations, order });
+            return accumulator;
+        }, []);
     }
     to(version, inclusive = true) {
-        return new Text(version, this.map.to(version, inclusive));
+        return this
+            .map.to(version, inclusive)
+            .reduce((accumulator, operations, order) => {
+            accumulator.push({ operations, order });
+            return accumulator;
+        }, []);
     }
 }
 exports.Text = Text;

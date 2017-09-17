@@ -243,13 +243,11 @@ class NaiveArrayList {
         return new NaiveArrayList();
     }
     from(position) {
-        const clone = this.array.slice(0);
-        clone.splice(position);
+        const clone = this.array.slice(position);
         return new NaiveArrayList(clone);
     }
     to(position) {
         const clone = this.array.slice(0, position);
-        clone.splice(position);
         return new NaiveArrayList(clone);
     }
 }
@@ -567,10 +565,20 @@ class Text {
         }, accumulator);
     }
     from(version, inclusive = true) {
-        return new Text(version, this.map.from(version, inclusive));
+        return this
+            .map.from(version, inclusive)
+            .reduce((accumulator, operations, order) => {
+            accumulator.push({ operations, order });
+            return accumulator;
+        }, []);
     }
     to(version, inclusive = true) {
-        return new Text(version, this.map.to(version, inclusive));
+        return this
+            .map.to(version, inclusive)
+            .reduce((accumulator, operations, order) => {
+            accumulator.push({ operations, order });
+            return accumulator;
+        }, []);
     }
 }
 exports.Text = Text;
