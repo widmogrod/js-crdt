@@ -1,6 +1,6 @@
 {
   "name": "js-crdt",
-  "version": "1.5.3",
+  "version": "1.5.4",
   "description": "CRDT Conflict-free Replication Data Type",
   "main": "build/index.js",
   "types": "build/index.d.ts",
