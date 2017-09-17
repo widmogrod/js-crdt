@@ -260,6 +260,16 @@ describe('text.Text', () => {
         let expected = new Selection("new", 4, 2);
         assert.deepEqual(result, expected);
       });
+      it('shoud reduce selection-range to cursor when whole selected text is deleted', () => {
+        let next = doc.next()
+
+        next.apply(new Selection("new", 4, 2));
+        next.apply(new Delete(3, 12));
+
+        let result = getSelection(next, fallback);
+        let expected = new Selection("new", 3, 0);
+        assert.deepEqual(result, expected);
+      });
       it('shoud do not move selection-range when delete done after', () => {
         let next = doc.next()
 

@@ -109,9 +109,13 @@ export function selectionUpdate(selection: Selection, op: Operation): Selection 
         return selection
           .moveRightBy(op.at - selection.at)
           .expandBy(selection.at - op.endsAt);
-      } else {
+      } else if (op.endsAt < selection.at) {
         return selection
           .moveRightBy(-op.length);
+      } else {
+        return selection
+          .moveRightBy(op.at - selection.at)
+          .expandBy(-selection.length);
       }
     } else if (op.at === selection.at) {
       if (selection.isInside(op.endsAt)) {
