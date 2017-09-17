@@ -95,6 +95,14 @@ export function selectionUpdate(selection: Selection, op: Operation): Selection 
       return selection;
     }
 
+    // is after selection:
+    //       sssss
+    //           iii
+    //             iiiiii
+    if (op.at >= selection.endsAt) {
+      return selection;
+    }
+
     // is before selection or on the same position:
     //       sssss
     //       iii
@@ -104,14 +112,7 @@ export function selectionUpdate(selection: Selection, op: Operation): Selection 
       return selection.moveRightBy(op.length);
     }
 
-    // is after selection:
-    //       sssss
-    //             iiii
-    if (op.at > selection.endsAt) {
-      return selection;
-    }
-
-    // is inside selection
+    // is inside selection:
     //       sssss
     //        i
     //           iiii

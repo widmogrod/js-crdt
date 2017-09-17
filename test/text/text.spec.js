@@ -211,6 +211,16 @@ describe('text.Text', () => {
           let expected = new Selection("new", 2, 4);
           assert.deepEqual(result, expected);
         });
+        it('shoud do not move selection-range when insert at the end of selection', () => {
+          let next = doc.next()
+
+          next.apply(new Selection("new", 2, 4));
+          next.apply(new Insert(6, 'abc'));
+
+          let result = getSelection(next, fallback);
+          let expected = new Selection("new", 2, 4);
+          assert.deepEqual(result, expected);
+        });
         it('shoud move selection-range at current position when insert is done on the same position', () => {
           let next = doc.next()
 

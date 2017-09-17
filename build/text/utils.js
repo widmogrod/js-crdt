@@ -83,6 +83,13 @@ function selectionUpdate(selection, op) {
         if (selection.isCursor() && op.at === selection.at) {
             return selection;
         }
+        // is after selection:
+        //       sssss
+        //           iii
+        //             iiiiii
+        if (op.at >= selection.endsAt) {
+            return selection;
+        }
         // is before selection or on the same position:
         //       sssss
         //       iii
@@ -91,13 +98,7 @@ function selectionUpdate(selection, op) {
         if (op.at <= selection.at) {
             return selection.moveRightBy(op.length);
         }
-        // is after selection:
-        //       sssss
-        //             iiii
-        if (op.at > selection.endsAt) {
-            return selection;
-        }
-        // is inside selection
+        // is inside selection:
         //       sssss
         //        i
         //           iiii
