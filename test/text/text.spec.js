@@ -122,70 +122,75 @@ describe('text.Text', () => {
     let fallback = new Selection("new", 0, 0);
 
     describe('selection-cursor', () => {
-      it('shoud fallback to default selection-cursor when there is no operations', () => {
-        let result = getSelection(doc, fallback);
-        let expected = new Selection("new", 0, 0);
-        assert.deepEqual(result, expected);
+      describe('insert', () => {
+        it('shoud fallback to default selection-cursor when there is no operations', () => {
+          let result = getSelection(doc, fallback);
+          let expected = new Selection("new", 0, 0);
+          assert.deepEqual(result, expected);
+        });
+        it('shoud move selection-cursor when insert is done before cursor position', () => {
+          let next = doc.next()
+
+          next.apply(new Selection("new", 2, 0));
+          next.apply(new Insert(1, 'abc'));
+
+          let result = getSelection(next, fallback);
+          let expected = new Selection("new", 5, 0);
+          assert.deepEqual(result, expected);
+        });
+        it('shoud leave selection-cursor at current position when insert is done on the same position', () => {
+          let next = doc.next()
+
+          next.apply(new Selection("new", 1, 0));
+          next.apply(new Insert(1, 'abc'));
+
+          let result = getSelection(next, fallback);
+          let expected = new Selection("new", 1, 0);
+          assert.deepEqual(result, expected);
+        });
       });
-      it('shoud move selection-cursor when insert is done before cursor position', () => {
-        let next = doc.next()
 
-        next.apply(new Selection("new", 2, 0));
-        next.apply(new Insert(1, 'abc'));
+      describe('delete', () => {
+        it('shoud move selection-cursor when delete done before seletion', () => {
+          let next = doc.next()
 
-        let result = getSelection(next, fallback);
-        let expected = new Selection("new", 5, 0);
-        assert.deepEqual(result, expected);
-      });
-      it('shoud leave selection-cursor at current position when insert is done on the same position', () => {
-        let next = doc.next()
+          next.apply(new Selection("new", 4, 0));
+          next.apply(new Delete(0, 2));
 
-        next.apply(new Selection("new", 1, 0));
-        next.apply(new Insert(1, 'abc'));
+          let result = getSelection(next, fallback);
+          let expected = new Selection("new", 2, 0);
+          assert.deepEqual(result, expected);
+        });
+        it('shoud leave selection-cursor at current position when delete is done on the same position', () => {
+          let next = doc.next()
 
-        let result = getSelection(next, fallback);
-        let expected = new Selection("new", 1, 0);
-        assert.deepEqual(result, expected);
-      });
-      it('shoud move selection-cursor when delete done before seletion', () => {
-        let next = doc.next()
+          next.apply(new Selection("new", 4, 0));
+          next.apply(new Delete(4, 2));
 
-        next.apply(new Selection("new", 4, 0));
-        next.apply(new Delete(0, 2));
+          let result = getSelection(next, fallback);
+          let expected = new Selection("new", 4, 0);
+          assert.deepEqual(result, expected);
+        });
+        it('shoud leave selection-cursor at current position when delete is done after cursor position', () => {
+          let next = doc.next()
 
-        let result = getSelection(next, fallback);
-        let expected = new Selection("new", 2, 0);
-        assert.deepEqual(result, expected);
-      });
-      it('shoud leave selection-cursor at current position when delete is done on the same position', () => {
-        let next = doc.next()
+          next.apply(new Selection("new", 4, 0));
+          next.apply(new Delete(5, 2));
 
-        next.apply(new Selection("new", 4, 0));
-        next.apply(new Delete(4, 2));
+          let result = getSelection(next, fallback);
+          let expected = new Selection("new", 4, 0);
+          assert.deepEqual(result, expected);
+        });
+        it('shoud move chose mose recent selection-cursor if available', () => {
+          let next = doc.next()
 
-        let result = getSelection(next, fallback);
-        let expected = new Selection("new", 4, 0);
-        assert.deepEqual(result, expected);
-      });
-      it('shoud leave selection-cursor at current position when delete is done after cursor position', () => {
-        let next = doc.next()
+          next.apply(new Insert(0, 'abc'));
+          next.apply(new Selection("new", 2, 0));
 
-        next.apply(new Selection("new", 4, 0));
-        next.apply(new Delete(5, 2));
-
-        let result = getSelection(next, fallback);
-        let expected = new Selection("new", 4, 0);
-        assert.deepEqual(result, expected);
-      });
-      it('shoud move chose mose recent selection-cursor if available', () => {
-        let next = doc.next()
-
-        next.apply(new Insert(0, 'abc'));
-        next.apply(new Selection("new", 2, 0));
-
-        let result = getSelection(next, fallback);
-        let expected = new Selection("new", 2, 0);
-        assert.deepEqual(result, expected);
+          let result = getSelection(next, fallback);
+          let expected = new Selection("new", 2, 0);
+          assert.deepEqual(result, expected);
+        });
       });
     });
 
