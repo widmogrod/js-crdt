@@ -90,7 +90,10 @@ export function selectionUpdate(selection: Selection, op: Operation): Selection 
   }
 
   if (op instanceof Insert) {
-    if (op.at <= selection.at) {
+    if (op.at < selection.at) {
+      return selection
+        .moveRightBy(op.length);
+    } else if (op.at === selection.at) {
       return selection.isCursor()
         ? selection
         : selection.moveRightBy(op.length);
