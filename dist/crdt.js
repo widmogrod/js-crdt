@@ -486,6 +486,9 @@ class Selection {
         this.length = length < 0 ? 0 : length;
         this.endsAt = this.at + this.length;
     }
+    isCursor() {
+        return this.length === 0;
+    }
     hasSameOrgin(b) {
         return this.origin === b.origin;
     }
@@ -625,7 +628,7 @@ function selectionUpdate(selection, op) {
         return selection;
     }
     if (op instanceof insert_1.Insert) {
-        if (op.at <= selection.at) {
+        if (op.at < selection.at) {
             return selection
                 .moveRightBy(op.length);
         }

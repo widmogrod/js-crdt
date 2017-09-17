@@ -127,13 +127,14 @@ describe('text.Text', () => {
         let expected = new Selection("new", 0, 0);
         assert.deepEqual(result, expected);
       });
-      it('shoud move selection-cursor when insert done on the same position', () => {
+      it('shoud leave selection-cursor at current position when insert is done on the same position', () => {
         let next = doc.next()
 
-        next.apply(new Insert(0, 'abc'));
+        next.apply(new Selection("new", 1, 0));
+        next.apply(new Insert(1, 'abc'));
 
         let result = getSelection(next, fallback);
-        let expected = new Selection("new", 3, 0);
+        let expected = new Selection("new", 1, 0);
         assert.deepEqual(result, expected);
       });
       it('shoud move selection-cursor when delete done before seletion', () => {

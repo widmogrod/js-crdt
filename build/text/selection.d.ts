@@ -4,6 +4,7 @@ export declare class Selection {
     length: number;
     endsAt: number;
     constructor(origin: string, at: number, length: number);
+    isCursor(): boolean;
     hasSameOrgin(b: Selection): boolean;
     moveRightBy(step: number): Selection;
     expandBy(length: number): Selection;

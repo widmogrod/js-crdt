@@ -80,7 +80,7 @@ function selectionUpdate(selection, op) {
         return selection;
     }
     if (op instanceof insert_1.Insert) {
-        if (op.at <= selection.at) {
+        if (op.at < selection.at) {
             return selection
                 .moveRightBy(op.length);
         }
