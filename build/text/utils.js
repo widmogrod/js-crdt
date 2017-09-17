@@ -114,8 +114,9 @@ function selectionUpdate(selection, op) {
                 .expandBy(selection.at - op.endsAt);
         }
         else if (selection.isInside(op.at)) {
-            return selection
-                .expandBy(op.at - selection.endsAt);
+            return selection.isInside(op.endsAt)
+                ? selection.expandBy(op.endsAt - selection.endsAt)
+                : selection.expandBy(selection.endsAt - op.at);
         }
         return selection;
     }

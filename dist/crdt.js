@@ -663,7 +663,7 @@ function selectionUpdate(selection, op) {
         }
         else if (selection.isInside(op.at)) {
             return selection
-                .expandBy(op.at - selection.endsAt);
+                .expandBy(-op.length);
         }
         return selection;
     }
