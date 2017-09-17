@@ -79,18 +79,29 @@ function selectionUpdate(selection, op) {
         return selection;
     }
     if (op instanceof insert_1.Insert) {
-        if (op.at < selection.at) {
+        // Don't move cursor when insert is done at the same position
+        if (selection.isCursor() && op.at === selection.at) {
+            return selection;
+        }
+        // is before selection or on the same position:
+        //       sssss
+        //       iii
+        // iiii
+        //  iiiiii
+        if (op.at <= selection.at) {
             return selection.moveRightBy(op.length);
         }
-        else if (op.at === selection.at) {
-            return selection.isCursor()
-                ? selection
-                : selection.moveRightBy(op.length);
+        // is after selection:
+        //       sssss
+        //             iiii
+        if (op.at > selection.endsAt) {
+            return selection;
         }
-        else if (selection.isInside(op.at)) {
-            return selection.expandBy(op.length);
-        }
-        return selection;
+        // is inside selection
+        //       sssss
+        //        i
+        //           iiii
+        return selection.expandBy(op.length);
     }
     if (op instanceof delete_1.Delete) {
         // is before selection:

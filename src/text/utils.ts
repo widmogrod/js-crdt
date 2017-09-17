@@ -90,17 +90,32 @@ export function selectionUpdate(selection: Selection, op: Operation): Selection 
   }
 
   if (op instanceof Insert) {
-    if (op.at < selection.at) {
-      return selection.moveRightBy(op.length);
-    } else if (op.at === selection.at) {
-      return selection.isCursor()
-        ? selection
-        : selection.moveRightBy(op.length);
-    } else if (selection.isInside(op.at)) {
-      return selection.expandBy(op.length);
+    // Don't move cursor when insert is done at the same position
+    if (selection.isCursor() && op.at === selection.at) {
+      return selection;
     }
 
-    return selection;
+    // is before selection or on the same position:
+    //       sssss
+    //       iii
+    // iiii
+    //  iiiiii
+    if (op.at <= selection.at) {
+      return selection.moveRightBy(op.length);
+    }
+
+    // is after selection:
+    //       sssss
+    //             iiii
+    if (op.at > selection.endsAt) {
+      return selection;
+    }
+
+    // is inside selection
+    //       sssss
+    //        i
+    //           iiii
+    return selection.expandBy(op.length);
   }
 
   if (op instanceof Delete) {
