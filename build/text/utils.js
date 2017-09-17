@@ -80,8 +80,7 @@ function selectionUpdate(selection, op) {
     }
     if (op instanceof insert_1.Insert) {
         if (op.at < selection.at) {
-            return selection
-                .moveRightBy(op.length);
+            return selection.moveRightBy(op.length);
         }
         else if (op.at === selection.at) {
             return selection.isCursor()
@@ -89,8 +88,7 @@ function selectionUpdate(selection, op) {
                 : selection.moveRightBy(op.length);
         }
         else if (selection.isInside(op.at)) {
-            return selection
-                .expandBy(op.length);
+            return selection.expandBy(op.length);
         }
         return selection;
     }
@@ -107,9 +105,14 @@ function selectionUpdate(selection, op) {
             }
         }
         else if (op.at === selection.at) {
-            return selection.isCursor()
-                ? selection
-                : selection.moveRightBy(-op.length);
+            if (selection.isInside(op.endsAt)) {
+                return selection
+                    .moveRightBy(op.at - selection.at)
+                    .expandBy(selection.at - op.endsAt);
+            }
+            else {
+                return selection;
+            }
         }
         else if (selection.isInside(op.at)) {
             return selection

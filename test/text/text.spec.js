@@ -234,7 +234,7 @@ describe('text.Text', () => {
         let next = doc.next()
 
         next.apply(new Selection("new", 2, 6));
-        next.apply(new Delete(3, 2));
+        next.apply(new Delete(2, 2));
 
         let result = getSelection(next, fallback);
         let expected = new Selection("new", 2, 4);
