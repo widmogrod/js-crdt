@@ -116,7 +116,7 @@ function selectionUpdate(selection, op) {
         }
         else if (selection.isInside(op.at)) {
             return selection
-                .expandBy(-op.length);
+                .expandBy(op.at - selection.endsAt);
         }
         return selection;
     }

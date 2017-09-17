@@ -250,6 +250,16 @@ describe('text.Text', () => {
         let expected = new Selection("new", 2, 4);
         assert.deepEqual(result, expected);
       });
+      it('shoud reduce selection-range when delete starts inside selection but ends outside of it', () => {
+        let next = doc.next()
+
+        next.apply(new Selection("new", 4, 8));
+        next.apply(new Delete(6, 12));
+
+        let result = getSelection(next, fallback);
+        let expected = new Selection("new", 4, 2);
+        assert.deepEqual(result, expected);
+      });
       it('shoud do not move selection-range when delete done after', () => {
         let next = doc.next()
 

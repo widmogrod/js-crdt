@@ -123,7 +123,7 @@ export function selectionUpdate(selection: Selection, op: Operation): Selection 
       }
     } else if (selection.isInside(op.at)) {
       return selection
-        .expandBy(-op.length);
+        .expandBy(op.at - selection.endsAt);
     }
 
     return selection;
