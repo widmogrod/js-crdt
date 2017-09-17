@@ -608,8 +608,7 @@ function getSelections(text, fallback) {
         return oo.operations.reduce((map, o) => {
             return map.reduce((map, s, key) => {
                 if (o instanceof selection_1.Selection) {
-                    const xxx = map.get(o.origin);
-                    if (!xxx) {
+                    if (!map.get(o.origin)) {
                         return map.set(o.origin, o);
                     }
                 }

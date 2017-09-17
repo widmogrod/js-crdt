@@ -237,7 +237,7 @@ describe('text.Text', () => {
     let doc = createFromOrderer(createOrderer('a'));
     let fallback = new Selection("new", 0, 0);
 
-    it('should return all selections', () => {
+    it('should return all selections but aggregated to latest', () => {
       let next = doc.next()
 
       next.apply(new Selection("a", 4, 2));
@@ -251,6 +251,24 @@ describe('text.Text', () => {
         "a": new Selection("a", 4, 2),
         "b": new Selection("b", 1, 1),
         "c": new Selection("c", 1, 1),
+      };
+
+      assert.deepEqual(result.data, expected);
+    });
+    it('should expand range of selection-ranges when insert done inside them', () => {
+      let next = doc.next()
+
+      next.apply(new Selection("a", 4, 2));
+      next.apply(new Selection("b", 4, 2));
+      next.apply(new Selection("c", 4, 2));
+      next.apply(new Insert(5, 'abc'));
+
+      let result = getSelections(next, fallback);
+      let expected = {
+        "new": new Selection("new", 0, 0),
+        "a": new Selection("a", 4, 5),
+        "b": new Selection("b", 4, 5),
+        "c": new Selection("c", 4, 5),
       };
 
       assert.deepEqual(result.data, expected);

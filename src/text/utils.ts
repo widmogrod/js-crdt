@@ -68,8 +68,7 @@ export function getSelections(text: Text, fallback: Selection): SelectionMap<str
     return oo.operations.reduce((map: SelectionMap<string, Selection>, o: Operation) => {
       return map.reduce((map: SelectionMap<string, Selection>, s: Selection, key: string) => {
         if (o instanceof Selection) {
-          const xxx = map.get(o.origin);
-          if (!xxx) {
+          if (!map.get(o.origin)) {
             return map.set(o.origin, o);
           }
         }
