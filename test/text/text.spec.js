@@ -122,173 +122,203 @@ describe('text.Text', () => {
     let fallback = new Selection("new", 0, 0);
 
     describe('selection-cursor', () => {
-      it('shoud fallback to default selection-cursor when there is no operations', () => {
-        let result = getSelection(doc, fallback);
-        let expected = new Selection("new", 0, 0);
-        assert.deepEqual(result, expected);
+      describe('insert', () => {
+        it('shoud fallback to default selection-cursor when there is no operations', () => {
+          let result = getSelection(doc, fallback);
+          let expected = new Selection("new", 0, 0);
+          assert.deepEqual(result, expected);
+        });
+        it('shoud move selection-cursor when insert is done before cursor position', () => {
+          let next = doc.next()
+
+          next.apply(new Selection("new", 2, 0));
+          next.apply(new Insert(1, 'abc'));
+
+          let result = getSelection(next, fallback);
+          let expected = new Selection("new", 5, 0);
+          assert.deepEqual(result, expected);
+        });
+        it('shoud leave selection-cursor at current position when insert is done on the same position', () => {
+          let next = doc.next()
+
+          next.apply(new Selection("new", 1, 0));
+          next.apply(new Insert(1, 'abc'));
+
+          let result = getSelection(next, fallback);
+          let expected = new Selection("new", 1, 0);
+          assert.deepEqual(result, expected);
+        });
       });
-      it('shoud move selection-cursor when insert is done before cursor position', () => {
-        let next = doc.next()
 
-        next.apply(new Selection("new", 2, 0));
-        next.apply(new Insert(1, 'abc'));
+      describe('delete', () => {
+        it('shoud move selection-cursor when delete done before seletion', () => {
+          let next = doc.next()
 
-        let result = getSelection(next, fallback);
-        let expected = new Selection("new", 5, 0);
-        assert.deepEqual(result, expected);
-      });
-      it('shoud leave selection-cursor at current position when insert is done on the same position', () => {
-        let next = doc.next()
+          next.apply(new Selection("new", 4, 0));
+          next.apply(new Delete(0, 2));
 
-        next.apply(new Selection("new", 1, 0));
-        next.apply(new Insert(1, 'abc'));
+          let result = getSelection(next, fallback);
+          let expected = new Selection("new", 2, 0);
+          assert.deepEqual(result, expected);
+        });
+        it('shoud leave selection-cursor at current position when delete is done on the same position', () => {
+          let next = doc.next()
 
-        let result = getSelection(next, fallback);
-        let expected = new Selection("new", 1, 0);
-        assert.deepEqual(result, expected);
-      });
-      it('shoud move selection-cursor when delete done before seletion', () => {
-        let next = doc.next()
+          next.apply(new Selection("new", 4, 0));
+          next.apply(new Delete(4, 2));
 
-        next.apply(new Selection("new", 4, 0));
-        next.apply(new Delete(0, 2));
+          let result = getSelection(next, fallback);
+          let expected = new Selection("new", 4, 0);
+          assert.deepEqual(result, expected);
+        });
+        it('shoud leave selection-cursor at current position when delete is done after cursor position', () => {
+          let next = doc.next()
 
-        let result = getSelection(next, fallback);
-        let expected = new Selection("new", 2, 0);
-        assert.deepEqual(result, expected);
-      });
-      it('shoud leave selection-cursor at current position when delete is done on the same position', () => {
-        let next = doc.next()
+          next.apply(new Selection("new", 4, 0));
+          next.apply(new Delete(5, 2));
 
-        next.apply(new Selection("new", 4, 0));
-        next.apply(new Delete(4, 2));
+          let result = getSelection(next, fallback);
+          let expected = new Selection("new", 4, 0);
+          assert.deepEqual(result, expected);
+        });
+        it('shoud move chose mose recent selection-cursor if available', () => {
+          let next = doc.next()
 
-        let result = getSelection(next, fallback);
-        let expected = new Selection("new", 4, 0);
-        assert.deepEqual(result, expected);
-      });
-      it('shoud leave selection-cursor at current position when delete is done after cursor position', () => {
-        let next = doc.next()
+          next.apply(new Insert(0, 'abc'));
+          next.apply(new Selection("new", 2, 0));
 
-        next.apply(new Selection("new", 4, 0));
-        next.apply(new Delete(5, 2));
-
-        let result = getSelection(next, fallback);
-        let expected = new Selection("new", 4, 0);
-        assert.deepEqual(result, expected);
-      });
-      it('shoud move chose mose recent selection-cursor if available', () => {
-        let next = doc.next()
-
-        next.apply(new Insert(0, 'abc'));
-        next.apply(new Selection("new", 2, 0));
-
-        let result = getSelection(next, fallback);
-        let expected = new Selection("new", 2, 0);
-        assert.deepEqual(result, expected);
+          let result = getSelection(next, fallback);
+          let expected = new Selection("new", 2, 0);
+          assert.deepEqual(result, expected);
+        });
       });
     });
 
     describe('selection-range', () => {
-      it('shoud move selection-range when insert done before selection', () => {
-        let next = doc.next()
+      describe('insert', () => {
+        it('shoud move selection-range when insert done before selection', () => {
+          let next = doc.next()
 
-        next.apply(new Selection("new", 5, 4));
-        next.apply(new Insert(1, 'abc'));
+          next.apply(new Selection("new", 5, 4));
+          next.apply(new Insert(1, 'abc'));
 
-        let result = getSelection(next, fallback);
-        let expected = new Selection("new", 8, 4);
-        assert.deepEqual(result, expected);
+          let result = getSelection(next, fallback);
+          let expected = new Selection("new", 8, 4);
+          assert.deepEqual(result, expected);
+        });
+        it('shoud do not move selection-range when insert done after selection', () => {
+          let next = doc.next()
+
+          next.apply(new Selection("new", 2, 4));
+          next.apply(new Insert(10, 'abc'));
+
+          let result = getSelection(next, fallback);
+          let expected = new Selection("new", 2, 4);
+          assert.deepEqual(result, expected);
+        });
+        it('shoud do not move selection-range when insert at the end of selection', () => {
+          let next = doc.next()
+
+          next.apply(new Selection("new", 2, 4));
+          next.apply(new Insert(6, 'abc'));
+
+          let result = getSelection(next, fallback);
+          let expected = new Selection("new", 2, 4);
+          assert.deepEqual(result, expected);
+        });
+        it('shoud move selection-range at current position when insert is done on the same position', () => {
+          let next = doc.next()
+
+          next.apply(new Selection("new", 5, 4));
+          next.apply(new Insert(5, 'abc'));
+
+          let result = getSelection(next, fallback);
+          let expected = new Selection("new", 8, 4);
+          assert.deepEqual(result, expected);
+        });
+        it('shoud expand selection-range when insert done between selection', () => {
+          let next = doc.next()
+
+          next.apply(new Selection("new", 2, 4));
+          next.apply(new Insert(3, 'abc'));
+
+          let result = getSelection(next, fallback);
+          let expected = new Selection("new", 2, 7);
+          assert.deepEqual(result, expected);
+        });
       });
-      it('shoud move selection-range at current position when insert is done on the same position', () => {
-        let next = doc.next()
 
-        next.apply(new Selection("new", 5, 4));
-        next.apply(new Insert(5, 'abc'));
+      describe('delete', () => {
+        it('shoud collaps selection-range when delete done between selection', () => {
+          let next = doc.next()
 
-        let result = getSelection(next, fallback);
-        let expected = new Selection("new", 8, 4);
-        assert.deepEqual(result, expected);
-      });
-      it('shoud move selection-range when insert done between selection', () => {
-        let next = doc.next()
+          next.apply(new Selection("new", 2, 6));
+          next.apply(new Delete(2, 2));
 
-        next.apply(new Selection("new", 2, 4));
-        next.apply(new Insert(3, 'abc'));
+          let result = getSelection(next, fallback);
+          let expected = new Selection("new", 2, 4);
+          assert.deepEqual(result, expected);
+        });
+        it('shoud move and reduce selection-range when delete done before selection but ends inside selection', () => {
+          let next = doc.next()
 
-        let result = getSelection(next, fallback);
-        let expected = new Selection("new", 2, 7);
-        assert.deepEqual(result, expected);
-      });
-      it('shoud do not move selection-range when insert done after selection', () => {
-        let next = doc.next()
+          next.apply(new Selection("new", 4, 8));
+          next.apply(new Delete(2, 6));
 
-        next.apply(new Selection("new", 2, 4));
-        next.apply(new Insert(10, 'abc'));
+          let result = getSelection(next, fallback);
+          let expected = new Selection("new", 2, 4);
+          assert.deepEqual(result, expected);
+        });
+        it('shoud reduce selection-range when delete starts inside selection but ends outside of it', () => {
+          let next = doc.next()
 
-        let result = getSelection(next, fallback);
-        let expected = new Selection("new", 2, 4);
-        assert.deepEqual(result, expected);
-      });
-      it('shoud collaps selection-range when delete done between selection', () => {
-        let next = doc.next()
+          next.apply(new Selection("new", 4, 3));
+          next.apply(new Delete(5, 5));
 
-        next.apply(new Selection("new", 2, 6));
-        next.apply(new Delete(2, 2));
+          let result = getSelection(next, fallback);
+          let expected = new Selection("new", 4, 1);
+          assert.deepEqual(result, expected);
+        });
+        it('shoud reduce selection-range to cursor when whole selected text is deleted', () => {
+          let next = doc.next()
 
-        let result = getSelection(next, fallback);
-        let expected = new Selection("new", 2, 4);
-        assert.deepEqual(result, expected);
-      });
-      it('shoud move and reduce selection-range when delete done before selection but ends inside selection', () => {
-        let next = doc.next()
+          next.apply(new Selection("new", 4, 2));
+          next.apply(new Delete(4, 2));
 
-        next.apply(new Selection("new", 4, 8));
-        next.apply(new Delete(2, 6));
+          let result = getSelection(next, fallback);
+          let expected = new Selection("new", 4, 0);
+          assert.deepEqual(result, expected);
+        });
+        it('shoud reduce selection-range to cursor and move it to deletion position when whole selected text is deleted outside selection', () => {
+          let next = doc.next()
 
-        let result = getSelection(next, fallback);
-        let expected = new Selection("new", 2, 4);
-        assert.deepEqual(result, expected);
-      });
-      it('shoud reduce selection-range when delete starts inside selection but ends outside of it', () => {
-        let next = doc.next()
+          next.apply(new Selection("new", 4, 2));
+          next.apply(new Delete(2, 8));
 
-        next.apply(new Selection("new", 4, 8));
-        next.apply(new Delete(6, 12));
+          let result = getSelection(next, fallback);
+          let expected = new Selection("new", 2, 0);
+          assert.deepEqual(result, expected);
+        });
+        it('shoud do not move selection-range when delete done after', () => {
+          let next = doc.next()
 
-        let result = getSelection(next, fallback);
-        let expected = new Selection("new", 4, 2);
-        assert.deepEqual(result, expected);
-      });
-      it('shoud reduce selection-range to cursor when whole selected text is deleted', () => {
-        let next = doc.next()
+          next.apply(new Selection("new", 4, 2));
+          next.apply(new Delete(9, 2));
 
-        next.apply(new Selection("new", 4, 2));
-        next.apply(new Delete(4, 2));
+          let result = getSelection(next, fallback);
+          let expected = new Selection("new", 4, 2);
+          assert.deepEqual(result, expected);
+        });
+        it('shoud move selection-range when delete done before selection', () => {
+          let next = doc.next()
 
-        let result = getSelection(next, fallback);
-        let expected = new Selection("new", 4, 0);
-        assert.deepEqual(result, expected);
-      });
-      it('shoud reduce selection-range to cursor and move it to deletion position when whole selected text is deleted', () => {
-        let next = doc.next()
+          next.apply(new Selection("new", 4, 2));
+          next.apply(new Delete(1, 2));
 
-        next.apply(new Selection("new", 4, 2));
-        next.apply(new Delete(2, 8));
-
-        let result = getSelection(next, fallback);
-        let expected = new Selection("new", 2, 0);
-        assert.deepEqual(result, expected);
-      });
-      it('shoud do not move selection-range when delete done after', () => {
-        let next = doc.next()
-
-        next.apply(new Selection("new", 4, 2));
-        next.apply(new Delete(9, 2));
-
-        let result = getSelection(next, fallback);
-        let expected = new Selection("new", 4, 2);
-        assert.deepEqual(result, expected);
+          let result = getSelection(next, fallback);
+          let expected = new Selection("new", 2, 2);
+          assert.deepEqual(result, expected);
+        });
       });
     });
   });

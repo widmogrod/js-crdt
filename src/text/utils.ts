@@ -90,42 +90,65 @@ export function selectionUpdate(selection: Selection, op: Operation): Selection 
   }
 
   if (op instanceof Insert) {
-    if (op.at < selection.at) {
-      return selection.moveRightBy(op.length);
-    } else if (op.at === selection.at) {
-      return selection.isCursor()
-        ? selection
-        : selection.moveRightBy(op.length);
-    } else if (selection.isInside(op.at)) {
-      return selection.expandBy(op.length);
+    // Don't move cursor when insert is done at the same position
+    if (selection.isCursor() && op.at === selection.at) {
+      return selection;
     }
 
-    return selection;
+    // is after selection:
+    //       sssss
+    //           iii
+    //             iiiiii
+    if (op.at >= selection.endsAt) {
+      return selection;
+    }
+
+    // is before selection or on the same position:
+    //       sssss
+    //       iii
+    // iiii
+    //  iiiiii
+    if (op.at <= selection.at) {
+      return selection.moveRightBy(op.length);
+    }
+
+    // is inside selection:
+    //       sssss
+    //        i
+    //           iiii
+    return selection.expandBy(op.length);
   }
 
   if (op instanceof Delete) {
-    if (op.at < selection.at) {
-      if (selection.isInside(op.endsAt)) {
-        return selection
-          .moveRightBy(op.at - selection.at)
-          .expandBy(selection.at - op.endsAt);
-      } else if (op.endsAt < selection.at) {
-        return selection
-          .moveRightBy(-op.length);
-      } else {
-        return selection
-          .moveRightBy(op.at - selection.at)
-          .expandBy(-selection.length);
-      }
-    } else if (op.at === selection.at) {
-      return selection
-        .expandBy(selection.at - op.endsAt);
-    } else if (selection.isInside(op.at)) {
-      return selection
-        .expandBy(op.at - selection.endsAt);
+    // is before selection:
+    //       ssssss
+    //  ddd
+    if (op.endsAt < selection.at) {
+      return selection.moveRightBy(-op.length);
     }
 
-    return selection;
+    // is after selection:
+    //       ssssss
+    //               ddddd
+    if (op.at > selection.endsAt) {
+      return selection;
+    }
+
+    // starts inside selection block:
+    //       ssssss
+    //       dddddddddd
+    //       ddd
+    //         ddd
+    //         ddddddddd
+    if (op.at >= selection.at) {
+      return selection.expandBy(-Math.min(selection.endsAt - op.at, op.length));
+    }
+
+    // ends inside selection:
+    //       ssssss
+    //     dddd
+    //   dddddddd
+    return selection.expandBy(selection.at - op.endsAt).moveRightBy(op.at - selection.at);
   }
 
   return selection;

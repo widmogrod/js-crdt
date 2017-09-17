@@ -79,45 +79,58 @@ function selectionUpdate(selection, op) {
         return selection;
     }
     if (op instanceof insert_1.Insert) {
-        if (op.at < selection.at) {
+        // Don't move cursor when insert is done at the same position
+        if (selection.isCursor() && op.at === selection.at) {
+            return selection;
+        }
+        // is after selection:
+        //       sssss
+        //           iii
+        //             iiiiii
+        if (op.at >= selection.endsAt) {
+            return selection;
+        }
+        // is before selection or on the same position:
+        //       sssss
+        //       iii
+        // iiii
+        //  iiiiii
+        if (op.at <= selection.at) {
             return selection.moveRightBy(op.length);
         }
-        else if (op.at === selection.at) {
-            return selection.isCursor()
-                ? selection
-                : selection.moveRightBy(op.length);
-        }
-        else if (selection.isInside(op.at)) {
-            return selection.expandBy(op.length);
-        }
-        return selection;
+        // is inside selection:
+        //       sssss
+        //        i
+        //           iiii
+        return selection.expandBy(op.length);
     }
     if (op instanceof delete_1.Delete) {
-        if (op.at < selection.at) {
-            if (selection.isInside(op.endsAt)) {
-                return selection
-                    .moveRightBy(op.at - selection.at)
-                    .expandBy(selection.at - op.endsAt);
-            }
-            else if (op.endsAt < selection.at) {
-                return selection
-                    .moveRightBy(-op.length);
-            }
-            else {
-                return selection
-                    .moveRightBy(op.at - selection.at)
-                    .expandBy(-selection.length);
-            }
+        // is before selection:
+        //       ssssss
+        //  ddd
+        if (op.endsAt < selection.at) {
+            return selection.moveRightBy(-op.length);
         }
-        else if (op.at === selection.at) {
-            return selection
-                .expandBy(selection.at - op.endsAt);
+        // is after selection:
+        //       ssssss
+        //               ddddd
+        if (op.at > selection.endsAt) {
+            return selection;
         }
-        else if (selection.isInside(op.at)) {
-            return selection
-                .expandBy(op.at - selection.endsAt);
+        // starts inside selection block:
+        //       ssssss
+        //       dddddddddd
+        //       ddd
+        //         ddd
+        //         ddddddddd
+        if (op.at >= selection.at) {
+            return selection.expandBy(-Math.min(selection.endsAt - op.at, op.length));
         }
-        return selection;
+        // ends inside selection:
+        //       ssssss
+        //     dddd
+        //   dddddddd
+        return selection.expandBy(selection.at - op.endsAt).moveRightBy(op.at - selection.at);
     }
     return selection;
 }
