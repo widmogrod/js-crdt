@@ -10,6 +10,9 @@ class Selection {
         this.length = length < 0 ? 0 : length;
         this.endsAt = this.at + this.length;
     }
+    isCursor() {
+        return this.length === 0;
+    }
     hasSameOrgin(b) {
         return this.origin === b.origin;
     }

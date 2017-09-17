@@ -68,8 +68,7 @@ export function getSelections(text: Text, fallback: Selection): SelectionMap<str
     return oo.operations.reduce((map: SelectionMap<string, Selection>, o: Operation) => {
       return map.reduce((map: SelectionMap<string, Selection>, s: Selection, key: string) => {
         if (o instanceof Selection) {
-          const xxx = map.get(o.origin);
-          if (!xxx) {
+          if (!map.get(o.origin)) {
             return map.set(o.origin, o);
           }
         }
@@ -91,30 +90,39 @@ export function selectionUpdate(selection: Selection, op: Operation): Selection 
   }
 
   if (op instanceof Insert) {
-    if (op.at <= selection.at) {
-      return selection
-        .moveRightBy(op.length);
+    if (op.at < selection.at) {
+      return selection.moveRightBy(op.length);
+    } else if (op.at === selection.at) {
+      return selection.isCursor()
+        ? selection
+        : selection.moveRightBy(op.length);
     } else if (selection.isInside(op.at)) {
-      return selection
-        .expandBy(op.length);
+      return selection.expandBy(op.length);
     }
 
     return selection;
   }
 
   if (op instanceof Delete) {
-    if (op.at <= selection.at) {
+    if (op.at < selection.at) {
       if (selection.isInside(op.endsAt)) {
         return selection
           .moveRightBy(op.at - selection.at)
           .expandBy(selection.at - op.endsAt);
-      } else {
+      } else if (op.endsAt < selection.at) {
         return selection
           .moveRightBy(-op.length);
+      } else {
+        return selection
+          .moveRightBy(op.at - selection.at)
+          .expandBy(-selection.length);
       }
+    } else if (op.at === selection.at) {
+      return selection
+        .expandBy(selection.at - op.endsAt);
     } else if (selection.isInside(op.at)) {
       return selection
-        .expandBy(-op.length);
+        .expandBy(op.at - selection.endsAt);
     }
 
     return selection;

@@ -486,6 +486,9 @@ class Selection {
         this.length = length < 0 ? 0 : length;
         this.endsAt = this.at + this.length;
     }
+    isCursor() {
+        return this.length === 0;
+    }
     hasSameOrgin(b) {
         return this.origin === b.origin;
     }
@@ -605,8 +608,7 @@ function getSelections(text, fallback) {
         return oo.operations.reduce((map, o) => {
             return map.reduce((map, s, key) => {
                 if (o instanceof selection_1.Selection) {
-                    const xxx = map.get(o.origin);
-                    if (!xxx) {
+                    if (!map.get(o.origin)) {
                         return map.set(o.origin, o);
                     }
                 }
@@ -625,31 +627,43 @@ function selectionUpdate(selection, op) {
         return selection;
     }
     if (op instanceof insert_1.Insert) {
-        if (op.at <= selection.at) {
-            return selection
-                .moveRightBy(op.length);
+        if (op.at < selection.at) {
+            return selection.moveRightBy(op.length);
+        }
+        else if (op.at === selection.at) {
+            return selection.isCursor()
+                ? selection
+                : selection.moveRightBy(op.length);
         }
         else if (selection.isInside(op.at)) {
-            return selection
-                .expandBy(op.length);
+            return selection.expandBy(op.length);
         }
         return selection;
     }
     if (op instanceof delete_1.Delete) {
-        if (op.at <= selection.at) {
+        if (op.at < selection.at) {
             if (selection.isInside(op.endsAt)) {
                 return selection
                     .moveRightBy(op.at - selection.at)
                     .expandBy(selection.at - op.endsAt);
             }
-            else {
+            else if (op.endsAt < selection.at) {
                 return selection
                     .moveRightBy(-op.length);
             }
+            else {
+                return selection
+                    .moveRightBy(op.at - selection.at)
+                    .expandBy(-selection.length);
+            }
+        }
+        else if (op.at === selection.at) {
+            return selection
+                .expandBy(selection.at - op.endsAt);
         }
         else if (selection.isInside(op.at)) {
             return selection
-                .expandBy(-op.length);
+                .expandBy(op.at - selection.endsAt);
         }
         return selection;
     }

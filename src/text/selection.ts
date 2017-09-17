@@ -7,6 +7,10 @@ export class Selection {
     this.endsAt = this.at + this.length;
   }
 
+  public isCursor(): boolean {
+    return this.length === 0;
+  }
+
   public hasSameOrgin(b: Selection): boolean {
     return this.origin === b.origin;
   }
