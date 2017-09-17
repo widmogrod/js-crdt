@@ -118,13 +118,8 @@ export function selectionUpdate(selection: Selection, op: Operation): Selection 
           .expandBy(-selection.length);
       }
     } else if (op.at === selection.at) {
-      if (selection.isInside(op.endsAt)) {
-        return selection
-          .moveRightBy(op.at - selection.at)
-          .expandBy(selection.at - op.endsAt);
-      } else {
-        return selection;
-      }
+      return selection
+        .expandBy(selection.at - op.endsAt);
     } else if (selection.isInside(op.at)) {
       return selection
         .expandBy(op.at - selection.endsAt);

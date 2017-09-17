@@ -264,10 +264,20 @@ describe('text.Text', () => {
         let next = doc.next()
 
         next.apply(new Selection("new", 4, 2));
-        next.apply(new Delete(3, 12));
+        next.apply(new Delete(4, 2));
 
         let result = getSelection(next, fallback);
-        let expected = new Selection("new", 3, 0);
+        let expected = new Selection("new", 4, 0);
+        assert.deepEqual(result, expected);
+      });
+      it('shoud reduce selection-range to cursor and move it to deletion position when whole selected text is deleted', () => {
+        let next = doc.next()
+
+        next.apply(new Selection("new", 4, 2));
+        next.apply(new Delete(2, 8));
+
+        let result = getSelection(next, fallback);
+        let expected = new Selection("new", 2, 0);
         assert.deepEqual(result, expected);
       });
       it('shoud do not move selection-range when delete done after', () => {
