@@ -157,6 +157,26 @@ describe('text.Text', () => {
         let expected = new Selection("new", 2, 0);
         assert.deepEqual(result, expected);
       });
+      it('shoud leave selection-cursor at current position when delete is done on the same position', () => {
+        let next = doc.next()
+
+        next.apply(new Selection("new", 4, 0));
+        next.apply(new Delete(4, 2));
+
+        let result = getSelection(next, fallback);
+        let expected = new Selection("new", 4, 0);
+        assert.deepEqual(result, expected);
+      });
+      it('shoud leave selection-cursor at current position when delete is done after cursor position', () => {
+        let next = doc.next()
+
+        next.apply(new Selection("new", 4, 0));
+        next.apply(new Delete(5, 2));
+
+        let result = getSelection(next, fallback);
+        let expected = new Selection("new", 4, 0);
+        assert.deepEqual(result, expected);
+      });
       it('shoud move chose mose recent selection-cursor if available', () => {
         let next = doc.next()
 

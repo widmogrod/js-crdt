@@ -643,7 +643,7 @@ function selectionUpdate(selection, op) {
         return selection;
     }
     if (op instanceof delete_1.Delete) {
-        if (op.at <= selection.at) {
+        if (op.at < selection.at) {
             if (selection.isInside(op.endsAt)) {
                 return selection
                     .moveRightBy(op.at - selection.at)
@@ -653,6 +653,11 @@ function selectionUpdate(selection, op) {
                 return selection
                     .moveRightBy(-op.length);
             }
+        }
+        else if (op.at === selection.at) {
+            return selection.isCursor()
+                ? selection
+                : selection.moveRightBy(-op.length);
         }
         else if (selection.isInside(op.at)) {
             return selection

@@ -106,7 +106,7 @@ export function selectionUpdate(selection: Selection, op: Operation): Selection 
   }
 
   if (op instanceof Delete) {
-    if (op.at <= selection.at) {
+    if (op.at < selection.at) {
       if (selection.isInside(op.endsAt)) {
         return selection
           .moveRightBy(op.at - selection.at)
@@ -115,6 +115,10 @@ export function selectionUpdate(selection: Selection, op: Operation): Selection 
         return selection
           .moveRightBy(-op.length);
       }
+    } else if (op.at === selection.at) {
+      return selection.isCursor()
+        ? selection
+        : selection.moveRightBy(-op.length);
     } else if (selection.isInside(op.at)) {
       return selection
         .expandBy(-op.length);
