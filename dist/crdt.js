@@ -538,12 +538,12 @@ class Text {
     next() {
         return new Text(this.order.next(), this.map);
     }
-    apply(operation) {
+    apply(...ops) {
         let operations = this.map.get(this.order);
         if (!operations) {
             operations = [];
         }
-        operations.push(operation);
+        ops.forEach((op) => operations.push(op));
         this.map = this.map.set(this.order, operations);
         return {
             operations,

@@ -26,14 +26,15 @@ export class Text {
     );
   }
 
-  public apply(operation: Operation): OrderedOperations {
+  public apply(...ops: Operation[]): OrderedOperations {
     let operations = this.map.get(this.order);
 
     if (!operations) {
       operations = [] as Operation[];
     }
 
-    operations.push(operation);
+    ops.forEach((op) => operations.push(op));
+
     this.map = this.map.set(this.order, operations);
 
     return {

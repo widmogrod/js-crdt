@@ -17,7 +17,7 @@ export declare class Text {
     map: OrderedMap<Orderer<any>, Operation[]>;
     constructor(order: Orderer<any>, map: OrderedMap<Orderer<any>, Operation[]>);
     next(): Text;
-    apply(operation: Operation): OrderedOperations;
+    apply(...ops: Operation[]): OrderedOperations;
     mergeOperations(o: OrderedOperations): Text;
     merge(b: Text): Text;
     equal(b: Text): boolean;
