@@ -16,7 +16,7 @@ describe('text.Insert', () => {
         at: -1,
         value: 'abc',
         data: ['1', '2', '3'],
-        expected: ['a','b', 'c', '1', '2', '3']
+        expected: ['a', 'b', 'c', '1', '2', '3']
       },
       'should fill data to position at witch modification was performed': {
         at: 3,
@@ -27,8 +27,8 @@ describe('text.Insert', () => {
       'should populate longer data, without loosing information': {
         at: 2,
         value: 'to',
-        data: ['k','t','o',' ', ' ', 'x'],
-        expected: ['k','t','t', 'o', 'o',' ', ' ', 'x']
+        data: ['k', 't', 'o', ' ', ' ', 'x'],
+        expected: ['k', 't', 't', 'o', 'o',' ', ' ', 'x']
       }
     };
 

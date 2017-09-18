@@ -42,7 +42,14 @@ function operationToArray(data, op) {
 }
 exports.operationToArray = operationToArray;
 function toString(value) {
-    return value.join("");
+    // result.reduce skips undefined values
+    // which for rendering is not good thing
+    let result = "";
+    for (let i = 0, len = value.length; i < len; i++) {
+        const item = value[i];
+        result += ((typeof item === "undefined") ? " " : item);
+    }
+    return result;
 }
 exports.toString = toString;
 function renderString(text) {

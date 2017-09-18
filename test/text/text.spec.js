@@ -117,6 +117,22 @@ describe('text.Text', () => {
     });
   });
 
+  describe("renderString", () => {
+    let doc = createFromOrderer(createOrderer('a'));
+
+    it('should render new line', () => {
+      let next = doc.next();
+      next.apply(new Insert(0, "\n"));
+      assert.equal(renderString(next), "\n");
+    });
+
+    it('should render new line considering position', () => {
+      let next = doc.next();
+      next.apply(new Insert(2, "\n"));
+      assert.equal(renderString(next), "  \n");
+    });
+  });
+
   describe("getSelection", () => {
     let doc = createFromOrderer(createOrderer('a'));
     let fallback = new Selection("new", 0, 0);
