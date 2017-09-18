@@ -7,6 +7,8 @@ export interface OrderedMap<K, V> {
   get?(key: K): V;
   merge(b: OrderedMap<K, V>): OrderedMap<K, V>;
   reduce<R>(fn: (aggregator: R, values: V, key: K) => R, aggregator: R): R;
+  to(key: K, inclusive: boolean): OrderedMap<K, V>;
+  from(key: K, inclusive: boolean): OrderedMap<K, V>;
 }
 
 export interface OrderedOperations {
@@ -15,24 +17,25 @@ export interface OrderedOperations {
 }
 
 export class Text {
-  constructor(public order: Orderer<any>, public setMap: OrderedMap<Orderer<any>, Operation[]>) {}
+  constructor(public order: Orderer<any>, public map: OrderedMap<Orderer<any>, Operation[]>) {}
 
   public next(): Text {
     return new Text(
       this.order.next(),
-      this.setMap,
+      this.map,
     );
   }
 
-  public apply(operation: Operation): OrderedOperations {
-    let operations = this.setMap.get(this.order);
+  public apply(...ops: Operation[]): OrderedOperations {
+    let operations = this.map.get(this.order);
 
     if (!operations) {
       operations = [] as Operation[];
     }
 
-    operations.push(operation);
-    this.setMap = this.setMap.set(this.order, operations);
+    ops.forEach((op) => operations.push(op));
+
+    this.map = this.map.set(this.order, operations);
 
     return {
       operations,
@@ -43,14 +46,14 @@ export class Text {
   public mergeOperations(o: OrderedOperations): Text {
     return new Text(
       merge(this.order, o.order),
-      this.setMap.set(o.order, o.operations),
+      this.map.set(o.order, o.operations),
     );
   }
 
   public merge(b: Text): Text {
     return new Text(
       merge(this.order, b.order),
-      merge(this.setMap, b.setMap),
+      merge(this.map, b.map),
     );
   }
 
@@ -59,8 +62,26 @@ export class Text {
   }
 
   public reduce<R>(fn: (aggregator: R, item: OrderedOperations) => R, accumulator): R {
-    return this.setMap.reduce((accumulator, operations, order) => {
+    return this.map.reduce((accumulator, operations, order) => {
       return fn(accumulator, {operations, order});
     }, accumulator);
+  }
+
+  public from(version: Orderer<any>, inclusive: boolean = true): OrderedOperations[] {
+    return this
+      .map.from(version, inclusive)
+      .reduce((accumulator, operations, order) => {
+        accumulator.push({operations, order});
+        return  accumulator;
+      }, []);
+  }
+
+  public to(version: Orderer<any>, inclusive: boolean = true): OrderedOperations[] {
+    return this
+      .map.to(version, inclusive)
+      .reduce((accumulator, operations, order) => {
+        accumulator.push({operations, order});
+        return  accumulator;
+      }, []);
   }
 }
