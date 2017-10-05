@@ -75,14 +75,14 @@ describe('OrderedMap', () => {
       equal(map.to(a), map0.set(a, 1));
       equal(map.to(b), map0.set(a, 1).set(b, 2));
       equal(map.to(c), map0.set(a, 1).set(b, 2).set(c, 3));
-      equal(map.to(d), map0);
+      equal(map.to(d), map0.set(a, 1).set(b, 2).set(c, 3));
     });
 
     it('should return values to exclusive', () => {
       equal(map.to(a, false), map0);
       equal(map.to(b, false), map0.set(a, 1));
       equal(map.to(c, false), map0.set(a, 1).set(b, 2));
-      equal(map.to(d, false), map0);
+      equal(map.to(d, false), map0.set(a, 1).set(b, 2).set(c, 3));
     });
   });
 });

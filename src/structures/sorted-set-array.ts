@@ -123,7 +123,7 @@ export class SortedSetArray<T extends Item<T>> {
   public from(value: T, inclusive: boolean = true): SortedSetArray<T> {
     return divide(
       0, this.elements.size(), this.elements, value,
-      (item, elements, lower) => this.mempty(),
+      (item, elements, lower) => new SortedSetArray(this.elements.from(lower, inclusive)),
       (item, elements, index) => new SortedSetArray(this.elements.from(index, inclusive)),
     );
   }
@@ -131,7 +131,7 @@ export class SortedSetArray<T extends Item<T>> {
   public to(value: T, inclusive: boolean = true): SortedSetArray<T> {
     return divide(
       0, this.elements.size(), this.elements, value,
-      (item, elements, lower) => this.mempty(),
+      (item, elements, lower) => new SortedSetArray(this.elements.to(lower, inclusive)),
       (item, elements, index) => new SortedSetArray(this.elements.to(index, inclusive)),
     );
   }

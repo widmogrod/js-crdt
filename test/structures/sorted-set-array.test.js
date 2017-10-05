@@ -90,14 +90,14 @@ describe('SortedSetArray', () => {
       assert(s_abc.to(a).equal(s_0.add(a).result));
       assert(s_abc.to(b).equal(s_0.add(a).result.add(b).result));
       assert(s_abc.to(c).equal(s_0.add(a).result.add(b).result.add(c).result));
-      assert(s_abc.to(d).equal(s_0));
+      assert(s_abc.to(d).equal(s_0.add(a).result.add(b).result.add(c).result));
     });
 
     it('should return values to exclusive', () => {
       assert(s_abc.to(a, false).equal(s_0));
       assert(s_abc.to(b, false).equal(s_0.add(a).result));
       assert(s_abc.to(c, false).equal(s_0.add(a).result.add(b).result));
-      assert(s_abc.to(d, false).equal(s_0));
+      assert(s_abc.to(d, false).equal(s_0.add(a).result.add(b).result.add(c).result));
     });
   });
 });

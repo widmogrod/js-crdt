@@ -383,15 +383,17 @@ describe('text.Text', () => {
 
   describe('from-to', () => {
     let doc0 = createFromOrderer(createOrderer('a'));
-    let next = doc0.next()
+    let doc1 = createFromOrderer(createOrderer('x'));
+
+    let next = doc0;
     const a = next.order;
     const x = new Insert(0, 'x');
     next.apply(x);
 
-    next = next.next();
-    const b = next.order;
     const y = new Insert(1, 'y');
-    next.apply(y);
+    doc1.apply(y);
+    next = next.next().merge(doc1);
+    const b = doc1.order;
 
     next = next.next();
     const c = next.order;
@@ -429,14 +431,14 @@ describe('text.Text', () => {
         equalTo(next.to(a), [x]);
         equalTo(next.to(b), [x, y]);
         equalTo(next.to(c), [x, y, z]);
-        equalTo(next.to(d), []);
+        equalTo(next.to(d), [x, y, z]);
       });
 
       it('should return values to exclusive', () => {
         equalTo(next.to(a, false), []);
         equalTo(next.to(b, false), [x]);
         equalTo(next.to(c, false), [x, y]);
-        equalTo(next.to(d, false), []);
+        equalTo(next.to(d, false), [x, y, z]);
       });
     });
   });
