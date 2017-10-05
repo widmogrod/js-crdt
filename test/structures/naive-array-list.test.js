@@ -46,17 +46,17 @@ describe('NaiveArrayList', () => {
       .insert(2, 'c');
 
     it('should return values to inclusive', () => {
-      assert.deepEqual(list.to(3).array, ['a', 'b', 'c']);
-      assert.deepEqual(list.to(2).array, ['a', 'b', 'c']);
-      assert.deepEqual(list.to(1).array, ['a', 'b']);
       assert.deepEqual(list.to(0).array, ['a']);
+      assert.deepEqual(list.to(1).array, ['a', 'b']);
+      assert.deepEqual(list.to(2).array, ['a', 'b', 'c']);
+      assert.deepEqual(list.to(3).array, ['a', 'b', 'c']);
     });
 
     it('should return values to exclusive', () => {
-      assert.deepEqual(list.to(3, false).array, ['a', 'b', 'c']);
-      assert.deepEqual(list.to(2, false).array, ['a', 'b']);
-      assert.deepEqual(list.to(1, false).array, ['a']);
       assert.deepEqual(list.to(0, false).array, []);
+      assert.deepEqual(list.to(1, false).array, ['a']);
+      assert.deepEqual(list.to(2, false).array, ['a', 'b']);
+      assert.deepEqual(list.to(3, false).array, ['a', 'b', 'c']);
     });
   });
 });
