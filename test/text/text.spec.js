@@ -380,4 +380,66 @@ describe('text.Text', () => {
       assert.deepEqual(result.data, expected);
     });
   });
+
+  describe('from-to', () => {
+    let doc0 = createFromOrderer(createOrderer('a'));
+    let doc1 = createFromOrderer(createOrderer('x'));
+
+    let next = doc0;
+    const a = next.order;
+    const x = new Insert(0, 'x');
+    next.apply(x);
+
+    const y = new Insert(1, 'y');
+    doc1.apply(y);
+    next = next.next().merge(doc1);
+    const b = doc1.order;
+
+    next = next.next();
+    const c = next.order;
+    const z = new Insert(2, 'z');
+    next.apply(z);
+
+    next = next.next();
+    const d = next.order;
+
+    function equalTo(a, b) {
+      assert.deepEqual(
+        a.reduce((array, oo) => array.concat(oo.operations), []),
+        b
+      );
+    }
+
+    describe('from', () => {
+      it('should return values from inclusive', () => {
+        equalTo(next.from(a), [x, y, z]);
+        equalTo(next.from(b), [y, z]);
+        equalTo(next.from(c), [z]);
+        equalTo(next.from(d), []);
+      });
+
+      it('should return values from exclusive', () => {
+        equalTo(next.from(a, false), [y, z]);
+        equalTo(next.from(b, false), [z]);
+        equalTo(next.from(c, false), []);
+        equalTo(next.from(d, false), []);
+      });
+    });
+
+    describe('to', () => {
+      it('should return values to inclusive', () => {
+        equalTo(next.to(a), [x]);
+        equalTo(next.to(b), [x, y]);
+        equalTo(next.to(c), [x, y, z]);
+        equalTo(next.to(d), [x, y, z]);
+      });
+
+      it('should return values to exclusive', () => {
+        equalTo(next.to(a, false), []);
+        equalTo(next.to(b, false), [x]);
+        equalTo(next.to(c, false), [x, y]);
+        equalTo(next.to(d, false), [x, y, z]);
+      });
+    });
+  });
 });

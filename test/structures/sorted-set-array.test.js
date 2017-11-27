@@ -16,6 +16,7 @@ describe('SortedSetArray', () => {
   const a = new Cmp('a');
   const b = new Cmp('b');
   const c = new Cmp('c');
+  const d = new Cmp('d');
 
   it('should be immutable', () => {
     const set1 = new SortedSetArray(new NaiveArrayList([]));
@@ -56,5 +57,47 @@ describe('SortedSetArray', () => {
     const s3 = s1.add(b).result.add(c).result;
 
     axioms(assert, s1, s2, s3);
+  });
+
+  describe('from', () => {
+    const s_0 = new SortedSetArray(new NaiveArrayList([]));
+    const s_a = s_0.add(a).result;
+    const s_ab = s_a.add(b).result;
+    const s_abc = s_ab.add(c).result;
+
+    it('should return values from inclusive', () => {
+      assert(s_abc.from(a).equal(s_0.add(a).result.add(b).result.add(c).result))
+      assert(s_abc.from(b).equal(s_0.add(b).result.add(c).result))
+      assert(s_abc.from(c).equal(s_0.add(c).result))
+      assert(s_abc.from(d).equal(s_0))
+    });
+
+    it('should return values from exclusive', () => {
+      assert(s_abc.from(a, false).equal(s_0.add(b).result.add(c).result))
+      assert(s_abc.from(b, false).equal(s_0.add(c).result))
+      assert(s_abc.from(c, false).equal(s_0))
+      assert(s_abc.from(d, false).equal(s_0))
+    });
+  });
+
+  describe('to', () => {
+    const s_0 = new SortedSetArray(new NaiveArrayList([]));
+    const s_a = s_0.add(a).result;
+    const s_ab = s_a.add(b).result;
+    const s_abc = s_ab.add(c).result;
+
+    it('should return values to inclusive', () => {
+      assert(s_abc.to(a).equal(s_0.add(a).result));
+      assert(s_abc.to(b).equal(s_0.add(a).result.add(b).result));
+      assert(s_abc.to(c).equal(s_0.add(a).result.add(b).result.add(c).result));
+      assert(s_abc.to(d).equal(s_0.add(a).result.add(b).result.add(c).result));
+    });
+
+    it('should return values to exclusive', () => {
+      assert(s_abc.to(a, false).equal(s_0));
+      assert(s_abc.to(b, false).equal(s_0.add(a).result));
+      assert(s_abc.to(c, false).equal(s_0.add(a).result.add(b).result));
+      assert(s_abc.to(d, false).equal(s_0.add(a).result.add(b).result.add(c).result));
+    });
   });
 });
