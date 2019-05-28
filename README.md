@@ -1,4 +1,5 @@
 # js-crdt [![Build Status](https://travis-ci.org/widmogrod/js-crdt.svg?branch=master)](https://travis-ci.org/widmogrod/js-crdt)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fwidmogrod%2Fjs-crdt.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fwidmogrod%2Fjs-crdt?ref=badge_shield)
 ## Introduction
 Real time collaboration is a fascinating concept.
 Main purpose of this libriary it to explore applications of data structure called `CRDT` in context of real time collaboration
@@ -35,3 +36,7 @@ npm test
 npm run lint
 npm run dist
 ```
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fwidmogrod%2Fjs-crdt.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fwidmogrod%2Fjs-crdt?ref=badge_large)
